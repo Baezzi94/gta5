@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공주님 클럽 — 사업 발표</title>
+<style>
+  :root{
+    --bg:#0a0a12; --bg2:#12101f; --card:#1a1730;
+    --pink:#ff4d9d; --gold:#ffd24d; --cyan:#4de1ff; --green:#4dff9e;
+    --txt:#f3f0ff; --muted:#9b94c0; --line:#2e2950;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+    background:radial-gradient(1200px 700px at 50% -10%,#241a3d 0%,var(--bg) 60%);
+    color:var(--txt);overflow:hidden;height:100vh;
+  }
+  .deck{height:100vh;width:100vw;position:relative}
+  .slide{
+    position:absolute;inset:0;display:none;flex-direction:column;
+    justify-content:center;align-items:center;padding:5vh 8vw;
+    animation:fade .5s ease;
+  }
+  .slide.active{display:flex}
+  @keyframes fade{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  h1{font-size:clamp(2.2rem,6vw,4.4rem);line-height:1.1;text-align:center;
+     background:linear-gradient(90deg,var(--pink),var(--gold));
+     -webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:1rem}
+  h2{font-size:clamp(1.6rem,4vw,2.8rem);color:var(--gold);margin-bottom:1.5rem;text-align:center}
+  .sub{color:var(--muted);font-size:clamp(1rem,2.2vw,1.4rem);text-align:center;max-width:50ch}
+  .tag{display:inline-block;padding:.35em 1em;border:1px solid var(--pink);border-radius:999px;
+       color:var(--pink);font-size:.9rem;letter-spacing:.1em;margin-bottom:1.5rem;text-transform:uppercase}
+  .grid{display:grid;gap:1rem;width:100%;max-width:1000px}
+  .g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)}
+  .card{background:linear-gradient(160deg,var(--card),var(--bg2));border:1px solid var(--line);
+        border-radius:16px;padding:1.3rem 1.5rem;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+  .card .big{font-size:2rem;font-weight:800;color:var(--cyan)}
+  .card .lbl{color:var(--muted);font-size:.95rem;margin-bottom:.3rem}
+  .pink{color:var(--pink)} .gold{color:var(--gold)} .cyan{color:var(--cyan)} .green{color:var(--green)}
+  table{width:100%;max-width:1050px;border-collapse:collapse;font-size:clamp(.8rem,1.6vw,1.05rem)}
+  th,td{padding:.6em .7em;border-bottom:1px solid var(--line);text-align:center}
+  th{color:var(--gold);font-size:.95em}
+  tr:hover td{background:rgba(255,77,157,.06)}
+  .hl{color:var(--gold);font-weight:700}
+  ul.clean{list-style:none;max-width:780px;width:100%}
+  ul.clean li{padding:.7rem 1rem;margin:.5rem 0;background:var(--card);border-left:3px solid var(--pink);
+              border-radius:8px;font-size:clamp(.95rem,2vw,1.25rem)}
+  .quote{font-size:clamp(1.2rem,3vw,2rem);font-style:italic;text-align:center;max-width:24ch;
+         line-height:1.5;color:var(--txt)}
+  .quote .pink{font-style:normal}
+  .nav{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:14px;align-items:center;z-index:10}
+  .nav button{background:var(--card);color:var(--txt);border:1px solid var(--line);
+              width:46px;height:46px;border-radius:50%;font-size:1.2rem;cursor:pointer;transition:.2s}
+  .nav button:hover{border-color:var(--pink);color:var(--pink)}
+  .counter{color:var(--muted);font-size:.9rem;min-width:54px;text-align:center}
+  .dots{position:fixed;top:20px;right:24px;display:flex;gap:7px;z-index:10}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s}
+  .dot.on{background:var(--pink);transform:scale(1.3)}
+  .foot{position:fixed;bottom:20px;left:24px;color:var(--muted);font-size:.8rem;z-index:10}
+  .note{color:var(--muted);font-size:.8rem;margin-top:1rem;text-align:center}
+  .em{font-size:clamp(1.1rem,2.4vw,1.5rem);color:var(--green);margin-top:1rem;font-weight:700}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- 1 표지 -->
+  <section class="slide active">
+    <div class="tag">CLIMAX 서버 · RP 컨텐츠</div>
+    <h1>🍷 공주님 클럽</h1>
+    <p class="sub">신생서버 선점형 토킹바 사업 — <span class="gold">"여기 들어오면 다 같이 부자된다"</span></p>
+    <p class="em">모두가 부자되는 자가증식 구조</p>
+    <p class="note">사장 : 시진핑</p>
+  </section>
+
+  <!-- 2 기회 -->
+  <section class="slide">
+    <h2>왜 지금, 이 서버인가</h2>
+    <div class="grid g2">
+      <div class="card"><div class="lbl">신생서버</div><div class="big">컨텐츠 갈증</div><p class="sub">뉴비들이 즐길 게 없다 → 흡인력 ↑</p></div>
+      <div class="card"><div class="lbl">부동산 없음</div><div class="big cyan">초기비용 0</div><p class="sub">유휴 공간 점유 + 게릴라 영업</p></div>
+      <div class="card"><div class="lbl">경쟁 부재</div><div class="big gold">선점 효과</div><p class="sub">"원조 토킹바" 포지션 독식</p></div>
+      <div class="card"><div class="lbl">빈집털기 → 인플레</div><div class="big pink">고가 정책 OK</div><p class="sub">통화량 ↑ → 비싸게 받아도 부담 ↓</p></div>
+    </div>
+    <p class="em">🔍 오늘 답사: 경쟁 클럽엔 공주님이 없었다 — 수요는 있는데 공급이 비어있음</p>
+    <p class="note">→ "공주님 확보 능력" 자체가 진입장벽. 우리가 수급만 하면 사실상 무경쟁 독점.</p>
+  </section>
+
+  <!-- 3 수익구조 -->
+  <section class="slide">
+    <h2>💰 수익 구조</h2>
+    <table>
+      <tr><th>항목</th><th>가격</th><th>분배</th></tr>
+      <tr><td>TC (입장료)</td><td>5만</td><td>전액 <span class="hl">운영풀</span> (음료 2잔 포함)</td></tr>
+      <tr><td>대화료</td><td>25만 / 20분</td><td><span class="pink">공주님 15</span> / 운영풀 10</td></tr>
+      <tr><td>2차 (외부)</td><td>100만 / 시간</td><td><span class="pink">공주님 70</span> / 웨이터 5 / 풀 25</td></tr>
+      <tr><td>팁</td><td>자유</td><td><span class="green">받은 사람 100% 개인 (+@)</span></td></tr>
+    </table>
+    <p class="note">운영풀 지분 → 사장 1.2 : 가드 1 : 웨이터 1 (일당 전면 폐지) · 삐끼 = 성과제(손님 3만/명, 영입 1만/타임)</p>
+  </section>
+
+  <!-- 4 공주님 -->
+  <section class="slide">
+    <div class="tag">핵심 자산</div>
+    <h2>👑 공주님은 무조건 후하게</h2>
+    <div class="grid g3">
+      <div class="card"><div class="lbl">풀북 1박</div><div class="big pink">180만</div><p class="sub">15만 × 12타임</p></div>
+      <div class="card"><div class="lbl">팁</div><div class="big green">전액 +@</div><p class="sub">인기 많으면 기본급 이상도!</p></div>
+      <div class="card"><div class="lbl">2차 (선택)</div><div class="big gold">70만 / 건</div><p class="sub">거부권 100% 보장</p></div>
+    </div>
+    <p class="em">인원수와 무관하게 본인 몫 100% 보장 — 안심하고 합류</p>
+  </section>
+
+  <!-- 5 섭외 멘트 -->
+  <section class="slide">
+    <div class="tag">공주님께</div>
+    <p class="quote">"한 타임 20분에 <span class="pink">15만</span>,<br><span class="green">팁은 전부 네 거 (+@)</span>.<br>편하게 4시간에 180만+.<br><span class="gold">여긴 네가 공주님이야.</span>"</p>
+  </section>
+
+  <!-- 6 치트키 -->
+  <section class="slide">
+    <h2>🔑 왜 공주님이 늘수록 다 부자?</h2>
+    <ul class="clean">
+      <li>👑 공주님은 <span class="pink">운영풀 분배에 안 들어감</span> — 대화료를 직접 가져감</li>
+      <li>➕ 공주님 1명 추가 = 풀에 <span class="cyan">돈만 꽂는 황금알 거위 🪿</span> (분배자는 그대로)</li>
+      <li>📈 그래서 공주님 2명→4명에 <span class="gold">사장·가드 수익 거의 2배</span></li>
+      <li>🔁 추천비(영입 1만·손님 3만)로 <span class="green">모두가 사람을 끌어오는 자가증식</span></li>
+    </ul>
+  </section>
+
+  <!-- 7 스케일링 표 -->
+  <section class="slide">
+    <h2>📊 공주님 수별 기대수익 (풀북 1박)</h2>
+    <table>
+      <tr><th>공주님</th><th>스탭(가드/웨)</th><th>운영풀</th><th>🎩 사장/박</th><th>🔫 가드·웨/박</th><th>👑 공주님</th></tr>
+      <tr><td>2</td><td>2 / 1</td><td>300~360만</td><td>86~103만</td><td>71~86만</td><td>180만 +팁</td></tr>
+      <tr><td class="hl">3</td><td>2 / 1</td><td>450~540만</td><td class="hl">129~154만</td><td>107~129만</td><td>180만 +팁</td></tr>
+      <tr><td>4</td><td>2 / 2</td><td>600~720만</td><td>138~166만</td><td>115~138만</td><td>180만 +팁</td></tr>
+      <tr><td class="hl">6</td><td>3 / 2</td><td>900~1,080만</td><td class="hl">174~209만</td><td>145~174만</td><td>180만 +팁</td></tr>
+      <tr><td>8</td><td>4 / 3</td><td>1,200~1,440만</td><td>176~211만</td><td>146~176만</td><td>180만 +팁</td></tr>
+      <tr><td class="gold">12</td><td>6 / 4</td><td>1,800~2,160만</td><td class="gold">193~231만</td><td>161~193만</td><td>180만 +팁</td></tr>
+    </table>
+    <p class="note">팁·2차 제외 · 게임내 화폐 · <span class="gold">현실 목표 4~6명</span> / 12명은 떡상 시나리오</p>
+  </section>
+
+  <!-- 8 프로세스 -->
+  <section class="slide">
+    <h2>🔄 영업 1회 흐름</h2>
+    <ul class="clean">
+      <li><b>1. 오픈 준비</b> — 위치 확보 · 공지 · 출근체크 · 예약 확인</li>
+      <li><b>2. 유치(삐끼)</b> — 홍보 · "OO초대" 손님 기록(→3만)</li>
+      <li><b>3. 입장(웨이터)</b> — TC 수납·음료 · 손님 등록 · 공주님 배정</li>
+      <li><b>4. 대화 타임</b> — 20분 타이머 · <span class="green">팁은 공주님 직접 수령</span></li>
+      <li><b>5. 2차 접수</b> — <span class="pink">웨이터 단독</span> · 동의·일정 확인 → 100만</li>
+      <li><b>6. 보안(가드)</b> — 진상·강도 대응 · 블랙리스트(밴)</li>
+      <li><b>7. 마감</b> — 정산 · 장부 마감 · 지급</li>
+    </ul>
+  </section>
+
+  <!-- 9 조직 -->
+  <section class="slide">
+    <h2>👥 조직 & 보상</h2>
+    <table>
+      <tr><th>역할</th><th>책임</th><th>보상</th></tr>
+      <tr><td>🎩 사장</td><td>총괄·정산·전략</td><td>운영풀 지분 1.2</td></tr>
+      <tr><td class="pink">👑 공주님</td><td>대화·접대·2차(선택)</td><td>대화료 15 + 팁(+@) + 2차 70</td></tr>
+      <tr><td>🔫 가드</td><td>보안·밴 집행</td><td>지분 1.0</td></tr>
+      <tr><td>🍷 웨이터</td><td>서빙·수납·2차 접수</td><td>지분 1.0 + 팁 + 2차중개 5</td></tr>
+      <tr><td>📣 삐끼</td><td>홍보·유치·영입</td><td>성과제(손님 3만·영입 1만) 무한대</td></tr>
+    </table>
+  </section>
+
+  <!-- 10 웹앱/로드맵 -->
+  <section class="slide">
+    <h2>🧩 운영 시스템 & 로드맵</h2>
+    <div class="grid g2">
+      <div class="card"><div class="lbl">웹앱 P1</div><div class="big cyan">손님·밴 관리</div></div>
+      <div class="card"><div class="lbl">웹앱 P2</div><div class="big cyan">예약·2차 일정</div></div>
+      <div class="card"><div class="lbl">웹앱 P3</div><div class="big gold">정산·지급표</div></div>
+      <div class="card"><div class="lbl">웹앱 P4</div><div class="big gold">대시보드·랭킹</div></div>
+    </div>
+    <p class="em">파일럿 1주 → 정기화 → 공주님 4~6명 확장 → 시스템화</p>
+  </section>
+
+  <!-- 11 마무리 -->
+  <section class="slide">
+    <h1>다 같이 부자되자 💸</h1>
+    <p class="sub">착취가 아니라, <span class="gold">다 같이 번다.</span><br>공주님을 빨아들이고 손님을 끌어온다 — 그게 우리 엔진.</p>
+    <p class="em">지금 시작하면 우리가 이 서버 토킹바 원조.</p>
+  </section>
+
+</div>
+
+<div class="dots" id="dots"></div>
+<div class="nav">
+  <button onclick="go(-1)">‹</button>
+  <span class="counter" id="counter">1 / 11</span>
+  <button onclick="go(1)">›</button>
+</div>
+<div class="foot">아래 화살표 버튼 또는 키보드 방향키로 넘기기 · 게임내 화폐(RP) 기준</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const dots=document.getElementById('dots');
+  let i=0;
+  slides.forEach((_,n)=>{const d=document.createElement('div');d.className='dot'+(n===0?' on':'');dots.appendChild(d)});
+  const dotEls=[...document.querySelectorAll('.dot')];
+  function render(){
+    slides.forEach((s,n)=>s.classList.toggle('active',n===i));
+    dotEls.forEach((d,n)=>d.classList.toggle('on',n===i));
+    document.getElementById('counter').textContent=(i+1)+' / '+slides.length;
+  }
+  function go(d){i=Math.min(slides.length-1,Math.max(0,i+d));render()}
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key==='ArrowDown')go(1);
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp')go(-1);
+  });
+  // 화면 클릭으로는 넘어가지 않음. 아래 화살표 버튼 또는 키보드 화살표로만 이동.
+</script>
+</body>
+</html>

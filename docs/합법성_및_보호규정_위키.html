@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공주님 클럽 — 합법성 및 구성원 보호 규정 (CLIMAX)</title>
+<style>
+  :root{
+    --bg:#0e0c16; --panel:#16131f; --panel2:#1d1930; --line:#2c2742;
+    --txt:#ece9f5; --muted:#9a93b8; --accent:#ff5ea0; --accent2:#ffcf5a; --link:#7ad0ff;
+    --ok:#5ee0a0; --warn:#ffb35e;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--txt);
+       font-family:'Pretendard','Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+       line-height:1.75;font-size:16px}
+  a{color:var(--link);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .layout{display:flex;min-height:100vh}
+  .side{width:300px;flex:none;background:var(--panel);border-right:1px solid var(--line);
+        position:sticky;top:0;height:100vh;overflow-y:auto;padding:24px 18px}
+  .brand{font-weight:800;font-size:1.12rem;
+         background:linear-gradient(90deg,var(--accent),var(--accent2));
+         -webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:4px}
+  .brand-sub{color:var(--muted);font-size:.8rem;margin-bottom:18px}
+  .side nav a{display:block;color:var(--muted);font-size:.9rem;padding:6px 10px;border-radius:8px;margin:1px 0}
+  .side nav a:hover{background:var(--panel2);color:var(--txt);text-decoration:none}
+  .side nav a.active{background:var(--panel2);color:var(--accent);font-weight:600}
+  .main{flex:1;min-width:0;display:flex;justify-content:center;padding:40px 28px 120px}
+  .doc{width:100%;max-width:880px}
+  .hero{border:1px solid var(--line);border-radius:18px;padding:30px 32px;margin-bottom:34px;
+        background:radial-gradient(700px 300px at 0% 0%,#1c2c2a 0%,var(--panel) 70%)}
+  .hero h1{margin:0 0 6px;font-size:1.85rem;line-height:1.25}
+  .hero .meta{color:var(--muted);font-size:.92rem;margin-top:14px}
+  .hero .meta b{color:var(--txt)}
+  .callout{border-left:3px solid var(--accent2);background:var(--panel2);
+           padding:12px 16px;border-radius:8px;margin:16px 0;color:#d9d3ee}
+  .ok{border-left:3px solid var(--ok);background:rgba(94,224,160,.08);padding:12px 16px;border-radius:8px;margin:16px 0}
+  .warn{border-left:3px solid var(--warn);background:rgba(255,179,94,.08);padding:12px 16px;border-radius:8px;margin:16px 0}
+  h2{margin:54px 0 14px;padding-top:12px;font-size:1.45rem;border-bottom:1px solid var(--line);padding-bottom:10px}
+  h3{margin:28px 0 10px;font-size:1.12rem;color:var(--accent2)}
+  p{margin:10px 0}
+  ul,ol{margin:10px 0;padding-left:22px}
+  li{margin:5px 0}
+  blockquote{margin:14px 0;padding:12px 18px;border-left:3px solid var(--accent2);
+             background:var(--panel);border-radius:8px;color:#e7e1f6;font-style:italic}
+  strong{color:#fff}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.9rem}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--accent2);font-weight:700}
+  tbody tr:nth-child(even){background:rgba(255,255,255,.02)}
+  tbody tr:hover{background:rgba(94,224,160,.06)}
+  .top{position:fixed;right:22px;bottom:22px;background:var(--panel2);border:1px solid var(--line);
+       color:var(--txt);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;
+       justify-content:center;font-size:1.2rem;cursor:pointer}
+  .top:hover{border-color:var(--accent);color:var(--accent)}
+  @media(max-width:820px){.side{display:none}}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="side">
+    <div class="brand">공주님 클럽 · 준수 규정</div>
+    <div class="brand-sub">CLIMAX 서버 법률 준수 / 구성원 보호</div>
+    <nav>
+      <a href="#s1">1. 합법성 핵심 선언</a>
+      <a href="#s2">2. 서버 법률 대조표</a>
+      <a href="#s3">3. 가드 행동 강령</a>
+      <a href="#s4">4. 구성원 보호 규정</a>
+      <a href="#s5">5. 손님 이용 수칙</a>
+      <a href="#s6">6. 2차 합법성 가이드</a>
+      <a href="#s7">7. 기록 및 증거 원칙</a>
+      <a href="#s8">8. 면책 및 적용 한계</a>
+      <a href="#sx">부록. 한 줄 요약</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+  <article class="doc">
+
+    <div class="hero">
+      <h1>공주님 클럽 — 합법성 및 구성원 보호 규정</h1>
+      <div>CLIMAX 서버 법률·운영정책·플레이 규칙 준수 문서</div>
+      <div class="meta">
+        대상 서버 : <b>CLIMAX (SEMI HARD)</b> &nbsp;·&nbsp; 기준 법령 : 서버 기본 법률 / 제재 법률 / 경찰 법률 (시행 2026.06.12)
+      </div>
+      <div class="callout">본 문서의 모든 거래·활동은 게임 내 RP(롤플레잉)와 게임 내 화폐로만 이루어진다.</div>
+    </div>
+
+    <h2 id="s1">1. 합법성 핵심 선언</h2>
+    <p>본 사업은 다음 근거로 CLIMAX의 규칙을 준수하는 합법적 RP 컨텐츠다.</p>
+    <div class="ok">
+      <strong>1) 현금 거래 아님</strong> — 제재법상 중대 위반인 "현금 거래"는 게임 재화를 현실 금전으로 거래하는 행위다. 본 사업의 모든 비용(TC·대화료·2차·팁·정산)은 전부 게임 내 화폐(RP)로만 처리하며 현실 금전이 일절 개입하지 않는다.
+    </div>
+    <ul>
+      <li><strong>2) RP 비즈니스</strong>: 서버는 "역할연기 수용 원칙"과 "역할연기 유지 의무"를 권장한다. 토킹바는 대화·접대를 매개로 한 합의된 상호작용 컨텐츠로, 서버가 지향하는 플레이어 간 상호작용에 부합한다.</li>
+      <li><strong>3) 이용 연령 준수</strong>: 20세 이상만 대상으로 하며 서버 이용 등급과 일치한다.</li>
+      <li><strong>4) 규칙 적극 준수</strong>: 성희롱·과도한 욕설·패드립·혐오 발언을 무관용으로 금지·신고한다. 우리는 서버법을 어기는 주체가 아니라 앞장서 지키는 주체다.</li>
+    </ul>
+
+    <h2 id="s2">2. 서버 법률 대조표 (조항별 준수 방식)</h2>
+    <table>
+      <thead><tr><th>서버 규정</th><th>핵심 내용</th><th>본 사업의 입장/조치</th></tr></thead>
+      <tbody>
+        <tr><td>현금 거래 (제재)</td><td>게임 재화 ↔ 현실 금전 거래 금지</td><td>전 거래 게임 내 화폐만 사용. 현실 금전 개입 0. <strong>해당 없음</strong></td></tr>
+        <tr><td>성희롱 (제재 15~30일)</td><td>성적 불쾌감 유발 언행 금지</td><td>공주님·스탭 대상 무관용. 즉시 출입거부 + 증거확보 + 경찰/F3 신고</td></tr>
+        <tr><td>과도한 욕설 (제재 5~15일)</td><td>지속적 욕설·인신공격 금지</td><td>손님·구성원 모두 금지. 위반 시 퇴장·신고</td></tr>
+        <tr><td>패드립·가족 비하 (15~30일)</td><td>가족·현실관계 비하 금지</td><td>무관용. 즉시 퇴장·신고</td></tr>
+        <tr><td>혐오 발언 (15일~영구)</td><td>성별·지역·국적 등 비하 금지</td><td>무관용. 즉시 퇴장·신고</td></tr>
+        <tr><td>개인정보 유출 (30일~영구)</td><td>현실 신상 공개·유포 금지</td><td>구성원 신상 보호. 신상 언급·협박·암시 즉시 차단·신고</td></tr>
+        <tr><td>현실과 서버 분리</td><td>서버 갈등을 현실로 끌지 않음</td><td>모든 갈등 RP 내 + F3 처리. 외부 분쟁 유도 금지</td></tr>
+        <tr><td>메타 정보 사용 금지</td><td>외부 정보를 캐릭터가 아는 척 금지</td><td>운영·홍보 시 메타 사용 금지 준수</td></tr>
+        <tr><td>뉴라이프 원칙</td><td>혼수 후 직전 기억 삭제</td><td>강도·충돌 대응 시 준수. 삭제 기억 기반 보복 금지</td></tr>
+        <tr><td>역할연기 수용/유지</td><td>RP 받아주고 RP 안에서 해결</td><td>컨텐츠 자체가 RP 기반. 문제는 상황 마무리 후 F3</td></tr>
+        <tr><td>영업 방해 (경찰법 25만)</td><td>정상 영업 방해 금지</td><td>진상·난동 손님은 피해 측으로서 경찰 신고 가능</td></tr>
+        <tr><td>폭행·특수폭행·살인 (경찰법)</td><td>신체 피해·살해</td><td>가드는 절대 가해자가 되지 않음(3장). 피해 시 신고</td></tr>
+        <tr><td>허위 신고·증거 조작 (제재)</td><td>거짓 신고·증거 조작 금지</td><td>우리도 준수. 신고는 사실·증거 기반으로만</td></tr>
+        <tr><td>광고/외부 유도 (제재)</td><td>타 서버·외부 유도 금지</td><td>홍보는 서버 내 RP 범위로 한정</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="s3">3. 보안(가드) 행동 강령 — 서버법 준수형</h2>
+    <div class="warn">
+      <strong>중요 전제:</strong> CLIMAX는 무법 서버가 아니라 경찰 법률이 존재하는 SEMI HARD 서버다. 가드가 손님을 살해(살인 100만/구금 15분)하거나 특수폭행(60만/구금 15분)으로 "응징"하면 <strong>우리가 중범죄자</strong>가 된다. 보안은 반드시 서버법 안에서 수행한다.
+    </div>
+    <h3>3-1. 대응 단계 (이 순서를 지킨다)</h3>
+    <ol>
+      <li><strong>RP 경고·중재</strong>: 상황을 RP 안에서 진정시킨다. 무리하게 중단시키지 않는다.</li>
+      <li><strong>출입거부(내부 블랙리스트)</strong>: 우리 영업장 이용을 거부한다. 이것은 서버 차단이 아니라 사업장 차원의 출입거부다(우리는 운영 권한이 없다).</li>
+      <li><strong>증거 확보</strong>: 영상·스크린샷·시간·장소·인물 정보를 기록한다.</li>
+      <li><strong>경찰 신고 / F3</strong>: 성희롱·폭행·영업방해·공갈 등은 경찰 신고 또는 F3 고객지원으로 처리한다.</li>
+    </ol>
+    <h3>3-2. 금지 사항 (가드가 하면 안 되는 것)</h3>
+    <ul>
+      <li>손님·플레이어 살해, 특수폭행, 납치 등 범죄 행위로 대응하는 것.</li>
+      <li>감정적 보복, 외부 커뮤니티로 분쟁 확산.</li>
+      <li>삭제되어야 할 기억(뉴라이프)을 활용한 보복.</li>
+    </ul>
+    <h3>3-3. 정당방위와 강도 대응</h3>
+    <ul>
+      <li>정당방위 성격의 RP는 가능하나, 현실성 유지·역할연기 수용 원칙을 지키며 과도하지 않게 한다.</li>
+      <li>강도·습격 시: 무리한 진압보다 안전 우선, 현금 분산, 상황 종료 후 경찰 신고로 처리. 혼수 발생 시 뉴라이프 적용.</li>
+    </ul>
+
+    <h2 id="s4">4. 구성원(공주님·스탭) 보호 규정</h2>
+    <p>우리 사람을 지키는 것이 최우선이다. 아래는 내부 규칙이자 서버법에 근거한 보호 장치다.</p>
+    <ol>
+      <li><strong>성희롱 즉시 차단</strong>: 공주님·스탭 대상 성적 불쾌감 유발 언행은 경고 없이 즉시 출입거부. 증거 확보 후 경찰/F3 신고(서버 제재 15~30일 대상임을 손님에게 사전 고지).</li>
+      <li><strong>현실 공격 차단</strong>: 구성원의 현실 신상·목소리·성별·나이·외모·직업 등을 이용한 비하·공격은 즉시 차단·신고(혐오 발언·개인정보 유출은 영구 제재까지 가능).</li>
+      <li><strong>거부권 절대 보장</strong>: 공주님은 2차를 포함한 어떠한 RP도 거부할 권리가 있다. 거부를 이유로 한 불이익은 없다.</li>
+      <li><strong>외부 분쟁 금지</strong>: 서버 내 갈등을 디스코드·외부 커뮤니티·개인 메시지로 끌고 가지 않는다(외부 분쟁 유도는 제재 대상).</li>
+      <li><strong>신고 지원</strong>: 구성원이 피해를 입으면 사업이 증거 확보와 신고를 함께 지원한다.</li>
+      <li><strong>안전한 동선</strong>: 공주님은 가드 시야 범위에서 활동하며, 2차 등 외부 이동 시 일정·위치를 웨이터/가드가 공유·관리한다.</li>
+    </ol>
+
+    <h2 id="s5">5. 손님 이용 수칙 (입장 시 고지)</h2>
+    <ul>
+      <li>20세 이상만 이용 가능.</li>
+      <li>성희롱·욕설·패드립·혐오 발언 시 즉시 퇴장 및 신고(서버 제재 대상).</li>
+      <li>정해진 시간·결제 규칙을 따른다. 시간초과·무전취식은 영업방해로 신고될 수 있다.</li>
+      <li>모든 분쟁은 RP 안에서, 마무리 후 F3 고객지원으로 처리한다.</li>
+      <li>2차는 합의된 RP 데이트 스토리라인이며, 공주님의 동의가 있어야만 성립한다.</li>
+    </ul>
+
+    <h2 id="s6">6. 2차(외부 데이트) 합법성 가이드</h2>
+    <ul>
+      <li><strong>성격</strong>: 게임 내 RP 데이트/에스코트 스토리라인. 현실 금전·현실 만남과 무관.</li>
+      <li><strong>합의</strong>: 공주님의 자발적 동의 필수, 거부권 보장.</li>
+      <li><strong>연령</strong>: 참여자 모두 20세 이상.</li>
+      <li><strong>표현 수위</strong>: 서버 허용 표현 범위를 벗어나지 않으며 성희롱 규정을 그대로 준수.</li>
+      <li><strong>현실 분리</strong>: 캐릭터 간 RP일 뿐, 현실의 관계·정보·감정으로 이어가지 않는다.</li>
+    </ul>
+
+    <h2 id="s7">7. 기록 및 증거 원칙</h2>
+    <ul>
+      <li>분쟁·신고에 대비해 영상·스크린샷·시간·장소·인물 정보를 평소에 확보한다.</li>
+      <li>우리도 허위 신고·과장 신고·증거 조작을 하지 않는다(신고자도 제재 대상).</li>
+      <li>장부(거래원장)도 투명하게 기록해 내부 분쟁을 예방한다.</li>
+    </ul>
+
+    <h2 id="s8">8. 면책 및 적용 한계</h2>
+    <ul>
+      <li>본 규정은 사업의 내부 자율 규칙이며, 서버 운영권한을 의미하지 않는다.</li>
+      <li>모든 사안의 최종 판단은 CLIMAX 운영진에게 있으며, 서버 법률·운영정책이 본 규정에 우선한다.</li>
+      <li>본 규정과 서버 규칙이 충돌할 경우 언제나 서버 규칙을 따른다.</li>
+    </ul>
+
+    <h2 id="sx">부록. 한 줄 요약</h2>
+    <ul>
+      <li>우리는 게임 내 화폐로만 운영하는 합법 RP 컨텐츠다(현금 거래 아님).</li>
+      <li>20세 이상, 성희롱·혐오 무관용, 현실/서버 분리 철저.</li>
+      <li>CLIMAX는 SEMI HARD(경찰법 존재). 가드는 범죄가 아니라 출입거부 + 신고로 대응한다.</li>
+      <li>우리 사람(공주님·스탭)은 서버법과 내부 규칙으로 이중 보호한다.</li>
+    </ul>
+
+    <p style="color:var(--muted);margin-top:40px;font-size:.88rem">본 문서는 RP 컨텐츠 운영을 위한 준수 지침이며 모든 활동은 게임 내에서 이루어진다.</p>
+
+  </article>
+  </main>
+</div>
+<div class="top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="맨 위로">↑</div>
+<script>
+  const links=[...document.querySelectorAll('.side nav a')];
+  const map=links.map(a=>({a,sec:document.querySelector(a.getAttribute('href'))})).filter(x=>x.sec);
+  const obs=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const hit=map.find(m=>m.sec===e.target);
+        if(hit)hit.a.classList.add('active');
+      }
+    });
+  },{rootMargin:'-20% 0px -70% 0px'});
+  map.forEach(m=>obs.observe(m.sec));
+</script>
+</body>
+</html>
