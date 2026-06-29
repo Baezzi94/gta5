@@ -13,7 +13,6 @@ const MENU = [
   { to: '/bans', label: '밴', icon: '⛔', roles: ['owner', 'staff'] },
   { to: '/flyer', label: '찌라시', icon: '📢', roles: ['owner', 'staff', 'promoter'] },
   { to: '/members', label: '멤버', icon: '👥', roles: ['owner'] },
-  { to: '/sessions', label: '세션', icon: '🗂️', roles: ['owner'] },
   { to: '/profile', label: '내 프로필', icon: '🙍', roles: ['owner', 'staff', 'promoter', 'princess'] },
 ]
 

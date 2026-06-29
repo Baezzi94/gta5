@@ -4,7 +4,6 @@ import ProtectedRoute from './ProtectedRoute'
 import Layout from '../components/Layout'
 import Login from '../pages/Login'
 import Members from '../pages/Members'
-import Sessions from '../pages/Sessions'
 import Attendance from '../pages/Attendance'
 import StaffAttendance from '../pages/StaffAttendance'
 import Customers from '../pages/Customers'
@@ -37,7 +36,6 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="members" element={<Members />} />
-          <Route path="sessions" element={<Sessions />} />
           <Route path="attendance" element={<Attendance />} />
           <Route path="staff-attendance" element={<StaffAttendance />} />
           <Route path="customers" element={<Customers />} />
