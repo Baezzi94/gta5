@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { listRange } from '../lib/charges'
+import { listRange, CHARGE_LABEL } from '../lib/charges'
 import { listMembers } from '../lib/members'
 import { settle } from '../lib/settlement'
 import { ymd, addDays } from '../lib/week'
+import { toCsv, downloadCsv } from '../lib/csv'
 
 const man = (won) => `${Math.round(won / 10000).toLocaleString()}만`
 const ROLE_LABEL = { owner: '사장', staff: '운영스탭', promoter: '삐끼', princess: '공주님' }
@@ -72,6 +73,30 @@ export default function Dashboard() {
   const princessRank = memberRows.filter((m) => m.role === 'princess').map((m) => ({ ...m, earn: m.talk + m.date2 })).sort((a, b) => b.earn - a.earn)
   const referrerRank = memberRows.map((m) => ({ ...m, ref: m.referral + m.recruit })).filter((m) => m.ref > 0).sort((a, b) => b.ref - a.ref)
 
+  function exportCharges() {
+    downloadCsv(`거래내역_${from}_${to}.csv`, toCsv(charges, [
+      { label: '날짜', value: 'date' },
+      { label: '유형', value: (r) => CHARGE_LABEL[r.type] ?? r.type },
+      { label: '손님', value: (r) => r.customer?.nickname ?? '' },
+      { label: '공주님', value: (r) => r.princess?.name ?? '' },
+      { label: '금액(원)', value: 'amount' },
+      { label: '수금', value: (r) => (r.collected ? '완료' : '미수금') },
+      { label: '수금시각', value: (r) => r.collected_at ?? '' },
+    ]))
+  }
+  function exportSettlement() {
+    downloadCsv(`정산합계_${from}_${to}.csv`, toCsv(memberRows, [
+      { label: '이름', value: 'name' },
+      { label: '역할', value: (r) => ROLE_LABEL[r.role] ?? r.role ?? '' },
+      { label: '대화료', value: 'talk' },
+      { label: '2차', value: 'date2' },
+      { label: '지분', value: 'share' },
+      { label: '추천', value: 'referral' },
+      { label: '영입', value: 'recruit' },
+      { label: '합계(원)', value: 'total' },
+    ]))
+  }
+
   const Bar = ({ value, max, color }) => (
     <div style={{ background: '#0a0810', borderRadius: 6, height: 16, flex: 1 }}>
       <div style={{ width: `${(value / max) * 100}%`, height: '100%', background: color, borderRadius: 6 }} />
@@ -88,6 +113,9 @@ export default function Dashboard() {
         <input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
         <button onClick={() => { setFrom(ymd(addDays(new Date(), -6))); setTo(ymd(new Date())) }}>최근 7일</button>
         <button onClick={() => { setFrom(ymd(addDays(new Date(), -29))); setTo(ymd(new Date())) }}>최근 30일</button>
+        <span style={{ flex: 1 }} />
+        <button onClick={exportCharges}>거래내역 CSV</button>
+        <button onClick={exportSettlement}>정산합계 CSV</button>
       </div>
 
       {/* KPI */}
