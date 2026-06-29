@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { listByDate, createCharge, setCollected, deleteCharge, CHARGE_AMOUNT, CHARGE_LABEL } from '../lib/charges'
 import { findOrCreateByPhone } from '../lib/customers'
+import { isBanned } from '../lib/bans'
 import { listMembers } from '../lib/members'
 import { settle } from '../lib/settlement'
 import { ymd } from '../lib/week'
@@ -41,6 +42,10 @@ export default function Collections() {
     e.preventDefault()
     setError('')
     try {
+      if (form.phone && (await isBanned(form.phone))) {
+        setError(`🚫 밴된 번호(${form.phone})입니다. 거래 불가 — 밴 관리에서 해제 후 가능.`)
+        return
+      }
       let customer_id = null
       if (form.phone) {
         const c = await findOrCreateByPhone({ phone: form.phone, nickname: form.nickname })

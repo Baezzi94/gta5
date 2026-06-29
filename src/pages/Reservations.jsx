@@ -73,7 +73,10 @@ export default function Reservations() {
     if (!form.phone) return setError('손님 전화번호를 입력하세요.')
     if (Number.isNaN(start_min) || Number.isNaN(end_min) || start_min >= end_min) return setError('시간을 올바르게 입력하세요 (시작 < 종료).')
     try {
-      if (await isBanned(form.phone)) setNotice('⚠️ 밴된 번호입니다. 그래도 예약은 진행됩니다.')
+      if (await isBanned(form.phone)) {
+        setError(`🚫 밴된 번호(${form.phone})입니다. 예약 불가 — 밴 관리에서 해제하면 가능합니다.`)
+        return
+      }
       const customer = await findOrCreateByPhone({ phone: form.phone, nickname: form.nickname, referred_by: form.referred_by || null })
       await createReservation({ date, customer_id: customer.id, princess_id: form.princess_id, start_min, end_min })
       setForm({ princess_id: '', phone: '', nickname: '', referred_by: '', start: '', end: '' })
