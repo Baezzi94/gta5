@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { listMembers, createMember, deleteMember } from '../lib/members'
+import { listMembers, createMember, updateMember, deleteMember } from '../lib/members'
 import { listCodes, regenerateCode } from '../lib/codes'
 
 const TYPES = [
@@ -14,6 +14,7 @@ export default function Members() {
   const [members, setMembers] = useState([])
   const [codes, setCodes] = useState([])
   const [copied, setCopied] = useState('')
+  const [editing, setEditing] = useState(null) // { id, name, phone, memo }
   const [form, setForm] = useState({ name: '', phone: '', type: 'princess', memo: '', referred_by: '' })
   const [error, setError] = useState('')
 
@@ -57,6 +58,17 @@ export default function Members() {
     try {
       await regenerateCode(role)
       loadCodes()
+    } catch (e) {
+      setError(e.message)
+    }
+  }
+
+  async function onSaveEdit() {
+    setError('')
+    try {
+      await updateMember(editing.id, { name: editing.name, phone: editing.phone, memo: editing.memo || null })
+      setEditing(null)
+      load()
     } catch (e) {
       setError(e.message)
     }
@@ -147,20 +159,35 @@ export default function Members() {
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ textAlign: 'left', color: '#ffcf5a' }}>
-            <th>이름</th><th>유형</th><th>전화</th><th>추천인</th><th>활성</th><th>삭제</th>
+            <th>이름</th><th>유형</th><th>전화</th><th>추천인</th><th>활성</th><th>관리</th>
           </tr>
         </thead>
         <tbody>
-          {members.map((m) => (
-            <tr key={m.id} style={{ borderTop: '1px solid #2c2742' }}>
-              <td>{m.name}</td>
-              <td>{TYPE_LABEL[m.type] ?? m.type}</td>
-              <td>{m.phone ?? '-'}</td>
-              <td>{members.find((x) => x.id === m.referred_by)?.name ?? '-'}</td>
-              <td>{m.active ? 'O' : 'X'}</td>
-              <td><button onClick={() => onDelete(m.id, m.name)}>삭제</button></td>
-            </tr>
-          ))}
+          {members.map((m) => {
+            const ed = editing && editing.id === m.id
+            return (
+              <tr key={m.id} style={{ borderTop: '1px solid #2c2742' }}>
+                <td>{ed ? <input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} style={{ width: 80 }} /> : m.name}</td>
+                <td>{TYPE_LABEL[m.type] ?? m.type}</td>
+                <td>{ed ? <input value={editing.phone ?? ''} onChange={(e) => setEditing({ ...editing, phone: e.target.value })} style={{ width: 110 }} /> : (m.phone ?? '-')}</td>
+                <td>{members.find((x) => x.id === m.referred_by)?.name ?? '-'}</td>
+                <td>{m.active ? 'O' : 'X'}</td>
+                <td style={{ display: 'flex', gap: 4 }}>
+                  {ed ? (
+                    <>
+                      <button onClick={onSaveEdit}>저장</button>
+                      <button onClick={() => setEditing(null)}>취소</button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => setEditing({ id: m.id, name: m.name, phone: m.phone ?? '', memo: m.memo ?? '' })}>수정</button>
+                      <button onClick={() => onDelete(m.id, m.name)}>삭제</button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </div>
