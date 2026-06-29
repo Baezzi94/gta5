@@ -44,6 +44,20 @@ export async function createTalkFromReservation(r) {
   })
 }
 
+// 손님당 하루 1번 TC(입장료) 거래 생성 (이미 있으면 건너뜀)
+export async function createTcOnce({ date, customer_id }) {
+  if (!customer_id) return null
+  const { data: existing } = await supabase
+    .from('charges')
+    .select('id')
+    .eq('date', date)
+    .eq('type', 'tc')
+    .eq('customer_id', customer_id)
+    .limit(1)
+  if (existing && existing.length) return existing[0]
+  return createCharge({ date, type: 'tc', amount: CHARGE_AMOUNT.tc, customer_id })
+}
+
 export async function setCollected(id, collected) {
   const { data, error } = await supabase
     .from('charges')
