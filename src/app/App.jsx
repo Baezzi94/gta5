@@ -3,7 +3,6 @@ import { useAuth } from './AuthContext'
 import ProtectedRoute from './ProtectedRoute'
 import Layout from '../components/Layout'
 import Login from '../pages/Login'
-import Home from '../pages/Home'
 import Members from '../pages/Members'
 import Sessions from '../pages/Sessions'
 import Attendance from '../pages/Attendance'
@@ -13,6 +12,7 @@ import Reservations from '../pages/Reservations'
 import Collections from '../pages/Collections'
 import Flyer from '../pages/Flyer'
 import Profile from '../pages/Profile'
+import Dashboard from '../pages/Dashboard'
 
 function Root() {
   const { session, loading } = useAuth()
@@ -33,7 +33,8 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Home />} />
+          <Route index element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="members" element={<Members />} />
           <Route path="sessions" element={<Sessions />} />
           <Route path="attendance" element={<Attendance />} />

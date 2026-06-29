@@ -13,6 +13,17 @@ export async function listByDate(date) {
   return data
 }
 
+export async function listRange(startDate, endDate) {
+  const { data, error } = await supabase
+    .from('charges')
+    .select('*, customer:customers(id, nickname, referred_by), princess:members(id, name, referred_by)')
+    .gte('date', startDate)
+    .lte('date', endDate)
+    .order('date', { ascending: true })
+  if (error) throw error
+  return data
+}
+
 export async function createCharge({ date, type, amount, customer_id, princess_id, reservation_id }) {
   const { data, error } = await supabase
     .from('charges')

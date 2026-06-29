@@ -4,6 +4,7 @@ import { useAuth } from '../app/AuthContext'
 const ROLE_LABEL = { owner: '사장', staff: '운영스탭', promoter: '삐끼', princess: '공주님' }
 
 const MENU = [
+  { to: '/dashboard', label: '대시보드', icon: '📊', roles: ['owner', 'staff', 'promoter', 'princess'] },
   { to: '/reservations', label: '예약판', icon: '📅', roles: ['owner', 'staff'] },
   { to: '/collections', label: '수금 · 정산', icon: '💰', roles: ['owner', 'staff', 'promoter', 'princess'] },
   { to: '/attendance', label: '출근부', icon: '🗓️', roles: ['owner', 'staff', 'princess'] },
