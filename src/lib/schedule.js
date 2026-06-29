@@ -28,7 +28,7 @@ export async function listByDatePrincess(date, memberId) {
 export async function listByDate(date) {
   const { data, error } = await supabase
     .from('availability')
-    .select('*, member:members(id, name, phone)')
+    .select('*, member:members(id, name, phone, profile_photo_url)')
     .eq('date', date)
     .order('start_min', { ascending: true })
   if (error) throw error

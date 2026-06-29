@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { listMembers, createMember, updateMember, deleteMember } from '../lib/members'
 import { listCodes, regenerateCode } from '../lib/codes'
+import { uploadAvatar } from '../lib/storage'
 
 const TYPES = [
   ['princess', '공주님'],
@@ -58,6 +59,18 @@ export default function Members() {
     try {
       await regenerateCode(role)
       loadCodes()
+    } catch (e) {
+      setError(e.message)
+    }
+  }
+
+  async function onPhoto(id, file) {
+    if (!file) return
+    setError('')
+    try {
+      const url = await uploadAvatar(id, file)
+      await updateMember(id, { profile_photo_url: url })
+      load()
     } catch (e) {
       setError(e.message)
     }
@@ -164,7 +177,7 @@ export default function Members() {
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ textAlign: 'left', color: '#ffcf5a' }}>
-            <th>이름</th><th>유형</th><th>전화</th><th>추천인</th><th>활성</th><th>관리</th>
+            <th>사진</th><th>이름</th><th>유형</th><th>전화</th><th>추천인</th><th>활성</th><th>관리</th>
           </tr>
         </thead>
         <tbody>
@@ -172,6 +185,16 @@ export default function Members() {
             const ed = editing && editing.id === m.id
             return (
               <tr key={m.id} style={{ borderTop: '1px solid #2c2742' }}>
+                <td>
+                  <label style={{ cursor: 'pointer', display: 'inline-block' }} title="클릭해서 사진 변경">
+                    {m.profile_photo_url ? (
+                      <img src={m.profile_photo_url} alt="" style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'cover' }} />
+                    ) : (
+                      <span style={{ display: 'inline-flex', width: 36, height: 36, borderRadius: 8, background: '#241a3d', alignItems: 'center', justifyContent: 'center', color: '#9a93b8' }}>＋</span>
+                    )}
+                    <input type="file" accept="image/*" hidden onChange={(e) => e.target.files[0] && onPhoto(m.id, e.target.files[0])} />
+                  </label>
+                </td>
                 <td>{ed ? <input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} style={{ width: 80 }} /> : m.name}</td>
                 <td>{TYPE_LABEL[m.type] ?? m.type}</td>
                 <td>{ed ? <input value={editing.phone ?? ''} onChange={(e) => setEditing({ ...editing, phone: e.target.value })} style={{ width: 110 }} /> : (m.phone ?? '-')}</td>

@@ -11,6 +11,8 @@ import Customers from '../pages/Customers'
 import Bans from '../pages/Bans'
 import Reservations from '../pages/Reservations'
 import Collections from '../pages/Collections'
+import Flyer from '../pages/Flyer'
+import Profile from '../pages/Profile'
 
 function Root() {
   const { session, loading } = useAuth()
@@ -39,6 +41,8 @@ export default function App() {
           <Route path="bans" element={<Bans />} />
           <Route path="reservations" element={<Reservations />} />
           <Route path="collections" element={<Collections />} />
+          <Route path="flyer" element={<Flyer />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

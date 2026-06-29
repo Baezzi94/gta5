@@ -9,6 +9,12 @@ export async function listMembers() {
   return data
 }
 
+export async function getMember(id) {
+  const { data, error } = await supabase.from('members').select('*').eq('id', id).maybeSingle()
+  if (error) throw error
+  return data
+}
+
 export async function createMember(m) {
   const { data, error } = await supabase.from('members').insert(m).select().single()
   if (error) throw error
