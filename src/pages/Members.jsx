@@ -13,6 +13,7 @@ const TYPE_LABEL = Object.fromEntries(TYPES)
 export default function Members() {
   const [members, setMembers] = useState([])
   const [codes, setCodes] = useState([])
+  const [copied, setCopied] = useState('')
   const [form, setForm] = useState({ name: '', phone: '', type: 'princess', memo: '', referred_by: '' })
   const [error, setError] = useState('')
 
@@ -34,6 +35,22 @@ export default function Members() {
     load()
     loadCodes()
   }, [])
+
+  async function onCopy(code, role) {
+    try {
+      await navigator.clipboard.writeText(code)
+    } catch {
+      // 클립보드 차단 환경 폴백
+      const t = document.createElement('textarea')
+      t.value = code
+      document.body.appendChild(t)
+      t.select()
+      document.execCommand('copy')
+      document.body.removeChild(t)
+    }
+    setCopied(role)
+    setTimeout(() => setCopied(''), 1200)
+  }
 
   async function onRegen(role) {
     setError('')
@@ -88,7 +105,10 @@ export default function Members() {
               <div key={c.role} style={{ background: '#241a3d', borderRadius: 8, padding: '8px 12px' }}>
                 <div style={{ color: '#ffcf5a', fontSize: 12 }}>{TYPE_LABEL[c.role] ?? c.role}</div>
                 <code style={{ fontSize: 16, letterSpacing: 1 }}>{c.code}</code>
-                <button style={{ marginLeft: 8, fontSize: 11 }} onClick={() => onRegen(c.role)}>재발급</button>
+                <button style={{ marginLeft: 8, fontSize: 11 }} onClick={() => onCopy(c.code, c.role)}>
+                  {copied === c.role ? '복사됨!' : '복사'}
+                </button>
+                <button style={{ marginLeft: 4, fontSize: 11 }} onClick={() => onRegen(c.role)}>재발급</button>
               </div>
             ))}
           </div>
