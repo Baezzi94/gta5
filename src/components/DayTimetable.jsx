@@ -51,7 +51,7 @@ export default function DayTimetable({ rows, onPick }) {
             style={{ width: 80, flex: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#ece9f5' }}
             title="클릭해서 예약 대상 선택"
           >
-            {r.name}
+            {r.checkedIn && <span title="출근중" style={{ marginRight: 4 }}>🟢</span>}{r.name}
           </div>
           <div style={{ position: 'relative', flex: 1, height: 24, background: '#0a0810', borderRadius: 6, overflow: 'hidden' }}>
             {r.windows.map((w, i) => (

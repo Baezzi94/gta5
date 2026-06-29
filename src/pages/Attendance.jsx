@@ -4,6 +4,7 @@ import { listRange, addAvailability, checkIn, checkOut, reCheckIn, removeAvailab
 import { hmToMin, minToHm } from '../lib/time'
 import { startOfWeek, weekDates, addDays, ymd } from '../lib/week'
 import { useAuth } from '../app/AuthContext'
+import TimeField from '../components/TimeField'
 
 const DOW = ['월', '화', '수', '목', '금', '토', '일']
 
@@ -81,9 +82,9 @@ export default function Attendance() {
             <option key={d} value={d}>{d} ({DOW[i]})</option>
           ))}
         </select>
-        <input type="time" value={form.start} onChange={(e) => setForm({ ...form, start: e.target.value })} />
+        <TimeField value={form.start} onChange={(v) => setForm({ ...form, start: v })} />
         ~
-        <input type="time" value={form.end} onChange={(e) => setForm({ ...form, end: e.target.value })} />
+        <TimeField value={form.end} onChange={(v) => setForm({ ...form, end: v })} />
         <button type="submit">가용시간 추가</button>
       </form>
 

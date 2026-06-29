@@ -8,6 +8,7 @@ import { isBanned } from '../lib/bans'
 import { hmToMin, minToHm } from '../lib/time'
 import { ymd } from '../lib/week'
 import DayTimetable from '../components/DayTimetable'
+import TimeField from '../components/TimeField'
 
 const STATUS = [
   ['in_progress', '진행'],
@@ -49,8 +50,9 @@ export default function Reservations() {
   const byPrincess = {}
   for (const a of avail) {
     const id = a.member_id
-    if (!byPrincess[id]) byPrincess[id] = { id, name: a.member?.name, windows: [], reservations: [] }
+    if (!byPrincess[id]) byPrincess[id] = { id, name: a.member?.name, windows: [], reservations: [], checkedIn: false }
     byPrincess[id].windows.push({ start: a.start_min, end: a.end_min })
+    if (a.checked_in_at && !a.checked_out_at) byPrincess[id].checkedIn = true
   }
   for (const r of rows) {
     if (r.status === 'cancelled') continue
@@ -129,7 +131,7 @@ export default function Reservations() {
         <select value={form.princess_id} onChange={(e) => setForm({ ...form, princess_id: e.target.value })}>
           <option value="">공주님 선택 (타임테이블 클릭으로도 선택 가능)</option>
           {timetableRows.map((p) => (
-            <option key={p.id} value={p.id}>{p.name} (가능 {p.windows.map((w) => `${minToHm(w.start)}~${minToHm(w.end)}`).join(', ')})</option>
+            <option key={p.id} value={p.id}>{p.checkedIn ? '🟢출근 ' : ''}{p.name} (가능 {p.windows.map((w) => `${minToHm(w.start)}~${minToHm(w.end)}`).join(', ')})</option>
           ))}
         </select>
         <div style={{ display: 'flex', gap: 6 }}>
@@ -144,17 +146,15 @@ export default function Reservations() {
         </select>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           <label>시간:</label>
-          <input
-            type="time"
+          <TimeField
             value={form.start}
-            onChange={(e) => {
-              const v = e.target.value
+            onChange={(v) => {
               const m = hmToMin(v)
-              setForm((f) => ({ ...f, start: v, end: f.end ? f.end : (Number.isNaN(m) ? '' : minToHm(m + 20)) }))
+              setForm((f) => ({ ...f, start: v, end: Number.isNaN(m) ? f.end : minToHm(m + 20) }))
             }}
           />
           ~
-          <input type="time" value={form.end} onChange={(e) => setForm({ ...form, end: e.target.value })} />
+          <TimeField value={form.end} onChange={(v) => setForm({ ...form, end: v })} />
         </div>
         <button type="submit">예약 추가</button>
         <span style={{ color: '#9a93b8', fontSize: 12 }}>전화번호로 손님 자동 등록/조회. 추천인 지정 시 손님추천(3만) 근거로 기록. 가용시간 밖/중복이면 거부.</span>
@@ -186,8 +186,8 @@ export default function Reservations() {
                 <td>
                   {ed ? (
                     <span style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                      <input type="time" value={editing.start} onChange={(e) => setEditing({ ...editing, start: e.target.value })} />~
-                      <input type="time" value={editing.end} onChange={(e) => setEditing({ ...editing, end: e.target.value })} />
+                      <TimeField value={editing.start} onChange={(v) => setEditing({ ...editing, start: v })} />~
+                      <TimeField value={editing.end} onChange={(v) => setEditing({ ...editing, end: v })} />
                     </span>
                   ) : (
                     `${minToHm(r.start_min)} ~ ${minToHm(r.end_min)}`
