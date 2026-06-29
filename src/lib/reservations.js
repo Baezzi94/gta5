@@ -7,7 +7,7 @@ import { listByDatePrincess } from './schedule'
 export async function listByDate(date) {
   const { data, error } = await supabase
     .from('reservations')
-    .select('*, customer:customers(id, nickname, phone), princess:members(id, name)')
+    .select('*, customer:customers(id, nickname, phone), princess:members!princess_id(id, name)')
     .eq('date', date)
     .order('start_min', { ascending: true })
   if (error) throw error

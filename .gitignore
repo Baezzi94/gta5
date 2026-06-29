@@ -31,3 +31,6 @@ Thumbs.db
 
 # Supabase local
 .supabase/
+
+# 가입 코드(비밀) — 커밋 금지
+가입코드.txt
