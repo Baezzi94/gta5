@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { listByDate as listAvail } from '../lib/schedule'
-import { listByDate as listReservations, createReservation, setStatus } from '../lib/reservations'
+import { listByDate as listReservations, createReservation, updateReservation, setStatus } from '../lib/reservations'
 import { findOrCreateByPhone } from '../lib/customers'
 import { createTalkFromReservation, createTcFromReservation } from '../lib/charges'
 import { listMembers } from '../lib/members'
@@ -25,6 +25,7 @@ export default function Reservations() {
   const [form, setForm] = useState({ princess_id: '', phone: '', nickname: '', referred_by: '', start: '', end: '' })
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
+  const [editing, setEditing] = useState(null) // { id, princess_id, start, end }
 
   async function load() {
     setError('')
@@ -73,6 +74,21 @@ export default function Reservations() {
       const customer = await findOrCreateByPhone({ phone: form.phone, nickname: form.nickname, referred_by: form.referred_by || null })
       await createReservation({ date, customer_id: customer.id, princess_id: form.princess_id, start_min, end_min })
       setForm({ princess_id: '', phone: '', nickname: '', referred_by: '', start: '', end: '' })
+      load()
+    } catch (e) {
+      setError(e.message)
+    }
+  }
+
+  async function onSaveEdit() {
+    setError('')
+    const start_min = hmToMin(editing.start)
+    const end_min = hmToMin(editing.end)
+    if (!editing.princess_id) return setError('공주님을 선택하세요.')
+    if (Number.isNaN(start_min) || Number.isNaN(end_min) || start_min >= end_min) return setError('시간을 올바르게 입력하세요.')
+    try {
+      await updateReservation(editing.id, { date, princess_id: editing.princess_id, start_min, end_min })
+      setEditing(null)
       load()
     } catch (e) {
       setError(e.message)
@@ -143,19 +159,51 @@ export default function Reservations() {
           </tr>
         </thead>
         <tbody>
-          {rows.map((r) => (
-            <tr key={r.id} style={{ borderTop: '1px solid #2c2742' }}>
-              <td>{r.princess?.name}</td>
-              <td>{r.customer?.nickname} <span style={{ color: '#9a93b8' }}>{r.customer?.phone}</span></td>
-              <td>{minToHm(r.start_min)} ~ {minToHm(r.end_min)}</td>
-              <td>{STATUS_LABEL[r.status]}</td>
-              <td style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                {STATUS.map(([v, l]) => (
-                  <button key={v} onClick={() => onStatus(r, v)}>{l}</button>
-                ))}
-              </td>
-            </tr>
-          ))}
+          {rows.map((r) => {
+            const ed = editing && editing.id === r.id
+            return (
+              <tr key={r.id} style={{ borderTop: '1px solid #2c2742' }}>
+                <td>
+                  {ed ? (
+                    <select value={editing.princess_id} onChange={(e) => setEditing({ ...editing, princess_id: e.target.value })}>
+                      {timetableRows.map((p) => (
+                        <option key={p.id} value={p.id}>{p.name}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    r.princess?.name
+                  )}
+                </td>
+                <td>{r.customer?.nickname} <span style={{ color: '#9a93b8' }}>{r.customer?.phone}</span></td>
+                <td>
+                  {ed ? (
+                    <span style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                      <input type="time" value={editing.start} onChange={(e) => setEditing({ ...editing, start: e.target.value })} />~
+                      <input type="time" value={editing.end} onChange={(e) => setEditing({ ...editing, end: e.target.value })} />
+                    </span>
+                  ) : (
+                    `${minToHm(r.start_min)} ~ ${minToHm(r.end_min)}`
+                  )}
+                </td>
+                <td>{STATUS_LABEL[r.status]}</td>
+                <td style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                  {ed ? (
+                    <>
+                      <button onClick={onSaveEdit}>저장</button>
+                      <button onClick={() => setEditing(null)}>취소</button>
+                    </>
+                  ) : (
+                    <>
+                      {STATUS.map(([v, l]) => (
+                        <button key={v} onClick={() => onStatus(r, v)}>{l}</button>
+                      ))}
+                      <button onClick={() => setEditing({ id: r.id, princess_id: r.princess_id, start: minToHm(r.start_min), end: minToHm(r.end_min) })}>수정</button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </div>
