@@ -336,8 +336,8 @@ import { dailyAnonCode, toDayKey } from './anonCode'
 
 describe('dailyAnonCode()', () => {
   const d1 = new Date('2026-06-29T10:00:00Z')
-  const d1b = new Date('2026-06-29T20:00:00Z') // 같은 KST 날짜
-  const d2 = new Date('2026-06-30T10:00:00Z') // 다음 날
+  const d1b = new Date('2026-06-29T14:00:00Z') // 같은 KST 날짜 (KST 19:00, 23:00)
+  const d2 = new Date('2026-06-30T10:00:00Z') // 다음 날 (KST)
 
   it('항상 6자리 숫자', () => {
     expect(dailyAnonCode('010-1234-5678', d1)).toMatch(/^\d{6}$/)
