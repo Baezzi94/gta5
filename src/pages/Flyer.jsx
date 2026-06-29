@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { listByDate } from '../lib/schedule'
 import { ymd } from '../lib/week'
+import { minToHm } from '../lib/time'
 import { toPng } from 'html-to-image'
 
 export default function Flyer() {
@@ -28,10 +29,13 @@ export default function Flyer() {
   const map = {}
   for (const a of avail) {
     const id = a.member_id
-    if (!map[id]) map[id] = { id, name: a.member?.name, photo: a.member?.profile_photo_url, checkedIn: false }
+    if (!map[id]) map[id] = { id, name: a.member?.name, photo: a.member?.profile_photo_url, checkedIn: false, windows: [] }
+    map[id].windows.push({ start: a.start_min, end: a.end_min })
     if (a.checked_in_at && !a.checked_out_at) map[id].checkedIn = true
   }
   let people = Object.values(map)
+  for (const p of people) p.windows.sort((x, y) => x.start - y.start)
+  const hoursText = (p) => p.windows.map((w) => `${minToHm(w.start)}~${minToHm(w.end)}`).join(', ')
   if (onlyCheckedIn) people = people.filter((p) => p.checkedIn)
 
   async function download() {
@@ -93,7 +97,8 @@ export default function Flyer() {
                   <div style={{ width: '100%', aspectRatio: '1 / 1', borderRadius: 10, background: '#241a3d', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9a93b8' }}>사진없음</div>
                 )}
                 <div style={{ marginTop: 8, fontWeight: 800 }}>{p.name}</div>
-                {p.checkedIn && <div style={{ color: '#5ee0a0', fontSize: 12, fontWeight: 700 }}>● 출근중</div>}
+                <div style={{ color: '#ffcf5a', fontSize: 12, fontWeight: 700, marginTop: 2 }}>🕐 {hoursText(p)}</div>
+                {p.checkedIn && <div style={{ color: '#5ee0a0', fontSize: 11, fontWeight: 700 }}>● 출근중</div>}
               </div>
             ))}
           </div>
