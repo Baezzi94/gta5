@@ -94,7 +94,7 @@
       <tr><th>항목</th><th>가격</th><th>분배</th></tr>
       <tr><td>TC (입장료)</td><td>5만</td><td>전액 <span class="hl">운영풀</span> (음료 2잔 포함)</td></tr>
       <tr><td>대화료</td><td>25만 / 20분</td><td><span class="pink">공주님 15</span> / 운영풀 10</td></tr>
-      <tr><td>2차 (외부)</td><td>100만 / 시간</td><td><span class="pink">공주님 70</span> / 웨이터 5 / 풀 25</td></tr>
+      <tr><td>2차 (외부)</td><td>100만 / 시간</td><td><span class="pink">공주님 70</span> / 운영풀 30 (지분 분배)</td></tr>
       <tr><td>팁</td><td>자유</td><td><span class="green">받은 사람 100% 개인 (+@)</span></td></tr>
     </table>
     <p class="note">운영풀 지분 → 사장 1.2 : 가드 1 : 웨이터 1 (일당 전면 폐지) · 삐끼 = 성과제(손님 3만/명, 영입 1만/타임)</p>
@@ -105,7 +105,7 @@
     <div class="tag">핵심 자산</div>
     <h2>👑 공주님은 무조건 후하게</h2>
     <div class="grid g3">
-      <div class="card"><div class="lbl">풀북 1박</div><div class="big pink">180만</div><p class="sub">15만 × 12타임</p></div>
+      <div class="card"><div class="lbl">4시간 근무시</div><div class="big pink">180만</div><p class="sub">15만 × 12타임</p></div>
       <div class="card"><div class="lbl">팁</div><div class="big green">전액 +@</div><p class="sub">인기 많으면 기본급 이상도!</p></div>
       <div class="card"><div class="lbl">2차 (선택)</div><div class="big gold">70만 / 건</div><p class="sub">거부권 100% 보장</p></div>
     </div>
@@ -129,9 +129,25 @@
     </ul>
   </section>
 
+  <!-- 6.5 추천 제도 -->
+  <section class="slide">
+    <div class="tag">자가증식 엔진</div>
+    <h2>📣 추천 제도 — 다 같이 끌어온다</h2>
+    <div class="grid g2">
+      <div class="card"><div class="lbl">손님 추천</div><div class="big pink">3만 / 명</div><p class="sub">데려온 손님 1명당. 한도 없음</p></div>
+      <div class="card"><div class="lbl">공주 영입</div><div class="big gold">1만 / 타임</div><p class="sub">내가 데려온 공주가 <span class="green">일하는 내내</span> 나에게</p></div>
+    </div>
+    <ul class="clean" style="margin-top:1rem">
+      <li>📣 삐끼는 <span class="pink">순수 성과제</span> — 능력만큼 무한대 (일당·지분 X)</li>
+      <li>👑 공주 한 명 영입 = 그가 일하는 동안 <span class="gold">내 통장에 계속 1만씩</span></li>
+      <li>🔁 그래서 <span class="green">모두가 사람을 데려올 이유</span>가 생긴다 → 자가증식</li>
+    </ul>
+    <p class="em">사람을 데려오는 것이 곧 내 수익이다</p>
+  </section>
+
   <!-- 7 스케일링 표 -->
   <section class="slide">
-    <h2>📊 공주님 수별 기대수익 (풀북 1박)</h2>
+    <h2>📊 공주님 수별 기대수익 (4시간 근무시)</h2>
     <table>
       <tr><th>공주님</th><th>스탭(가드/웨)</th><th>운영풀</th><th>🎩 사장/박</th><th>🔫 가드·웨/박</th><th>👑 공주님</th></tr>
       <tr><td>2</td><td>2 / 1</td><td>300~360만</td><td>86~103만</td><td>71~86만</td><td>180만 +팁</td></tr>
@@ -166,7 +182,7 @@
       <tr><td>🎩 사장</td><td>총괄·정산·전략</td><td>운영풀 지분 1.2</td></tr>
       <tr><td class="pink">👑 공주님</td><td>대화·접대·2차(선택)</td><td>대화료 15 + 팁(+@) + 2차 70</td></tr>
       <tr><td>🔫 가드</td><td>보안·밴 집행</td><td>지분 1.0</td></tr>
-      <tr><td>🍷 웨이터</td><td>서빙·수납·2차 접수</td><td>지분 1.0 + 팁 + 2차중개 5</td></tr>
+      <tr><td>🍷 웨이터</td><td>서빙·수납·2차 접수</td><td>지분 1.0 + 팁</td></tr>
       <tr><td>📣 삐끼</td><td>홍보·유치·영입</td><td>성과제(손님 3만·영입 1만) 무한대</td></tr>
     </table>
   </section>
@@ -216,6 +232,7 @@
     if(e.key==='ArrowRight'||e.key==='ArrowDown')go(1);
     if(e.key==='ArrowLeft'||e.key==='ArrowUp')go(-1);
   });
+  render(); // 초기 카운터/상태 동기화 (총 슬라이드 수 반영)
   // 화면 클릭으로는 넘어가지 않음. 아래 화살표 버튼 또는 키보드 화살표로만 이동.
 </script>
 </body>
