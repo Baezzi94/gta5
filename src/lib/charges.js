@@ -59,6 +59,11 @@ export async function createTcFromReservation(r) {
   return createFromReservation(r, 'tc')
 }
 
+// 2차 거래(100만)
+export async function createDate2FromReservation(r) {
+  return createFromReservation(r, 'date2', { princess_id: r.princess_id })
+}
+
 export async function setCollected(id, collected) {
   const { data, error } = await supabase
     .from('charges')

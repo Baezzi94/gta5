@@ -64,10 +64,10 @@ export default function DayTimetable({ rows, onPick }) {
             {r.reservations.map((b, i) => (
               <div
                 key={'b' + i}
-                title={`${b.label || ''} ${minToHm(b.start)}~${minToHm(b.end)}`}
-                style={{ position: 'absolute', left: `${pct(b.start)}%`, width: `${pct(b.end) - pct(b.start)}%`, top: 2, bottom: 2, background: STATUS_COLOR[b.status] || '#4de1ff', borderRadius: 4, fontSize: 10, color: '#1a1020', overflow: 'hidden', whiteSpace: 'nowrap', padding: '0 3px', lineHeight: '20px' }}
+                title={`${b.is_date2 ? '[2차] ' : ''}${b.label || ''} ${minToHm(b.start)}~${minToHm(b.end)}`}
+                style={{ position: 'absolute', left: `${pct(b.start)}%`, width: `${pct(b.end) - pct(b.start)}%`, top: 2, bottom: 2, background: b.is_date2 ? '#c08bff' : (STATUS_COLOR[b.status] || '#4de1ff'), borderRadius: 4, fontSize: 10, color: '#1a1020', overflow: 'hidden', whiteSpace: 'nowrap', padding: '0 3px', lineHeight: '20px' }}
               >
-                {b.label || ''}
+                {b.is_date2 ? `2차 ${b.label || ''}` : (b.label || '')}
               </div>
             ))}
           </div>
@@ -77,7 +77,8 @@ export default function DayTimetable({ rows, onPick }) {
         <span style={{ color: '#5ee0a0' }}>■</span> 가능시간 &nbsp;
         <span style={{ color: '#4de1ff' }}>■</span> 예약 &nbsp;
         <span style={{ color: '#ffd24d' }}>■</span> 진행 &nbsp;
-        <span style={{ color: '#4dff9e' }}>■</span> 완료
+        <span style={{ color: '#4dff9e' }}>■</span> 완료 &nbsp;
+        <span style={{ color: '#c08bff' }}>■</span> 2차
       </div>
     </div>
   )

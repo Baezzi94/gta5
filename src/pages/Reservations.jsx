@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { listByDate as listAvail } from '../lib/schedule'
-import { listByDate as listReservations, createReservation, updateReservation, setStatus } from '../lib/reservations'
+import { listByDate as listReservations, createReservation, updateReservation, setStatus, startDate2 } from '../lib/reservations'
 import { findOrCreateByPhone } from '../lib/customers'
-import { createTalkFromReservation, createTcFromReservation } from '../lib/charges'
+import { createTalkFromReservation, createTcFromReservation, createDate2FromReservation } from '../lib/charges'
 import { listMembers } from '../lib/members'
 import { isBanned } from '../lib/bans'
 import { hmToMin, minToHm } from '../lib/time'
@@ -27,6 +27,7 @@ export default function Reservations() {
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
   const [editing, setEditing] = useState(null) // { id, princess_id, start, end }
+  const [date2For, setDate2For] = useState(null) // { id, minutes }
 
   async function load() {
     setError('')
@@ -58,7 +59,7 @@ export default function Reservations() {
     if (r.status === 'cancelled') continue
     const id = r.princess_id
     if (!byPrincess[id]) continue
-    byPrincess[id].reservations.push({ start: r.start_min, end: r.end_min, status: r.status, label: r.customer?.nickname })
+    byPrincess[id].reservations.push({ start: r.start_min, end: r.end_min, status: r.status, label: r.customer?.nickname, is_date2: r.is_date2 })
   }
   const timetableRows = Object.values(byPrincess)
 
@@ -92,6 +93,30 @@ export default function Reservations() {
       await updateReservation(editing.id, { date, princess_id: editing.princess_id, start_min, end_min })
       setEditing(null)
       load()
+    } catch (e) {
+      setError(e.message)
+    }
+  }
+
+  async function onConfirmDate2(r) {
+    setError('')
+    setNotice('')
+    const dur = Number(date2For?.minutes)
+    if (!dur || dur <= 0) return setError('2차 시간을 분으로 입력하세요.')
+    try {
+      const conflictIds = await startDate2(r, dur)
+      await createDate2FromReservation(r)
+      const names = conflictIds.map((id) => {
+        const c = rows.find((x) => x.id === id)
+        return c ? `${c.customer?.nickname}(${minToHm(c.start_min)}~${minToHm(c.end_min)})` : id
+      })
+      setDate2For(null)
+      await load()
+      setNotice(
+        names.length
+          ? `⚠️ 2차로 ${dur}분 자리가 빕니다. 밀어야 할 예약: ${names.join(', ')} — 수정/취소로 조정하세요. (2차 100만 미수금 생성)`
+          : `2차 등록 완료 (겹치는 예약 없음). 2차 100만 미수금 생성됨.`
+      )
     } catch (e) {
       setError(e.message)
     }
@@ -193,12 +218,25 @@ export default function Reservations() {
                     `${minToHm(r.start_min)} ~ ${minToHm(r.end_min)}`
                   )}
                 </td>
-                <td>{STATUS_LABEL[r.status]}</td>
-                <td style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                <td>{r.is_date2 ? <span style={{ color: '#c08bff', fontWeight: 700 }}>2차(외부)</span> : STATUS_LABEL[r.status]}</td>
+                <td style={{ display: 'flex', gap: 4, flexWrap: 'wrap', alignItems: 'center' }}>
                   {ed ? (
                     <>
                       <button onClick={onSaveEdit}>저장</button>
                       <button onClick={() => setEditing(null)}>취소</button>
+                    </>
+                  ) : date2For && date2For.id === r.id ? (
+                    <>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={date2For.minutes}
+                        onChange={(e) => setDate2For({ ...date2For, minutes: e.target.value.replace(/\D/g, '') })}
+                        placeholder="분"
+                        style={{ width: 56 }}
+                      />
+                      <button onClick={() => onConfirmDate2(r)}>2차확정</button>
+                      <button onClick={() => setDate2For(null)}>취소</button>
                     </>
                   ) : (
                     <>
@@ -206,6 +244,7 @@ export default function Reservations() {
                         <button key={v} onClick={() => onStatus(r, v)}>{l}</button>
                       ))}
                       <button onClick={() => setEditing({ id: r.id, princess_id: r.princess_id, start: minToHm(r.start_min), end: minToHm(r.end_min) })}>수정</button>
+                      {!r.is_date2 && <button onClick={() => setDate2For({ id: r.id, minutes: '60' })}>2차</button>}
                     </>
                   )}
                 </td>
