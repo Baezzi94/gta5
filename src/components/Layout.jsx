@@ -4,13 +4,13 @@ import { useAuth } from '../app/AuthContext'
 const ROLE_LABEL = { owner: '사장', staff: '운영스탭', promoter: '삐끼', princess: '공주님' }
 
 const MENU = [
-  { to: '/reservations', label: '예약판', roles: ['owner', 'staff'] },
-  { to: '/collections', label: '수금/정산', roles: ['owner', 'staff', 'promoter', 'princess'] },
-  { to: '/attendance', label: '출근부', roles: ['owner', 'staff', 'princess'] },
-  { to: '/customers', label: '손님', roles: ['owner', 'staff'] },
-  { to: '/bans', label: '밴', roles: ['owner', 'staff'] },
-  { to: '/members', label: '멤버', roles: ['owner'] },
-  { to: '/sessions', label: '세션', roles: ['owner'] },
+  { to: '/reservations', label: '예약판', icon: '📅', roles: ['owner', 'staff'] },
+  { to: '/collections', label: '수금 · 정산', icon: '💰', roles: ['owner', 'staff', 'promoter', 'princess'] },
+  { to: '/attendance', label: '출근부', icon: '🗓️', roles: ['owner', 'staff', 'princess'] },
+  { to: '/customers', label: '손님', icon: '🙋', roles: ['owner', 'staff'] },
+  { to: '/bans', label: '밴', icon: '⛔', roles: ['owner', 'staff'] },
+  { to: '/members', label: '멤버', icon: '👥', roles: ['owner'] },
+  { to: '/sessions', label: '세션', icon: '🗂️', roles: ['owner'] },
 ]
 
 export default function Layout() {
@@ -35,7 +35,7 @@ export default function Layout() {
                 background: isActive ? '#1d1930' : 'transparent',
               })}
             >
-              {m.label}
+              <span style={{ marginRight: 8 }}>{m.icon}</span>{m.label}
             </NavLink>
           ))}
         </nav>

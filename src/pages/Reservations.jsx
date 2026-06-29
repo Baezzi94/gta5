@@ -144,7 +144,15 @@ export default function Reservations() {
         </select>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           <label>시간:</label>
-          <input type="time" value={form.start} onChange={(e) => setForm({ ...form, start: e.target.value })} />
+          <input
+            type="time"
+            value={form.start}
+            onChange={(e) => {
+              const v = e.target.value
+              const m = hmToMin(v)
+              setForm((f) => ({ ...f, start: v, end: f.end ? f.end : (Number.isNaN(m) ? '' : minToHm(m + 20)) }))
+            }}
+          />
           ~
           <input type="time" value={form.end} onChange={(e) => setForm({ ...form, end: e.target.value })} />
         </div>
