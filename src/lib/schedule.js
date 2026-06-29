@@ -67,6 +67,18 @@ export async function checkOut(id) {
   return data
 }
 
+// 재출근: 퇴근 기록을 지워 다시 출근중 상태로
+export async function reCheckIn(id) {
+  const { data, error } = await supabase
+    .from('availability')
+    .update({ checked_out_at: null, checked_in_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
 export async function removeAvailability(id) {
   const { error } = await supabase.from('availability').delete().eq('id', id)
   if (error) throw error

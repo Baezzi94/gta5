@@ -7,7 +7,7 @@ export default function Customers() {
   const [query, setQuery] = useState('')
   const [rows, setRows] = useState([])
   const [anon, setAnon] = useState(false)
-  const [form, setForm] = useState({ phone: '', nickname: '', birthday: '', memo: '' })
+  const [form, setForm] = useState({ phone: '', nickname: '', memo: '' })
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
 
@@ -34,10 +34,9 @@ export default function Customers() {
       await createCustomer({
         phone: form.phone,
         nickname: form.nickname,
-        birthday: form.birthday || null,
         memo: form.memo || null,
       })
-      setForm({ phone: '', nickname: '', birthday: '', memo: '' })
+      setForm({ phone: '', nickname: '', memo: '' })
       load()
     } catch (e) {
       setError(e.message)
@@ -55,7 +54,6 @@ export default function Customers() {
       <form onSubmit={onCreate} style={{ display: 'grid', gap: 8, maxWidth: 420, marginBottom: 20 }}>
         <input placeholder="전화번호(고정 ID)" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required />
         <input placeholder="닉네임" value={form.nickname} onChange={(e) => setForm({ ...form, nickname: e.target.value })} required />
-        <input type="date" value={form.birthday} onChange={(e) => setForm({ ...form, birthday: e.target.value })} />
         <input placeholder="메모(선호/특이사항)" value={form.memo} onChange={(e) => setForm({ ...form, memo: e.target.value })} />
         <button type="submit">손님 등록</button>
       </form>
@@ -71,7 +69,7 @@ export default function Customers() {
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ textAlign: 'left', color: '#ffcf5a' }}>
-            <th>표시</th><th>전화</th><th>생일</th><th>메모</th>
+            <th>표시</th><th>전화</th><th>메모</th>
           </tr>
         </thead>
         <tbody>
@@ -79,7 +77,6 @@ export default function Customers() {
             <tr key={c.id} style={{ borderTop: '1px solid #2c2742' }}>
               <td>{anon ? `익명#${dailyAnonCode(c.phone, now)}` : c.nickname}</td>
               <td>{anon ? '***' : c.phone}</td>
-              <td>{c.birthday ?? '-'}</td>
               <td>{c.memo ?? '-'}</td>
             </tr>
           ))}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { listMembers } from '../lib/members'
-import { listRange, addAvailability, checkIn, checkOut, removeAvailability } from '../lib/schedule'
+import { listRange, addAvailability, checkIn, checkOut, reCheckIn, removeAvailability } from '../lib/schedule'
 import { hmToMin, minToHm } from '../lib/time'
 import { startOfWeek, weekDates, addDays, ymd } from '../lib/week'
 import { useAuth } from '../app/AuthContext'
@@ -109,6 +109,7 @@ export default function Attendance() {
                       <div style={{ display: 'flex', gap: 4, marginTop: 2 }}>
                         {!b.checked_in_at && <button style={{ fontSize: 11 }} onClick={() => act(checkIn, b.id)}>출근</button>}
                         {b.checked_in_at && !b.checked_out_at && <button style={{ fontSize: 11 }} onClick={() => act(checkOut, b.id)}>퇴근</button>}
+                        {b.checked_out_at && <button style={{ fontSize: 11 }} onClick={() => act(reCheckIn, b.id)}>재출근</button>}
                         <button style={{ fontSize: 11 }} onClick={() => act(removeAvailability, b.id)}>삭제</button>
                       </div>
                     )}
