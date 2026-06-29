@@ -66,7 +66,12 @@ export default function Members() {
   async function onSaveEdit() {
     setError('')
     try {
-      await updateMember(editing.id, { name: editing.name, phone: editing.phone, memo: editing.memo || null })
+      await updateMember(editing.id, {
+        name: editing.name,
+        phone: editing.phone,
+        memo: editing.memo || null,
+        referred_by: editing.referred_by || null,
+      })
       setEditing(null)
       load()
     } catch (e) {
@@ -170,7 +175,18 @@ export default function Members() {
                 <td>{ed ? <input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} style={{ width: 80 }} /> : m.name}</td>
                 <td>{TYPE_LABEL[m.type] ?? m.type}</td>
                 <td>{ed ? <input value={editing.phone ?? ''} onChange={(e) => setEditing({ ...editing, phone: e.target.value })} style={{ width: 110 }} /> : (m.phone ?? '-')}</td>
-                <td>{members.find((x) => x.id === m.referred_by)?.name ?? '-'}</td>
+                <td>
+                  {ed ? (
+                    <select value={editing.referred_by ?? ''} onChange={(e) => setEditing({ ...editing, referred_by: e.target.value })}>
+                      <option value="">추천인 없음</option>
+                      {members.filter((x) => x.active && x.id !== m.id).map((x) => (
+                        <option key={x.id} value={x.id}>{x.name} / {x.phone ?? '-'}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    members.find((x) => x.id === m.referred_by)?.name ?? '-'
+                  )}
+                </td>
                 <td>{m.active ? 'O' : 'X'}</td>
                 <td style={{ display: 'flex', gap: 4 }}>
                   {ed ? (
@@ -180,7 +196,7 @@ export default function Members() {
                     </>
                   ) : (
                     <>
-                      <button onClick={() => setEditing({ id: m.id, name: m.name, phone: m.phone ?? '', memo: m.memo ?? '' })}>수정</button>
+                      <button onClick={() => setEditing({ id: m.id, name: m.name, phone: m.phone ?? '', memo: m.memo ?? '', referred_by: m.referred_by ?? '' })}>수정</button>
                       <button onClick={() => onDelete(m.id, m.name)}>삭제</button>
                     </>
                   )}
