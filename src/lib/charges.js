@@ -30,32 +30,33 @@ export async function createCharge({ date, type, amount, customer_id, princess_i
   return data
 }
 
-// 예약 완료 시 대화료 거래 자동 생성 (이미 있으면 건너뜀)
-export async function createTalkFromReservation(r) {
-  const { data: existing } = await supabase.from('charges').select('id').eq('reservation_id', r.id).maybeSingle()
-  if (existing) return existing
-  return createCharge({
-    date: r.date,
-    type: 'talk',
-    amount: CHARGE_AMOUNT.talk,
-    customer_id: r.customer_id,
-    princess_id: r.princess_id,
-    reservation_id: r.id,
-  })
-}
-
-// 손님당 하루 1번 TC(입장료) 거래 생성 (이미 있으면 건너뜀)
-export async function createTcOnce({ date, customer_id }) {
-  if (!customer_id) return null
+// 예약 단위로 특정 유형 거래 1건 생성 (이미 있으면 건너뜀)
+async function createFromReservation(r, type, extra = {}) {
   const { data: existing } = await supabase
     .from('charges')
     .select('id')
-    .eq('date', date)
-    .eq('type', 'tc')
-    .eq('customer_id', customer_id)
+    .eq('reservation_id', r.id)
+    .eq('type', type)
     .limit(1)
   if (existing && existing.length) return existing[0]
-  return createCharge({ date, type: 'tc', amount: CHARGE_AMOUNT.tc, customer_id })
+  return createCharge({
+    date: r.date,
+    type,
+    amount: CHARGE_AMOUNT[type],
+    customer_id: r.customer_id,
+    reservation_id: r.id,
+    ...extra,
+  })
+}
+
+// 예약(타임) 진행 시: 대화료 거래
+export async function createTalkFromReservation(r) {
+  return createFromReservation(r, 'talk', { princess_id: r.princess_id })
+}
+
+// 예약(타임)마다 TC(입장료) 거래 — 시간(방문)이 다르면 각각 부과
+export async function createTcFromReservation(r) {
+  return createFromReservation(r, 'tc')
 }
 
 export async function setCollected(id, collected) {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { listByDate as listAvail } from '../lib/schedule'
 import { listByDate as listReservations, createReservation, setStatus } from '../lib/reservations'
 import { findOrCreateByPhone } from '../lib/customers'
-import { createTalkFromReservation, createTcOnce } from '../lib/charges'
+import { createTalkFromReservation, createTcFromReservation } from '../lib/charges'
 import { listMembers } from '../lib/members'
 import { isBanned } from '../lib/bans'
 import { hmToMin, minToHm } from '../lib/time'
@@ -83,9 +83,9 @@ export default function Reservations() {
     setError('')
     try {
       await setStatus(r.id, status)
-      // 선불: "진행" 시작 시 TC(손님당 1회) + 대화료 거래 자동 생성
+      // 선불: "진행" 시작 시 예약(타임) 단위로 TC + 대화료 거래 자동 생성
       if (status === 'in_progress') {
-        await createTcOnce({ date: r.date, customer_id: r.customer_id })
+        await createTcFromReservation(r)
         await createTalkFromReservation(r)
       }
       load()
