@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { listRange, CHARGE_LABEL } from '../lib/charges'
+import { listRange as listAvailRange } from '../lib/schedule'
 import { listMembers } from '../lib/members'
 import { settle } from '../lib/settlement'
 import { ymd, addDays } from '../lib/week'
@@ -12,6 +13,7 @@ export default function Dashboard() {
   const [from, setFrom] = useState(() => ymd(addDays(new Date(), -6)))
   const [to, setTo] = useState(() => ymd(new Date()))
   const [charges, setCharges] = useState([])
+  const [avail, setAvail] = useState([])
   const [members, setMembers] = useState([])
   const [error, setError] = useState('')
 
@@ -19,6 +21,7 @@ export default function Dashboard() {
     setError('')
     try {
       setCharges(await listRange(from, to))
+      setAvail(await listAvailRange(from, to))
     } catch (e) {
       setError(e.message)
     }
@@ -46,9 +49,6 @@ export default function Dashboard() {
   const maxRev = Math.max(1, ...dailyRows.map(([, v]) => v))
 
   // 인원별 정산 합계 (일별 settle 누적)
-  const shareMembers = members
-    .filter((m) => (m.type === 'owner' || m.type === 'staff') && m.active)
-    .map((m) => ({ id: m.id, role: m.type }))
   const enrich = (c) => ({
     type: c.type,
     amount: c.amount,
@@ -59,6 +59,10 @@ export default function Dashboard() {
   })
   const acc = {}
   for (const d of [...new Set(collected.map((c) => c.date))]) {
+    const staffInIds = new Set(avail.filter((a) => a.date === d && a.checked_in_at && a.member?.type === 'staff').map((a) => a.member_id))
+    const shareMembers = members
+      .filter((m) => m.active && (m.type === 'owner' || (m.type === 'staff' && staffInIds.has(m.id))))
+      .map((m) => ({ id: m.id, role: m.type }))
     const res = settle(collected.filter((c) => c.date === d).map(enrich), shareMembers)
     for (const pm of res.perMember) {
       const a = (acc[pm.id] = acc[pm.id] || { talk: 0, date2: 0, share: 0, referral: 0, recruit: 0, total: 0 })

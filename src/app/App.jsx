@@ -6,6 +6,7 @@ import Login from '../pages/Login'
 import Members from '../pages/Members'
 import Sessions from '../pages/Sessions'
 import Attendance from '../pages/Attendance'
+import StaffAttendance from '../pages/StaffAttendance'
 import Customers from '../pages/Customers'
 import Bans from '../pages/Bans'
 import Reservations from '../pages/Reservations'
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="members" element={<Members />} />
           <Route path="sessions" element={<Sessions />} />
           <Route path="attendance" element={<Attendance />} />
+          <Route path="staff-attendance" element={<StaffAttendance />} />
           <Route path="customers" element={<Customers />} />
           <Route path="bans" element={<Bans />} />
           <Route path="reservations" element={<Reservations />} />

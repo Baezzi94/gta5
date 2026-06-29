@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { listByDate, createCharge, setCollected, deleteCharge, CHARGE_AMOUNT, CHARGE_LABEL } from '../lib/charges'
 import { findOrCreateByPhone } from '../lib/customers'
 import { isBanned } from '../lib/bans'
+import { listByDate as listAvailByDate } from '../lib/schedule'
 import { listMembers } from '../lib/members'
 import { settle } from '../lib/settlement'
 import { ymd } from '../lib/week'
@@ -17,6 +18,7 @@ export default function Collections() {
   const canAdd = role === 'owner' || role === 'staff'
   const [date, setDate] = useState(() => ymd(new Date()))
   const [rows, setRows] = useState([])
+  const [avail, setAvail] = useState([])
   const [members, setMembers] = useState([])
   const [form, setForm] = useState({ type: 'tc', phone: '', nickname: '', princess_id: '' })
   const princesses = members.filter((m) => m.type === 'princess')
@@ -26,6 +28,7 @@ export default function Collections() {
     setError('')
     try {
       setRows(await listByDate(date))
+      setAvail(await listAvailByDate(date))
     } catch (e) {
       setError(e.message)
     }
@@ -92,8 +95,10 @@ export default function Collections() {
       princess_referred_by: c.princess?.referred_by,
       customer_referred_by: c.customer?.referred_by,
     }))
+  // 그날 출근(체크인)한 스탭만 지분. 사장은 항상 포함.
+  const staffInIds = new Set(avail.filter((a) => a.checked_in_at && a.member?.type === 'staff').map((a) => a.member_id))
   const shareMembers = members
-    .filter((m) => (m.type === 'owner' || m.type === 'staff') && m.active)
+    .filter((m) => m.active && (m.type === 'owner' || (m.type === 'staff' && staffInIds.has(m.id))))
     .map((m) => ({ id: m.id, role: m.type }))
   const settlement = settle(enriched, shareMembers)
   const settleRows = settlement.perMember
