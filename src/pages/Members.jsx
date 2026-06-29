@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { listMembers, createMember } from '../lib/members'
-import { searchMembers } from '../lib/memberSearch'
 
 const TYPES = [
   ['princess', '공주님'],
@@ -12,8 +11,7 @@ const TYPE_LABEL = Object.fromEntries(TYPES)
 
 export default function Members() {
   const [members, setMembers] = useState([])
-  const [form, setForm] = useState({ name: '', phone: '', type: 'princess', memo: '', referred_by: null })
-  const [refQuery, setRefQuery] = useState('')
+  const [form, setForm] = useState({ name: '', phone: '', type: 'princess', memo: '', referred_by: '' })
   const [error, setError] = useState('')
 
   async function load() {
@@ -33,21 +31,17 @@ export default function Members() {
     try {
       await createMember({
         name: form.name,
-        phone: form.phone || null,
+        phone: form.phone,
         type: form.type,
         memo: form.memo || null,
-        referred_by: form.referred_by,
+        referred_by: form.type === 'princess' && form.referred_by ? form.referred_by : null,
       })
-      setForm({ name: '', phone: '', type: 'princess', memo: '', referred_by: null })
-      setRefQuery('')
+      setForm({ name: '', phone: '', type: 'princess', memo: '', referred_by: '' })
       load()
     } catch (e) {
       setError(e.message)
     }
   }
-
-  const refCandidates = refQuery ? searchMembers(members, refQuery).slice(0, 5) : []
-  const refName = form.referred_by ? members.find((m) => m.id === form.referred_by)?.name : null
 
   return (
     <div>
@@ -56,38 +50,29 @@ export default function Members() {
 
       <form onSubmit={onCreate} style={{ display: 'grid', gap: 8, maxWidth: 420, marginBottom: 24 }}>
         <input placeholder="이름(닉)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-        <input placeholder="전화번호(선택)" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+        <input placeholder="전화번호 (필수)" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required />
         <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
           {TYPES.map(([v, l]) => (
             <option key={v} value={v}>{l}</option>
           ))}
         </select>
-        <div>
-          <input
-            placeholder="추천인 검색(전화/닉)"
-            value={refName ?? refQuery}
-            onChange={(e) => {
-              setRefQuery(e.target.value)
-              setForm({ ...form, referred_by: null })
-            }}
-          />
-          {refCandidates.length > 0 && (
-            <div style={{ background: '#1d1930', borderRadius: 8, marginTop: 2 }}>
-              {refCandidates.map((m) => (
-                <div
-                  key={m.id}
-                  onClick={() => {
-                    setForm({ ...form, referred_by: m.id })
-                    setRefQuery('')
-                  }}
-                  style={{ padding: '6px 10px', cursor: 'pointer' }}
-                >
-                  {m.name} <span style={{ color: '#9a93b8' }}>{m.phone}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+
+        {form.type === 'princess' && (
+          <label style={{ display: 'grid', gap: 4 }}>
+            <span style={{ color: '#9a93b8', fontSize: 13 }}>추천인 (이 공주님을 데려온 멤버)</span>
+            <select value={form.referred_by} onChange={(e) => setForm({ ...form, referred_by: e.target.value })}>
+              <option value="">없음</option>
+              {members
+                .filter((m) => m.active)
+                .map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name} / {m.phone ?? '-'} ({TYPE_LABEL[m.type]})
+                  </option>
+                ))}
+            </select>
+          </label>
+        )}
+
         <input placeholder="메모(선택)" value={form.memo} onChange={(e) => setForm({ ...form, memo: e.target.value })} />
         <button type="submit">멤버 추가</button>
       </form>

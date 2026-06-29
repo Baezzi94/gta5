@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { overlaps, isAvailable, canExtend } from './availability'
+import { overlaps, isAvailable, canExtend, withinWindow } from './availability'
 
 describe('overlaps()', () => {
   it('겹치면 true', () => {
@@ -28,5 +28,20 @@ describe('canExtend()', () => {
   it('다음 슬롯에 예약 차 있으면 연장 불가', () => {
     const busy = [{ start: 0, end: 20 }, { start: 20, end: 40 }]
     expect(canExtend(busy, { start: 0, end: 20 }, 20)).toBe(false)
+  })
+})
+
+describe('withinWindow()', () => {
+  const win = { start: 1260, end: 1380 } // 21:00~23:00
+  it('윈도우 안이면 true', () => {
+    expect(withinWindow(win, { start: 1260, end: 1280 })).toBe(true)
+    expect(withinWindow(win, { start: 1360, end: 1380 })).toBe(true)
+  })
+  it('윈도우 벗어나면 false', () => {
+    expect(withinWindow(win, { start: 1240, end: 1280 })).toBe(false)
+    expect(withinWindow(win, { start: 1370, end: 1400 })).toBe(false)
+  })
+  it('윈도우 없으면 false', () => {
+    expect(withinWindow(null, { start: 0, end: 20 })).toBe(false)
   })
 })

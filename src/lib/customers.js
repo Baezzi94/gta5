@@ -27,3 +27,10 @@ export async function updateCustomer(id, patch) {
   if (error) throw error
   return data
 }
+
+// 전화번호로 찾고 없으면 생성 (예약 시 인라인 등록용)
+export async function findOrCreateByPhone({ phone, nickname }) {
+  const existing = await getByPhone(phone)
+  if (existing) return existing
+  return createCustomer({ phone, nickname: nickname || phone })
+}

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { listBans, createBan, liftBan } from '../lib/bans'
 
+const REASONS = ['성희롱', '진상/난동', '폭력', '분란 조장', '무전취식', '노쇼', '시간초과 불응', '기타']
+
 export default function Bans() {
   const [rows, setRows] = useState([])
-  const [form, setForm] = useState({ phone: '', reason: '' })
+  const [form, setForm] = useState({ phone: '', reason: REASONS[0], detail: '' })
   const [error, setError] = useState('')
 
   async function load() {
@@ -22,8 +24,9 @@ export default function Bans() {
     e.preventDefault()
     setError('')
     try {
-      await createBan({ phone: form.phone, reason: form.reason })
-      setForm({ phone: '', reason: '' })
+      const reason = form.detail ? `${form.reason} - ${form.detail}` : form.reason
+      await createBan({ phone: form.phone, reason })
+      setForm({ phone: '', reason: REASONS[0], detail: '' })
       load()
     } catch (e) {
       setError(e.message)
@@ -46,8 +49,13 @@ export default function Bans() {
       {error && <p style={{ color: 'salmon' }}>{error}</p>}
 
       <form onSubmit={onCreate} style={{ display: 'grid', gap: 8, maxWidth: 420, marginBottom: 20 }}>
-        <input placeholder="전화번호" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required />
-        <input placeholder="사유(성희롱/진상/노쇼 등)" value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} required />
+        <input placeholder="전화번호 (필수)" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required />
+        <select value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })}>
+          {REASONS.map((r) => (
+            <option key={r} value={r}>{r}</option>
+          ))}
+        </select>
+        <input placeholder="상세(선택)" value={form.detail} onChange={(e) => setForm({ ...form, detail: e.target.value })} />
         <button type="submit">밴 등록</button>
       </form>
 

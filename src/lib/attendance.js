@@ -52,6 +52,18 @@ export async function setAvailableSlots(id, n) {
   return data
 }
 
+// 가용시간(예정) 윈도우 설정 (자정 기준 분)
+export async function setPlan(id, planStartMin, planEndMin) {
+  const { data, error } = await supabase
+    .from('attendance')
+    .update({ plan_start_min: planStartMin, plan_end_min: planEndMin })
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
 export async function removePlanned(id) {
   const { error } = await supabase.from('attendance').delete().eq('id', id)
   if (error) throw error
