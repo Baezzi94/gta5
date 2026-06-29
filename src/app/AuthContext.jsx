@@ -32,6 +32,7 @@ export function AuthProvider({ children }) {
   const value = {
     session, role, memberId, loading,
     signIn: (email, password) => supabase.auth.signInWithPassword({ email, password }),
+    signUp: (email, password, meta) => supabase.auth.signUp({ email, password, options: { data: meta } }),
     signOut: () => supabase.auth.signOut(),
   }
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>

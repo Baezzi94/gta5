@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { listMembers, createMember, deleteMember } from '../lib/members'
+import { listCodes, regenerateCode } from '../lib/codes'
 
 const TYPES = [
   ['princess', '공주님'],
@@ -11,6 +12,7 @@ const TYPE_LABEL = Object.fromEntries(TYPES)
 
 export default function Members() {
   const [members, setMembers] = useState([])
+  const [codes, setCodes] = useState([])
   const [form, setForm] = useState({ name: '', phone: '', type: 'princess', memo: '', referred_by: '' })
   const [error, setError] = useState('')
 
@@ -21,9 +23,27 @@ export default function Members() {
       setError(e.message)
     }
   }
+  async function loadCodes() {
+    try {
+      setCodes(await listCodes())
+    } catch (e) {
+      /* 코드 조회 권한 없으면 무시 */
+    }
+  }
   useEffect(() => {
     load()
+    loadCodes()
   }, [])
+
+  async function onRegen(role) {
+    setError('')
+    try {
+      await regenerateCode(role)
+      loadCodes()
+    } catch (e) {
+      setError(e.message)
+    }
+  }
 
   async function onDelete(id, name) {
     if (!window.confirm(`'${name}' 멤버를 삭제할까요? (되돌릴 수 없음)`)) return
@@ -58,6 +78,22 @@ export default function Members() {
     <div>
       <h1>멤버 관리</h1>
       {error && <p style={{ color: 'salmon' }}>{error}</p>}
+
+      {codes.length > 0 && (
+        <div style={{ marginBottom: 20, padding: 12, background: '#16131f', borderRadius: 10 }}>
+          <strong>가입 코드</strong>
+          <p style={{ color: '#9a93b8', fontSize: 12, margin: '4px 0 8px' }}>역할별 코드를 해당 인원에게 전달 → 회원가입 시 입력하면 자동으로 그 역할로 가입됩니다.</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+            {codes.map((c) => (
+              <div key={c.role} style={{ background: '#241a3d', borderRadius: 8, padding: '8px 12px' }}>
+                <div style={{ color: '#ffcf5a', fontSize: 12 }}>{TYPE_LABEL[c.role] ?? c.role}</div>
+                <code style={{ fontSize: 16, letterSpacing: 1 }}>{c.code}</code>
+                <button style={{ marginLeft: 8, fontSize: 11 }} onClick={() => onRegen(c.role)}>재발급</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <form onSubmit={onCreate} style={{ display: 'grid', gap: 8, maxWidth: 420, marginBottom: 24 }}>
         <input placeholder="이름(닉)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
