@@ -10,6 +10,7 @@ import Attendance from '../pages/Attendance'
 import Customers from '../pages/Customers'
 import Bans from '../pages/Bans'
 import Reservations from '../pages/Reservations'
+import Collections from '../pages/Collections'
 
 function Root() {
   const { session, loading } = useAuth()
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="customers" element={<Customers />} />
           <Route path="bans" element={<Bans />} />
           <Route path="reservations" element={<Reservations />} />
+          <Route path="collections" element={<Collections />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

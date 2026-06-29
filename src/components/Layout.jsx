@@ -5,6 +5,7 @@ const ROLE_LABEL = { owner: '사장', staff: '운영스탭', promoter: '삐끼',
 
 const MENU = [
   { to: '/reservations', label: '예약판', roles: ['owner', 'staff'] },
+  { to: '/collections', label: '수금/정산', roles: ['owner', 'staff', 'promoter', 'princess'] },
   { to: '/attendance', label: '출근부', roles: ['owner', 'staff', 'princess'] },
   { to: '/customers', label: '손님', roles: ['owner', 'staff'] },
   { to: '/bans', label: '밴', roles: ['owner', 'staff'] },

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { listByDate as listAvail } from '../lib/schedule'
 import { listByDate as listReservations, createReservation, setStatus } from '../lib/reservations'
 import { findOrCreateByPhone } from '../lib/customers'
+import { createTalkFromReservation } from '../lib/charges'
 import { listMembers } from '../lib/members'
 import { isBanned } from '../lib/bans'
 import { hmToMin, minToHm } from '../lib/time'
@@ -78,10 +79,12 @@ export default function Reservations() {
     }
   }
 
-  async function onStatus(id, status) {
+  async function onStatus(r, status) {
     setError('')
     try {
-      await setStatus(id, status)
+      await setStatus(r.id, status)
+      // 완료 처리 시 대화료 거래(수금 대상) 자동 생성
+      if (status === 'done') await createTalkFromReservation(r)
       load()
     } catch (e) {
       setError(e.message)
@@ -145,7 +148,7 @@ export default function Reservations() {
               <td>{STATUS_LABEL[r.status]}</td>
               <td style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                 {STATUS.map(([v, l]) => (
-                  <button key={v} onClick={() => onStatus(r.id, v)}>{l}</button>
+                  <button key={v} onClick={() => onStatus(r, v)}>{l}</button>
                 ))}
               </td>
             </tr>
