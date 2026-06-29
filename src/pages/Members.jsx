@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { listMembers, createMember } from '../lib/members'
+import { listMembers, createMember, deleteMember } from '../lib/members'
 
 const TYPES = [
   ['princess', '공주님'],
@@ -24,6 +24,17 @@ export default function Members() {
   useEffect(() => {
     load()
   }, [])
+
+  async function onDelete(id, name) {
+    if (!window.confirm(`'${name}' 멤버를 삭제할까요? (되돌릴 수 없음)`)) return
+    setError('')
+    try {
+      await deleteMember(id)
+      load()
+    } catch (e) {
+      setError(e.message + ' (예약·추천 등 연결된 기록이 있으면 삭제 대신 비활성화하세요)')
+    }
+  }
 
   async function onCreate(e) {
     e.preventDefault()
@@ -80,7 +91,7 @@ export default function Members() {
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ textAlign: 'left', color: '#ffcf5a' }}>
-            <th>이름</th><th>유형</th><th>전화</th><th>추천인</th><th>활성</th>
+            <th>이름</th><th>유형</th><th>전화</th><th>추천인</th><th>활성</th><th>삭제</th>
           </tr>
         </thead>
         <tbody>
@@ -91,6 +102,7 @@ export default function Members() {
               <td>{m.phone ?? '-'}</td>
               <td>{members.find((x) => x.id === m.referred_by)?.name ?? '-'}</td>
               <td>{m.active ? 'O' : 'X'}</td>
+              <td><button onClick={() => onDelete(m.id, m.name)}>삭제</button></td>
             </tr>
           ))}
         </tbody>

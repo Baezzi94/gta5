@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { getOpenSession } from '../lib/sessions'
-import { listBySession as listAttendance } from '../lib/attendance'
-import { listBySession as listReservations, createReservation, setStatus } from '../lib/reservations'
+import { listByDate as listAvail } from '../lib/schedule'
+import { listByDate as listReservations, createReservation, setStatus } from '../lib/reservations'
 import { findOrCreateByPhone } from '../lib/customers'
 import { isBanned } from '../lib/bans'
 import { hmToMin, minToHm } from '../lib/time'
+import { ymd } from '../lib/week'
 
 const STATUS = [
   ['in_progress', '진행'],
@@ -15,8 +15,8 @@ const STATUS = [
 const STATUS_LABEL = { booked: '예약', in_progress: '진행', done: '완료', no_show: '노쇼', cancelled: '취소' }
 
 export default function Reservations() {
-  const [session, setSession] = useState(null)
-  const [attendance, setAttendance] = useState([])
+  const [date, setDate] = useState(() => ymd(new Date()))
+  const [avail, setAvail] = useState([])
   const [rows, setRows] = useState([])
   const [form, setForm] = useState({ princess_id: '', phone: '', nickname: '', start: '', end: '' })
   const [notice, setNotice] = useState('')
@@ -25,19 +25,25 @@ export default function Reservations() {
   async function load() {
     setError('')
     try {
-      const s = await getOpenSession()
-      setSession(s)
-      if (s) {
-        setAttendance(await listAttendance(s.id))
-        setRows(await listReservations(s.id))
-      }
+      setAvail(await listAvail(date))
+      setRows(await listReservations(date))
     } catch (e) {
       setError(e.message)
     }
   }
   useEffect(() => {
     load()
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date])
+
+  // 그 날짜 가용 공주님별 윈도우 묶기
+  const byPrincess = {}
+  for (const a of avail) {
+    const id = a.member_id
+    if (!byPrincess[id]) byPrincess[id] = { id, name: a.member?.name, windows: [] }
+    byPrincess[id].windows.push(`${minToHm(a.start_min)}~${minToHm(a.end_min)}`)
+  }
+  const princessOptions = Object.values(byPrincess)
 
   async function onCreate(e) {
     e.preventDefault()
@@ -47,19 +53,11 @@ export default function Reservations() {
     const end_min = hmToMin(form.end)
     if (!form.princess_id) return setError('공주님을 선택하세요.')
     if (!form.phone) return setError('손님 전화번호를 입력하세요.')
-    if (Number.isNaN(start_min) || Number.isNaN(end_min) || start_min >= end_min) {
-      return setError('시간을 올바르게 입력하세요 (시작 < 종료).')
-    }
+    if (Number.isNaN(start_min) || Number.isNaN(end_min) || start_min >= end_min) return setError('시간을 올바르게 입력하세요 (시작 < 종료).')
     try {
       if (await isBanned(form.phone)) setNotice('⚠️ 밴된 번호입니다. 그래도 예약은 진행됩니다.')
       const customer = await findOrCreateByPhone({ phone: form.phone, nickname: form.nickname })
-      await createReservation({
-        session_id: session.id,
-        customer_id: customer.id,
-        princess_id: form.princess_id,
-        start_min,
-        end_min,
-      })
+      await createReservation({ date, customer_id: customer.id, princess_id: form.princess_id, start_min, end_min })
       setForm({ princess_id: '', phone: '', nickname: '', start: '', end: '' })
       load()
     } catch (e) {
@@ -77,39 +75,30 @@ export default function Reservations() {
     }
   }
 
-  if (!session) {
-    return (
-      <div>
-        <h1>예약판</h1>
-        <p style={{ color: '#9a93b8' }}>열린 영업 세션이 없습니다.</p>
-        {error && <p style={{ color: 'salmon' }}>{error}</p>}
-      </div>
-    )
-  }
-
   return (
     <div>
-      <h1>예약판 <span style={{ color: '#9a93b8', fontSize: 14 }}>(오늘 세션: {session.date})</span></h1>
+      <h1>예약판</h1>
       {error && <p style={{ color: 'salmon' }}>{error}</p>}
       {notice && <p style={{ color: '#ffb35e' }}>{notice}</p>}
 
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
+        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        <button onClick={() => setDate(ymd(new Date()))}>오늘</button>
+        <span style={{ color: '#9a93b8' }}>가용 공주님 {princessOptions.length}명</span>
+      </div>
+
       <form onSubmit={onCreate} style={{ display: 'grid', gap: 8, maxWidth: 480, marginBottom: 24, padding: 12, background: '#16131f', borderRadius: 10 }}>
-        <strong>새 예약</strong>
+        <strong>새 예약 ({date})</strong>
         <select value={form.princess_id} onChange={(e) => setForm({ ...form, princess_id: e.target.value })}>
-          <option value="">공주님 선택</option>
-          {attendance.map((a) => (
-            <option key={a.member_id} value={a.member_id}>
-              {a.member?.name}
-              {a.plan_start_min != null ? ` (가능 ${minToHm(a.plan_start_min)}~${minToHm(a.plan_end_min)})` : ' (가용시간 미설정)'}
-            </option>
+          <option value="">공주님 선택 (가용시간 등록된 사람만)</option>
+          {princessOptions.map((p) => (
+            <option key={p.id} value={p.id}>{p.name} (가능 {p.windows.join(', ')})</option>
           ))}
         </select>
-
         <div style={{ display: 'flex', gap: 6 }}>
           <input placeholder="손님 전화번호" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required style={{ flex: 1 }} />
           <input placeholder="닉네임" value={form.nickname} onChange={(e) => setForm({ ...form, nickname: e.target.value })} style={{ flex: 1 }} />
         </div>
-
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           <label>시간:</label>
           <input type="time" value={form.start} onChange={(e) => setForm({ ...form, start: e.target.value })} />
@@ -117,7 +106,7 @@ export default function Reservations() {
           <input type="time" value={form.end} onChange={(e) => setForm({ ...form, end: e.target.value })} />
         </div>
         <button type="submit">예약 추가</button>
-        <span style={{ color: '#9a93b8', fontSize: 12 }}>전화번호로 손님이 자동 등록/조회됩니다. 가용시간 밖이면 예약이 거부됩니다.</span>
+        <span style={{ color: '#9a93b8', fontSize: 12 }}>전화번호로 손님 자동 등록/조회. 가용시간 밖/중복이면 거부됩니다.</span>
       </form>
 
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>

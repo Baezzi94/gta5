@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { overlaps, isAvailable, canExtend, withinWindow } from './availability'
+import { overlaps, isAvailable, canExtend, withinWindow, withinAnyWindow } from './availability'
 
 describe('overlaps()', () => {
   it('겹치면 true', () => {
@@ -43,5 +43,22 @@ describe('withinWindow()', () => {
   })
   it('윈도우 없으면 false', () => {
     expect(withinWindow(null, { start: 0, end: 20 })).toBe(false)
+  })
+})
+
+describe('withinAnyWindow()', () => {
+  const wins = [
+    { start: 1080, end: 1140 }, // 18:00~19:00
+    { start: 1260, end: 1380 }, // 21:00~23:00
+  ]
+  it('어느 블록 안이면 true', () => {
+    expect(withinAnyWindow(wins, { start: 1260, end: 1280 })).toBe(true)
+    expect(withinAnyWindow(wins, { start: 1080, end: 1100 })).toBe(true)
+  })
+  it('어느 블록에도 안 들면 false', () => {
+    expect(withinAnyWindow(wins, { start: 1150, end: 1200 })).toBe(false)
+  })
+  it('빈 목록이면 false', () => {
+    expect(withinAnyWindow([], { start: 0, end: 20 })).toBe(false)
   })
 })

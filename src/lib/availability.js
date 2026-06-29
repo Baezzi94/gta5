@@ -18,3 +18,8 @@ export function withinWindow(window, slot) {
   if (!window) return false
   return slot.start >= window.start && slot.end <= window.end
 }
+
+// 여러 가용 블록(windows) 중 하나라도 slot을 완전히 포함하면 true
+export function withinAnyWindow(windows, slot) {
+  return (windows || []).some((w) => withinWindow(w, slot))
+}

@@ -24,3 +24,8 @@ export async function updateMember(id, patch) {
 export async function deactivateMember(id) {
   return updateMember(id, { active: false })
 }
+
+export async function deleteMember(id) {
+  const { error } = await supabase.from('members').delete().eq('id', id)
+  if (error) throw error
+}
