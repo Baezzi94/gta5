@@ -2,10 +2,13 @@ import { useEffect, useState } from 'react'
 import { listByDate, createCharge, setCollected, deleteCharge, CHARGE_AMOUNT, CHARGE_LABEL } from '../lib/charges'
 import { findOrCreateByPhone } from '../lib/customers'
 import { listMembers } from '../lib/members'
+import { settle } from '../lib/settlement'
 import { ymd } from '../lib/week'
 import { useAuth } from '../app/AuthContext'
 
 const man = (won) => `${Math.round(won / 10000)}만`
+const won = (n) => `${Math.round(n).toLocaleString()}원`
+const ROLE_LABEL = { owner: '사장', staff: '운영스탭', promoter: '삐끼', princess: '공주님' }
 
 export default function Collections() {
   const { role } = useAuth()
@@ -13,8 +16,9 @@ export default function Collections() {
   const canAdd = role === 'owner' || role === 'staff'
   const [date, setDate] = useState(() => ymd(new Date()))
   const [rows, setRows] = useState([])
-  const [princesses, setPrincesses] = useState([])
+  const [members, setMembers] = useState([])
   const [form, setForm] = useState({ type: 'tc', phone: '', nickname: '', princess_id: '' })
+  const princesses = members.filter((m) => m.type === 'princess')
   const [error, setError] = useState('')
 
   async function load() {
@@ -30,7 +34,7 @@ export default function Collections() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date])
   useEffect(() => {
-    listMembers().then((m) => setPrincesses(m.filter((x) => x.type === 'princess'))).catch(() => {})
+    listMembers().then(setMembers).catch(() => {})
   }, [])
 
   async function onAdd(e) {
@@ -70,6 +74,27 @@ export default function Collections() {
   const collected = rows.filter((r) => r.collected).reduce((s, r) => s + r.amount, 0)
   const outstanding = total - collected
   const uncollectedCount = rows.filter((r) => !r.collected).length
+
+  // 정산 (수금완료 기준)
+  const memberMap = Object.fromEntries(members.map((m) => [m.id, m]))
+  const enriched = rows
+    .filter((r) => r.collected)
+    .map((c) => ({
+      type: c.type,
+      amount: c.amount,
+      princess_id: c.princess_id,
+      customer_id: c.customer_id,
+      princess_referred_by: c.princess?.referred_by,
+      customer_referred_by: c.customer?.referred_by,
+    }))
+  const shareMembers = members
+    .filter((m) => (m.type === 'owner' || m.type === 'staff') && m.active)
+    .map((m) => ({ id: m.id, role: m.type }))
+  const settlement = settle(enriched, shareMembers)
+  const settleRows = settlement.perMember
+    .map((pm) => ({ ...pm, name: memberMap[pm.id]?.name ?? '(삭제됨)', role: memberMap[pm.id]?.type }))
+    .filter((pm) => pm.total !== 0)
+    .sort((a, b) => b.total - a.total)
 
   return (
     <div>
@@ -146,6 +171,37 @@ export default function Collections() {
           ))}
         </tbody>
       </table>
+
+      {/* 정산 대시보드 (수금완료 기준) */}
+      <h2 style={{ marginTop: 28 }}>정산 분배 <span style={{ color: '#9a93b8', fontSize: 13, fontWeight: 400 }}>(수금완료 기준 · 운영풀 {won(settlement.pool)} · 지분 사장1.2 : 스탭1.0)</span></h2>
+      {settleRows.length === 0 ? (
+        <p style={{ color: '#9a93b8' }}>수금 완료된 거래가 없습니다. 거래를 "수금" 처리하면 자동 분배됩니다.</p>
+      ) : (
+        <table>
+          <thead>
+            <tr style={{ color: '#ffcf5a' }}>
+              <th>이름</th><th>역할</th><th>대화료</th><th>2차</th><th>지분</th><th>손님추천</th><th>영입</th><th>합계</th>
+            </tr>
+          </thead>
+          <tbody>
+            {settleRows.map((m) => (
+              <tr key={m.id}>
+                <td>{m.name}</td>
+                <td>{ROLE_LABEL[m.role] ?? m.role ?? '-'}</td>
+                <td>{m.talk ? won(m.talk) : '-'}</td>
+                <td>{m.date2 ? won(m.date2) : '-'}</td>
+                <td>{m.share ? won(m.share) : '-'}</td>
+                <td>{m.referral ? won(m.referral) : '-'}</td>
+                <td>{m.recruit ? won(m.recruit) : '-'}</td>
+                <td style={{ fontWeight: 800, color: '#5ee0a0' }}>{won(m.total)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      <p style={{ color: '#9a93b8', fontSize: 12, marginTop: 6 }}>
+        ※ 팁은 정산 제외(개인 수령). 지분은 활성 사장·운영스탭 기준 자동 분배. 수금 처리할수록 실시간 반영됩니다.
+      </p>
     </div>
   )
 }

@@ -6,7 +6,7 @@ export const CHARGE_LABEL = { tc: 'TC(입장료)', talk: '대화료', date2: '2�
 export async function listByDate(date) {
   const { data, error } = await supabase
     .from('charges')
-    .select('*, customer:customers(id, nickname, phone), princess:members(id, name)')
+    .select('*, customer:customers(id, nickname, phone, referred_by), princess:members(id, name, referred_by)')
     .eq('date', date)
     .order('created_at', { ascending: true })
   if (error) throw error

@@ -1,0 +1,45 @@
+import { describe, it, expect } from 'vitest'
+import { settle } from './settlement'
+
+describe('settle()', () => {
+  const charges = [
+    { type: 'tc', amount: 50000, customer_id: 'C1' },
+    { type: 'talk', amount: 250000, princess_id: 'P1', princess_referred_by: 'R1', customer_id: 'C1' },
+    { type: 'date2', amount: 1000000, princess_id: 'P2', customer_id: 'C2', customer_referred_by: 'R2' },
+  ]
+  const shareMembers = [
+    { id: 'O', role: 'owner' },
+    { id: 'S1', role: 'staff' },
+  ]
+  const r = settle(charges, shareMembers)
+
+  it('운영풀 = tc5 + talk풀10 - 영입1 + date2풀30 - 손님추천3 = 41만', () => {
+    expect(r.pool).toBe(410000)
+  })
+  it('공주 개인: 대화료 15만, 2차 70만', () => {
+    const p1 = r.perMember.find((m) => m.id === 'P1')
+    const p2 = r.perMember.find((m) => m.id === 'P2')
+    expect(p1.talk).toBe(150000)
+    expect(p2.date2).toBe(700000)
+  })
+  it('영입자 R1 +1만, 손님추천자 R2 +3만', () => {
+    expect(r.perMember.find((m) => m.id === 'R1').recruit).toBe(10000)
+    expect(r.perMember.find((m) => m.id === 'R2').referral).toBe(30000)
+  })
+  it('사장 지분 > 스탭 지분 (1.2 : 1.0)', () => {
+    const o = r.perMember.find((m) => m.id === 'O').share
+    const s = r.perMember.find((m) => m.id === 'S1').share
+    expect(o).toBeGreaterThan(s)
+    expect(o + s).toBeLessThanOrEqual(410000 + 1) // 반올림 오차 허용
+  })
+  it('손님추천은 동일 손님 1회만', () => {
+    const dup = settle(
+      [
+        { type: 'talk', amount: 250000, princess_id: 'P1', customer_id: 'C9', customer_referred_by: 'R9' },
+        { type: 'talk', amount: 250000, princess_id: 'P1', customer_id: 'C9', customer_referred_by: 'R9' },
+      ],
+      []
+    )
+    expect(dup.perMember.find((m) => m.id === 'R9').referral).toBe(30000)
+  })
+})
