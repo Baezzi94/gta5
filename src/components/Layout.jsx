@@ -8,7 +8,7 @@ const MENU = [
   { to: '/reservations', label: '예약판', icon: '📅', roles: ['owner', 'staff'] },
   { to: '/collections', label: '수금 · 정산', icon: '💰', roles: ['owner', 'staff', 'promoter', 'princess'] },
   { to: '/attendance', label: '공주 출근부', icon: '🗓️', roles: ['owner', 'staff', 'princess'] },
-  { to: '/staff-attendance', label: '스탭 출근부', icon: '🧑‍✈️', roles: ['owner', 'staff', 'promoter', 'princess'] },
+  { to: '/staff-attendance', label: '스탭 출근부', icon: '🧑‍✈️', roles: ['owner', 'staff', 'princess'] },
   { to: '/customers', label: '손님', icon: '🙋', roles: ['owner', 'staff'] },
   { to: '/bans', label: '밴', icon: '⛔', roles: ['owner', 'staff'] },
   { to: '/flyer', label: '찌라시', icon: '📢', roles: ['owner', 'staff', 'promoter'] },
