@@ -10,7 +10,8 @@ const DOW = ['월', '화', '수', '목', '금', '토', '일']
 
 export default function Attendance() {
   const { role, memberId } = useAuth()
-  const canManage = role === 'owner' || role === 'staff'
+  const isOwner = role === 'owner'
+  const canAdd = isOwner || role === 'princess' // 사장: 전체 / 공주: 본인만
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()))
   const [blocks, setBlocks] = useState([])
   const [princesses, setPrincesses] = useState([])
@@ -47,7 +48,7 @@ export default function Attendance() {
   async function onAdd(e) {
     e.preventDefault()
     setError('')
-    const mid = canManage ? form.member_id : memberId
+    const mid = isOwner ? form.member_id : memberId
     if (!mid) return setError('공주님을 선택하세요.')
     const start = hmToMin(form.start)
     const end = hmToMin(form.end)
@@ -68,25 +69,27 @@ export default function Attendance() {
         <span style={{ color: '#9a93b8' }}>{days[0]} ~ {days[6]}</span>
       </div>
 
-      <form onSubmit={onAdd} style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16, padding: 10, background: '#16131f', borderRadius: 10 }}>
-        {canManage && (
-          <select value={form.member_id} onChange={(e) => setForm({ ...form, member_id: e.target.value })}>
-            <option value="">공주님</option>
-            {princesses.map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
+      {canAdd && (
+        <form onSubmit={onAdd} style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16, padding: 10, background: '#16131f', borderRadius: 10 }}>
+          {isOwner && (
+            <select value={form.member_id} onChange={(e) => setForm({ ...form, member_id: e.target.value })}>
+              <option value="">공주님</option>
+              {princesses.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+          )}
+          <select value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })}>
+            {days.map((d, i) => (
+              <option key={d} value={d}>{d} ({DOW[i]})</option>
             ))}
           </select>
-        )}
-        <select value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })}>
-          {days.map((d, i) => (
-            <option key={d} value={d}>{d} ({DOW[i]})</option>
-          ))}
-        </select>
-        <TimeField value={form.start} onChange={(v) => setForm({ ...form, start: v })} />
-        ~
-        <TimeField value={form.end} onChange={(v) => setForm({ ...form, end: v })} />
-        <button type="submit">가용시간 추가</button>
-      </form>
+          <TimeField value={form.start} onChange={(v) => setForm({ ...form, start: v })} />
+          ~
+          <TimeField value={form.end} onChange={(v) => setForm({ ...form, end: v })} />
+          <button type="submit">가용시간 추가</button>
+        </form>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6 }}>
         {days.map((d, i) => {
@@ -98,7 +101,7 @@ export default function Attendance() {
               </div>
               {dayBlocks.map((b) => {
                 const mine = b.member_id === memberId
-                const editable = canManage || mine
+                const editable = isOwner || mine
                 return (
                   <div key={b.id} style={{ background: '#241a3d', borderRadius: 6, padding: '4px 6px', marginBottom: 4, fontSize: 12 }}>
                     <div style={{ fontWeight: 600 }}>{b.member?.name}</div>

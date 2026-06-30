@@ -9,8 +9,9 @@ import TimeField from '../components/TimeField'
 const DOW = ['월', '화', '수', '목', '금', '토', '일']
 
 export default function StaffAttendance() {
-  const { role } = useAuth()
-  const canManage = role === 'owner' || role === 'staff'
+  const { role, memberId } = useAuth()
+  const isOwner = role === 'owner'
+  const canAdd = isOwner || role === 'staff' // 사장: 전체 / 스탭: 본인만
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()))
   const [blocks, setBlocks] = useState([])
   const [staff, setStaff] = useState([])
@@ -47,11 +48,12 @@ export default function StaffAttendance() {
   async function onAdd(e) {
     e.preventDefault()
     setError('')
-    if (!form.member_id) return setError('스탭을 선택하세요.')
+    const mid = isOwner ? form.member_id : memberId
+    if (!mid) return setError('스탭을 선택하세요.')
     const start = hmToMin(form.start)
     const end = hmToMin(form.end)
     if (Number.isNaN(start) || Number.isNaN(end) || start >= end) return setError('시간을 올바르게 입력하세요 (시작 < 종료).')
-    await act(addAvailability, form.member_id, form.date, start, end)
+    await act(addAvailability, mid, form.date, start, end)
     setForm({ ...form, start: '', end: '' })
   }
 
@@ -68,14 +70,16 @@ export default function StaffAttendance() {
         <span style={{ color: '#9a93b8' }}>{days[0]} ~ {days[6]}</span>
       </div>
 
-      {canManage && (
+      {canAdd && (
         <form onSubmit={onAdd} style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16, padding: 10, background: '#16131f', borderRadius: 10 }}>
-          <select value={form.member_id} onChange={(e) => setForm({ ...form, member_id: e.target.value })}>
-            <option value="">스탭</option>
-            {staff.map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
-          </select>
+          {isOwner && (
+            <select value={form.member_id} onChange={(e) => setForm({ ...form, member_id: e.target.value })}>
+              <option value="">스탭</option>
+              {staff.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+          )}
           <select value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })}>
             {days.map((d, i) => (
               <option key={d} value={d}>{d} ({DOW[i]})</option>
@@ -103,7 +107,7 @@ export default function StaffAttendance() {
                   <div style={{ color: b.checked_in_at ? '#5ee0a0' : '#9a93b8' }}>
                     {b.checked_in_at ? (b.checked_out_at ? '퇴근' : '출근중') : '예정'}
                   </div>
-                  {canManage && (
+                  {(isOwner || b.member_id === memberId) && (
                     <div style={{ display: 'flex', gap: 4, marginTop: 2 }}>
                       {!b.checked_in_at && <button style={{ fontSize: 11 }} onClick={() => act(checkIn, b.id)}>출근</button>}
                       {b.checked_in_at && !b.checked_out_at && <button style={{ fontSize: 11 }} onClick={() => act(checkOut, b.id)}>퇴근</button>}

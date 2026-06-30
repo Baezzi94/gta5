@@ -5,7 +5,8 @@ export function hmToMin(hm) {
   if (!m) return NaN
   const h = Number(m[1])
   const min = Number(m[2])
-  if (h > 23 || min > 59) return NaN
+  // 심야 영업 지원: 24:00~29:59 = 자정 넘어 새벽까지 (24:00=1440, 26:00=새벽2시)
+  if (h > 29 || min > 59) return NaN
   return h * 60 + min
 }
 

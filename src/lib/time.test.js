@@ -7,8 +7,12 @@ describe('hmToMin()', () => {
     expect(hmToMin('09:30')).toBe(570)
     expect(hmToMin('23:59')).toBe(1439)
   })
+  it('심야(24:00~29:59) 허용', () => {
+    expect(hmToMin('24:00')).toBe(1440)
+    expect(hmToMin('26:30')).toBe(1590)
+  })
   it('잘못된 입력은 NaN', () => {
-    expect(Number.isNaN(hmToMin('25:00'))).toBe(true)
+    expect(Number.isNaN(hmToMin('30:00'))).toBe(true)
     expect(Number.isNaN(hmToMin('abc'))).toBe(true)
     expect(Number.isNaN(hmToMin(''))).toBe(true)
   })
