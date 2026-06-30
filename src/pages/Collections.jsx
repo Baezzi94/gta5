@@ -81,14 +81,17 @@ export default function Collections() {
     }
   }
 
-  const total = rows.reduce((s, r) => s + r.amount, 0)
-  const collected = rows.filter((r) => r.collected).reduce((s, r) => s + r.amount, 0)
+  // 노쇼/취소된 예약의 거래는 무효 처리(집계·정산 제외)
+  const isVoid = (r) => r.reservation?.status === 'cancelled' || r.reservation?.status === 'no_show'
+  const live = rows.filter((r) => !isVoid(r))
+  const total = live.reduce((s, r) => s + r.amount, 0)
+  const collected = live.filter((r) => r.collected).reduce((s, r) => s + r.amount, 0)
   const outstanding = total - collected
-  const uncollectedCount = rows.filter((r) => !r.collected).length
+  const uncollectedCount = live.filter((r) => !r.collected).length
 
-  // 정산 (수금완료 기준)
+  // 정산 (수금완료 기준, 무효 제외)
   const memberMap = Object.fromEntries(members.map((m) => [m.id, m]))
-  const enriched = rows
+  const enriched = live
     .filter((r) => r.collected)
     .map((c) => ({
       type: c.type,
@@ -176,23 +179,28 @@ export default function Collections() {
           </tr>
         </thead>
         <tbody>
-          {rows.map((r) => (
-            <tr key={r.id} style={{ borderTop: '1px solid #2c2742', background: r.collected ? 'transparent' : 'rgba(255,94,94,.07)' }}>
+          {rows.map((r) => {
+            const voided = isVoid(r)
+            return (
+            <tr key={r.id} style={{ borderTop: '1px solid #2c2742', background: voided ? 'transparent' : (r.collected ? 'transparent' : 'rgba(255,94,94,.07)'), opacity: voided ? 0.5 : 1 }}>
               <td>{CHARGE_LABEL[r.type]}</td>
               <td>{r.customer?.nickname ?? '-'}</td>
               <td>{r.princess?.name ?? '-'}</td>
-              <td>{man(r.amount)}</td>
-              <td style={{ color: r.collected ? '#5ee0a0' : '#ff5e5e', fontWeight: 700 }}>{r.collected ? '수금완료' : '미수금'}</td>
+              <td style={{ textDecoration: voided ? 'line-through' : 'none' }}>{man(r.amount)}</td>
+              <td style={{ fontWeight: 700, color: voided ? '#9a93b8' : (r.collected ? '#5ee0a0' : '#ff5e5e') }}>
+                {voided ? '취소됨' : (r.collected ? '수금완료' : '미수금')}
+              </td>
               {isOwner && (
                 <td style={{ display: 'flex', gap: 4 }}>
-                  {r.collected
+                  {!voided && (r.collected
                     ? <button onClick={() => act(setCollected, r.id, false)}>수금취소</button>
-                    : <button onClick={() => act(setCollected, r.id, true)}>수금</button>}
+                    : <button onClick={() => act(setCollected, r.id, true)}>수금</button>)}
                   <button onClick={() => act(deleteCharge, r.id)}>삭제</button>
                 </td>
               )}
             </tr>
-          ))}
+            )
+          })}
         </tbody>
       </table>
 
