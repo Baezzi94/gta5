@@ -11,7 +11,7 @@
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
-  body{margin:0;background:var(--bg);color:var(--txt);font-family:'Pretendard','Malgun Gothic',sans-serif;line-height:1.75;font-size:16px}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:'Pretendard','Malgun Gothic',sans-serif;line-height:1.8;font-size:16px}
   a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
   .layout{display:flex;min-height:100vh}
   .side{width:260px;flex:none;background:var(--panel);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;padding:22px 16px}
@@ -24,22 +24,29 @@
   .doc{width:100%;max-width:860px}
   .hero{border:1px solid var(--line);border-radius:18px;padding:28px 30px;margin-bottom:30px;background:radial-gradient(700px 300px at 0% 0%,#2a1c3c,var(--panel) 70%)}
   .hero h1{margin:0 0 6px;font-size:1.9rem}
-  h2{margin:50px 0 14px;padding-top:12px;font-size:1.45rem;border-bottom:1px solid var(--line);padding-bottom:10px;scroll-margin-top:12px}
-  h3{margin:26px 0 8px;font-size:1.12rem;color:var(--accent2)}
-  ul,ol{padding-left:22px} li{margin:5px 0}
+  h2{margin:48px 0 14px;padding-top:12px;font-size:1.45rem;border-bottom:1px solid var(--line);padding-bottom:10px;scroll-margin-top:12px}
+  h3{margin:24px 0 8px;font-size:1.1rem;color:var(--accent2)}
+  p{margin:10px 0}
+  ul,ol{padding-left:22px} li{margin:7px 0}
   table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.92rem}
   th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
   th{background:var(--panel2);color:var(--accent2)}
   .callout{border-left:3px solid var(--accent);background:var(--panel2);padding:12px 16px;border-radius:8px;margin:14px 0}
   .ok{border-left:3px solid var(--ok);background:rgba(94,224,160,.08);padding:12px 16px;border-radius:8px;margin:14px 0}
-  .role{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.8rem;font-weight:700;margin-right:6px}
+  .warn{border-left:3px solid var(--accent2);background:rgba(255,207,90,.08);padding:12px 16px;border-radius:8px;margin:14px 0}
+  /* 아코디언 */
+  details{border:1px solid var(--line);border-radius:12px;margin:14px 0;background:var(--panel);overflow:hidden}
+  details[open]{background:var(--panel2)}
+  summary{cursor:pointer;padding:16px 18px;font-size:1.15rem;font-weight:800;list-style:none;display:flex;align-items:center;gap:10px}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:'▶';color:var(--accent);font-size:.8rem;transition:transform .15s}
+  details[open] summary::before{transform:rotate(90deg)}
+  .acc-body{padding:0 20px 18px}
+  .role{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.78rem;font-weight:700}
   .r-princess{background:rgba(255,94,160,.18);color:#ff8fb0}
   .r-staff{background:rgba(90,215,255,.16);color:#7ad0ff}
   .r-promoter{background:rgba(255,207,90,.16);color:#ffcf5a}
-  /* 캡쳐 자리 */
-  .shot{border:2px dashed #3a3458;border-radius:12px;background:#120f1c;color:#6f688c;text-align:center;padding:34px 16px;margin:12px 0;font-size:.9rem}
-  .shot b{color:#9a93b8}
-  .step{counter-reset:none}
+  .shot{border:2px dashed #3a3458;border-radius:12px;background:#120f1c;color:#6f688c;text-align:center;padding:34px 16px;margin:12px 0}
   strong{color:#fff}
   code{font-family:'D2Coding',monospace;background:#0a0810;padding:2px 6px;border-radius:6px}
   @media(max-width:820px){.side{display:none}}
@@ -51,13 +58,11 @@
     <div class="brand">공주님 클럽</div>
     <div class="brand-sub">직원 매뉴얼</div>
     <nav>
-      <a href="#intro">0. 시작하기</a>
-      <a href="#pay">1. 역할별 정산(얼마 버나)</a>
-      <a href="#princess">2. 공주님 가이드</a>
-      <a href="#staff">3. 운영스탭 가이드</a>
-      <a href="#promoter">4. 삐끼 가이드</a>
-      <a href="#app">5. 운영앱 사용법</a>
-      <a href="#rules">6. 필수 규칙</a>
+      <a href="#start">0. 시작하기</a>
+      <a href="#common">1. 공통 가이드 (필독)</a>
+      <a href="#jobs">2. 직업별 가이드</a>
+      <a href="#app">3. 운영앱 사용법</a>
+      <a href="#rules">4. 필수 규칙</a>
     </nav>
   </aside>
 
@@ -65,142 +70,174 @@
 
     <div class="hero">
       <h1>공주님 클럽 직원 매뉴얼</h1>
-      <div>CLIMAX 서버 토킹바 · 우리 모두 다 같이 버는 곳</div>
-      <div class="callout">모든 금액은 게임 내 화폐(RP) 기준. 합법 RP 컨텐츠이며, 현금 거래가 아닙니다.</div>
+      <div>CLIMAX 서버 토킹바 · 다 같이 버는 곳</div>
+      <div class="callout">모든 금액·활동은 게임 내 화폐(RP)와 RP(롤플레잉) 안에서 이루어집니다. 합법 컨텐츠이며 현금 거래가 아닙니다.</div>
     </div>
 
-    <h2 id="intro">0. 시작하기</h2>
+    <!-- 0 -->
+    <h2 id="start">0. 시작하기</h2>
+    <p>가장 먼저 운영앱에 가입하고 로그인합니다. 우리 가게의 예약·출근·정산·홍보가 전부 이 앱 하나로 돌아가니, 익숙해지는 게 첫걸음입니다.</p>
     <ol>
-      <li>운영앱 접속: <a href="https://gta5-rho.vercel.app" target="_blank">https://gta5-rho.vercel.app</a></li>
-      <li><strong>회원가입</strong> 탭 → 사장이 DM으로 준 <strong>가입코드</strong> + 이메일/비번 + 이름/전화 입력.</li>
-      <li>공주님은 가입 시 <strong>추천인(데려온 사람) 전화/닉</strong>도 입력.</li>
-      <li>로그인되면 사장에게 알리기.</li>
+      <li><strong>앱 접속</strong> — <a href="https://gta5-rho.vercel.app" target="_blank">https://gta5-rho.vercel.app</a> 에 들어갑니다. 폰·PC 어디서든 됩니다.</li>
+      <li><strong>회원가입</strong> — "회원가입" 탭에서 사장이 DM으로 보내준 <strong>직업별 가입코드</strong>를 넣고, 이메일·비밀번호·이름·전화번호를 입력합니다. 코드에 따라 역할(공주님/운영스탭/삐끼)이 자동으로 정해집니다.</li>
+      <li><strong>공주님이라면</strong> — 가입할 때 "추천인(나를 데려온 사람) 전화/닉"도 함께 입력해 주세요. 그래야 데려온 사람에게 영입 보상이 정상 지급됩니다.</li>
+      <li><strong>로그인 후</strong> — 사장에게 "가입했어요"라고 알려 주세요. 그래야 바로 운영에 합류시켜 드립니다.</li>
     </ol>
-    <div class="ok"><strong>핵심 원칙:</strong> 공주님이 늘수록·손님이 늘수록 모두가 번다. 그래서 <strong>사람을 데려오는 게 곧 내 수익</strong>입니다.</div>
 
-    <h2 id="pay">1. 역할별 정산 (얼마 버나)</h2>
-    <h3>가격표</h3>
+    <!-- 1 공통 -->
+    <h2 id="common">1. 공통 가이드 (모두 필독)</h2>
+
+    <h3>우리가 하는 일</h3>
+    <p>공주님 클럽은 여성 유저(공주님)와의 대화·접대를 컨텐츠로 제공하는 <strong>토킹바</strong>입니다. 손님은 입장료를 내고, 공주님과 20분 단위로 대화를 즐기며, 원하면 외부 데이트(2차)나 주류를 추가로 즐깁니다. 모든 것은 서버 규칙 안에서 이루어지는 합법 RP입니다.</p>
+
+    <h3>돈이 도는 구조 — 왜 "다 같이 버는" 곳인가</h3>
+    <p>우리 가게의 핵심 철학은 <strong>"공주님이 늘수록, 손님이 늘수록 모두가 부자가 된다"</strong>입니다. 그래서 사장이 혼자 많이 가져가지 않고, 일한 사람들이 나눠 갖는 구조로 설계되어 있습니다. 즉 <strong>사람을 데려오는 행위 자체가 곧 내 수익</strong>이 됩니다.</p>
     <table>
       <tr><th>항목</th><th>가격</th><th>분배</th></tr>
-      <tr><td>TC(입장료)</td><td>5만</td><td>전액 운영풀</td></tr>
-      <tr><td>대화료</td><td>25만 / 20분</td><td>공주 15 / 운영풀 10</td></tr>
-      <tr><td>2차(외부)</td><td>100만 / 시간</td><td>공주 70 / 운영풀 30</td></tr>
-      <tr><td>팁</td><td>자유</td><td>받은 사람 100% 개인 (+@)</td></tr>
-      <tr><td>주류·담배</td><td>메뉴별</td><td>마진(판매−도매) = 출근 전원 N빵</td></tr>
+      <tr><td>TC(입장료)</td><td>5만</td><td>전액 운영풀(공동 수익)</td></tr>
+      <tr><td>대화료</td><td>25만 / 20분</td><td>공주 15만 / 운영풀 10만</td></tr>
+      <tr><td>2차(외부 데이트)</td><td>100만 / 시간</td><td>공주 70만 / 운영풀 30만</td></tr>
+      <tr><td>팁</td><td>자유</td><td>받은 사람이 100% 개인 소유 (+@)</td></tr>
+      <tr><td>주류·담배</td><td>메뉴별</td><td>마진(판매가−도매가)을 출근 전원이 N빵</td></tr>
     </table>
+    <p><strong>운영풀</strong>이란 TC·대화료의 가게 몫·2차의 가게 몫이 모이는 <strong>공동 주머니</strong>입니다. 이 운영풀을 그날 일한 사람들의 <strong>지분</strong>대로 나눕니다(사장 1.2 : 운영스탭 1.0). 공주님은 대화료를 직접 가져가므로 운영풀 지분에는 들어가지 않지만, 그만큼 본인 몫이 확실히 보장됩니다.</p>
 
-    <h3><span class="role r-princess">공주님</span>이렇게 법니다</h3>
+    <h3>출근과 정산의 대원칙</h3>
     <ul>
-      <li><strong>대화료 15만</strong> / 20분 타임 (4시간 풀 = 약 180만)</li>
-      <li><strong>팁 전액 본인 (+@)</strong> — 인기 많으면 기본급보다 더 벌 수도. 상한 없음!</li>
-      <li><strong>2차 70만</strong> / 건 (본인 선택, 거부권 보장)</li>
-      <li><strong>주류 마진 N빵</strong> (출근한 날) — 술 팔리면 같이 나눠 가짐</li>
-      <li>운영풀 지분은 없음(대화료를 직접 가져가니까). <strong>인원수와 무관하게 내 몫 100% 보장</strong></li>
+      <li><strong>그날 번 것은 그날 나눕니다.</strong> 영업이 끝나면 운영풀을 지분대로 정산해 지급합니다.</li>
+      <li><strong>출근(체크인)해야 정산을 받습니다.</strong> 출근부에 가용시간을 등록만 한 "예정" 상태로는 정산·예약 대상이 되지 않습니다. 꼭 영업일에 <strong>출근 버튼</strong>을 눌러야 합니다. (허위 출근은 기록으로 추적됩니다.)</li>
+      <li><strong>팁을 제외한 모든 현금은 사장에게 모입니다.</strong> 받은 돈은 사장에게 인계하고, 사장이 장부에 기록해 투명하게 정산합니다. 분쟁을 막기 위한 장치입니다.</li>
     </ul>
 
-    <h3><span class="role r-staff">운영스탭</span>(가드·웨이터 겸직) 이렇게 법니다</h3>
-    <ul>
-      <li><strong>운영풀 지분 1.0</strong> (출근한 날만!) — 그날 매출(TC·대화료풀·2차풀)을 사장1.2 : 스탭1.0으로 나눔</li>
-      <li><strong>팁</strong> (웨이터 턴에 받은 것 개인)</li>
-      <li><strong>주류 마진 N빵</strong> (출근한 날)</li>
-      <li><strong>⚠️ 출근(체크인) 안 하면 그날 지분 0원.</strong> 꼭 출근 버튼 누르기!</li>
-    </ul>
+    <h3>예의와 합법성 (모두에게 적용)</h3>
+    <p>우리는 서버 규칙을 어기는 곳이 아니라 <strong>앞장서서 지키는</strong> 곳입니다. 20세 이상만 이용하며, 성희롱·욕설·패드립·혐오 표현은 손님이든 직원이든 무관용으로 대응합니다. 서버 내 갈등은 RP 안에서 풀고, 마무리 후 F3 고객지원으로 처리하며, 외부(디스코드 등)로 분쟁을 끌고 가지 않습니다.</p>
 
-    <h3><span class="role r-promoter">삐끼</span>이렇게 법니다 (성과제·한도 없음)</h3>
-    <ul>
-      <li><strong>손님 추천 3만 / 명</strong> — 내가 데려온 손님이 이용하면</li>
-      <li><strong>공주 영입 1만 / 타임</strong> — 내가 데려온 공주가 일하는 내내 계속!</li>
-      <li>일당·지분 없음. <strong>데려온 만큼 무한대</strong>로 법니다.</li>
-    </ul>
+    <!-- 2 직업별 -->
+    <h2 id="jobs">2. 직업별 가이드</h2>
+    <p style="color:var(--muted)">제목을 누르면 펼쳐집니다. 본인 직업을 먼저 정독하세요.</p>
 
-    <h2 id="princess">2. 공주님 업무 가이드</h2>
-    <ol>
-      <li><strong>내 프로필</strong>에서 사진 등록 (찌라시 홍보에 사용).</li>
-      <li><strong>공주 출근부</strong>에서 내가 일할 <strong>가용시간</strong>을 미리 등록 (예: 21:00~24:00). 본인 것만 등록·수정 가능.</li>
-      <li>실제 영업일에 <strong>출근 버튼</strong> 클릭 → 그때부터 예약을 받습니다. (출근 안 하면 예약 안 잡힘)</li>
-      <li>손님과 1:1 대화·접대 RP (20분 타임). <strong>매너로 단골 만들기 = 팁이 곧 내 수입.</strong></li>
-      <li>2차는 본인이 원할 때만, <strong>웨이터를 통해서만</strong> 잡습니다.</li>
-      <li>일 끝나면 <strong>퇴근 버튼</strong>.</li>
-    </ol>
-    <div class="callout">팁은 직접 받아 본인이 보관(앱 장부 미기록). 그 외 모든 돈은 사장에게 모입니다.</div>
+    <details open>
+      <summary><span class="role r-princess">공주님</span> 공주님 가이드</summary>
+      <div class="acc-body">
+        <h3>내가 버는 방식</h3>
+        <p>공주님은 가게의 심장이고, 그만큼 가장 후하게 가져갑니다. 수익은 크게 네 갈래입니다.</p>
+        <ul>
+          <li><strong>대화료 15만 / 20분 타임.</strong> 4시간 풀로 일하면 대화료만 약 180만입니다. 인원수가 늘어도 본인 몫은 줄지 않습니다 — 내 타임은 온전히 내 것입니다.</li>
+          <li><strong>팁은 전액 본인 소유(+@).</strong> 앱 장부에 기록하지 않고 직접 받아 보관합니다. 매너가 좋고 인기가 많으면 기본 대화료보다 팁이 더 클 수도 있습니다. 상한이 없습니다.</li>
+          <li><strong>2차(외부 데이트) 70만 / 건.</strong> 100% 본인 선택이며 거부권이 보장됩니다. 부담 갖지 말고, 원할 때만 하면 됩니다.</li>
+          <li><strong>주류 마진 N빵.</strong> 출근한 날 가게에서 술이 팔리면 그 마진을 출근 전원이 함께 나눕니다. 손님에게 "술 한잔 사주세요"라고 자연스럽게 권하면 매출도, 내 몫도 늘어납니다.</li>
+        </ul>
+        <h3>업무 흐름 (이 순서대로)</h3>
+        <ol>
+          <li><strong>프로필 사진 등록.</strong> [내 프로필]에서 사진을 올립니다. 이 사진이 홍보물(찌라시)에 들어가 손님을 끌어옵니다.</li>
+          <li><strong>가용시간 미리 등록.</strong> [공주 출근부]에서 내가 일할 수 있는 시간(예: 21:00~24:00)을 미리 등록합니다. 본인 것만 등록·수정할 수 있습니다. 일주일치 미리 잡아두면 예약이 그만큼 일찍 들어옵니다.</li>
+          <li><strong>영업일에 출근 버튼.</strong> 실제로 일하는 날 [출근] 버튼을 눌러야 그 시간부터 예약을 받습니다. 안 누르면 손님이 나를 예약할 수 없습니다.</li>
+          <li><strong>접대.</strong> 손님과 1:1로 20분 타임을 진행합니다. 손님을 기분 좋게 해서 단골로 만드는 것이 곧 팁이고 재방문입니다.</li>
+          <li><strong>2차는 웨이터를 통해서만.</strong> 손님이 2차를 원하면 직접 정하지 말고 웨이터에게 넘깁니다. 웨이터가 일정·동의를 확인해 안전하게 잡아 줍니다.</li>
+          <li><strong>퇴근 버튼.</strong> 일이 끝나면 퇴근 처리합니다.</li>
+        </ol>
+        <div class="callout">정리: 사진 등록 → 가용시간 → <strong>출근</strong> → 접대(팁은 내 것) → 2차는 선택 → 퇴근.</div>
+      </div>
+    </details>
 
-    <h2 id="staff">3. 운영스탭 업무 가이드</h2>
-    <p>가드 역할과 웨이터 역할을 <strong>교대</strong>로 봅니다.</p>
-    <h3>출근</h3>
-    <ul><li><strong>스탭 출근부</strong>에서 근무시간 등록 + <strong>출근 버튼</strong> (지분 받으려면 필수).</li></ul>
-    <h3>웨이터 턴</h3>
-    <ol>
-      <li><strong>예약판</strong>에서 손님 예약 잡기/수정/미루기 (출근한 공주만 선택 가능).</li>
-      <li>손님 입장 → <strong>TC 수금</strong>·음료 제공, 손님 등록.</li>
-      <li>대화 타임 <strong>진행</strong> 누르면 TC·대화료가 자동 거래로 잡힘 (선불).</li>
-      <li><strong>2차 접수</strong>(웨이터 단독): 공주 동의·일정 확인 → 등록. 2차 시간만큼 그 공주 자리 비움 → 겹치는 예약은 안내대로 조정.</li>
-      <li><strong>주류·메뉴 판매</strong>: 수금/정산에서 손님+메뉴 수량 입력 → 판매 등록.</li>
-      <li>받은 현금은 <strong>사장에게 인계</strong>.</li>
-    </ol>
-    <h3>가드 턴</h3>
-    <ul>
-      <li>출입 통제·분위기 관리.</li>
-      <li><strong>성희롱·진상·시간초과·무전취식</strong>은 무관용 → <strong>밴</strong> 등록 + 사장/경찰(F3) 신고.</li>
-      <li>※ 손님을 죽이거나 폭행하면 우리가 범죄자. RP 경고 → 출입거부 → 증거 → 신고 순서로.</li>
-    </ul>
+    <details>
+      <summary><span class="role r-staff">운영스탭</span> 운영스탭 가이드 (가드·웨이터 겸직)</summary>
+      <div class="acc-body">
+        <h3>내가 버는 방식</h3>
+        <p>운영스탭은 가게가 돌아가게 만드는 사람입니다. 한 명이 가드 역할과 웨이터 역할을 <strong>교대</strong>로 맡아 지루하지 않게 일합니다.</p>
+        <ul>
+          <li><strong>운영풀 지분 1.0(출근한 날).</strong> 그날 매출(TC·대화료 가게몫·2차 가게몫)을 사장 1.2 : 스탭 각 1.0으로 나눠 가집니다. 손님이 많은 날일수록 내 몫도 커집니다.</li>
+          <li><strong>팁.</strong> 웨이터 턴에 손님이 주는 팁은 본인 소유입니다.</li>
+          <li><strong>주류 마진 N빵.</strong> 출근한 날 술 매출 마진을 함께 나눕니다.</li>
+        </ul>
+        <div class="warn"><strong>반드시 출근(체크인)하세요.</strong> [스탭 출근부]에서 근무시간을 등록하고 출근 버튼을 눌러야 그날 지분을 받습니다. 안 누르면 아무리 일해도 정산 0원입니다.</div>
+        <h3>웨이터 턴 업무</h3>
+        <ol>
+          <li><strong>예약 관리.</strong> [예약판]에서 손님 예약을 잡고, 미루고, 수정합니다. 출근한 공주님만 예약 대상으로 뜨니, 가용시간과 충돌을 보며 배정합니다.</li>
+          <li><strong>입장 처리.</strong> 손님이 오면 입장료(TC)를 받고 음료를 제공하며, 손님을 앱에 등록합니다(전화번호가 손님의 고정 ID입니다).</li>
+          <li><strong>타임 진행.</strong> 대화가 시작되면 [진행]을 누릅니다. 그 순간 TC와 대화료가 자동으로 거래(미수금)로 잡힙니다. 선불 원칙이라 진행 시점에 받습니다.</li>
+          <li><strong>2차 접수(웨이터 단독).</strong> 공주님 동의와 일정을 확인하고 2차를 등록합니다. 2차 시간만큼 그 공주님 자리가 비므로, 겹치는 예약은 앱 안내대로 미루거나 조정합니다.</li>
+          <li><strong>주류·메뉴 판매.</strong> [수금/정산]의 판매 폼에서 손님과 메뉴 수량을 넣으면 합계가 자동 계산됩니다. 선불로 받고 등록합니다.</li>
+          <li><strong>현금 인계.</strong> 받은 돈은 사장에게 인계합니다.</li>
+        </ol>
+        <h3>가드 턴 업무</h3>
+        <ul>
+          <li><strong>분위기·출입 관리.</strong> 손님 응대와 가게 분위기를 지킵니다.</li>
+          <li><strong>무관용 단속.</strong> 성희롱·진상·시간초과·무전취식은 즉시 대응 → 출입거부(밴) 등록 + 증거 확보 + 사장/경찰(F3) 신고.</li>
+          <li><strong>선은 지킨다.</strong> 손님을 죽이거나 폭행하면 우리가 범죄자가 됩니다. <strong>RP 경고 → 출입거부 → 증거 → 신고</strong> 순서로, 서버법 안에서 대응합니다.</li>
+        </ul>
+      </div>
+    </details>
 
-    <h2 id="promoter">4. 삐끼 업무 가이드</h2>
-    <ol>
-      <li>핫스팟에서 홍보, 손님 유치, 새 공주 섭외.</li>
-      <li>손님 데려오면 예약 시 <strong>추천인(나)</strong>으로 등록되게 → 손님추천 3만.</li>
-      <li>공주 영입하면 그 공주 가입 시 <strong>추천인(나)</strong> 등록 → 그 공주 일하는 내내 타임당 1만.</li>
-      <li>내 실적은 <strong>대시보드 → 추천/영입 실적</strong>에서 확인.</li>
-    </ol>
+    <details>
+      <summary><span class="role r-promoter">삐끼</span> 삐끼 가이드 (성과제 · 한도 없음)</summary>
+      <div class="acc-body">
+        <h3>내가 버는 방식</h3>
+        <p>삐끼는 일당이나 지분이 없는 대신, <strong>데려온 만큼 무한대로</strong> 버는 순수 성과제입니다. 능력이 곧 수입입니다.</p>
+        <ul>
+          <li><strong>손님 추천 3만 / 명.</strong> 내가 데려온 손님이 가게를 이용하면 한 명당 3만이 내 몫이 됩니다.</li>
+          <li><strong>공주 영입 1만 / 타임.</strong> 내가 데려온 공주님이 일하는 동안 그가 받는 타임마다 1만이 계속 내게 들어옵니다. 한 명만 잘 영입해도 그가 일하는 내내 수입이 쌓입니다 — 가장 강력한 무기입니다.</li>
+        </ul>
+        <h3>업무 흐름</h3>
+        <ol>
+          <li><strong>홍보·유치.</strong> 핫스팟에서 손님을 끌어오고, 새 공주님을 적극적으로 섭외합니다.</li>
+          <li><strong>반드시 "내 추천"으로 등록되게.</strong> 손님을 데려오면 예약 시 추천인이 나로 기록되도록, 공주님을 영입하면 그 공주님 가입 시 추천인이 나로 입력되도록 챙깁니다. 등록되지 않으면 보상이 인정되지 않습니다.</li>
+          <li><strong>실적 확인.</strong> [대시보드]의 추천/영입 실적에서 내 성과를 확인할 수 있습니다.</li>
+        </ol>
+      </div>
+    </details>
 
-    <h2 id="app">5. 운영앱 사용법 (화면별)</h2>
-    <p style="color:var(--muted)">아래 점선 박스 자리에 각 화면 캡쳐를 넣으세요. (이미지로 교체)</p>
+    <!-- 3 앱 -->
+    <h2 id="app">3. 운영앱 사용법 (화면별)</h2>
+    <p style="color:var(--muted)">아래 점선 박스 자리에 각 화면 캡쳐를 넣으세요.</p>
 
     <h3>📊 대시보드</h3>
-    <p>기간별 매출·미수금, 일별 차트, 공주 수익/추천 실적 랭킹, 인원별 정산 합계. 로그인하면 첫 화면.</p>
-    <div class="shot"><b>[캡쳐: 대시보드 화면]</b></div>
+    <p>로그인하면 처음 보이는 화면입니다. 기간을 골라 총 매출·미수금, 일별 매출 추이, 공주님 수익 랭킹과 추천/영입 실적, 인원별 정산 합계를 한눈에 봅니다. 운영 상태를 파악하는 출발점입니다.</p>
+    <div class="shot"><b>[캡쳐: 대시보드]</b></div>
 
     <h3>📅 예약판</h3>
-    <p>날짜 선택 → 출근중 공주 타임테이블 확인 → 공주·손님(전화/닉)·시간 입력 → 예약. 진행/완료/노쇼/취소/수정, 사장은 삭제.</p>
-    <div class="shot"><b>[캡쳐: 예약판 화면]</b></div>
+    <p>날짜를 고르면 그날 출근한 공주님들의 가능시간이 타임테이블로 보입니다. 공주님·손님·시간을 넣어 예약하고, 진행/완료/노쇼/취소로 상태를 바꿉니다. 노쇼·취소한 예약의 거래는 정산에서 "취소됨"으로 빠집니다. (예약 삭제는 사장만)</p>
+    <div class="shot"><b>[캡쳐: 예약판]</b></div>
 
-    <h3>🗓️ 공주 출근부 / 🧑‍✈️ 스탭 출근부</h3>
-    <p>주간 캘린더. 본인 가용시간 등록 → 출근/퇴근/재출근. (사장은 전체 관리)</p>
-    <div class="shot"><b>[캡쳐: 출근부 화면]</b></div>
+    <h3>🗓️ 출근부 (공주·스탭)</h3>
+    <p>주간 캘린더입니다. 본인의 가용시간을 등록하고, 영업일에 출근/퇴근/재출근을 누릅니다. 본인 것만 수정할 수 있고, 사장만 전체를 관리합니다.</p>
+    <div class="shot"><b>[캡쳐: 출근부]</b></div>
 
     <h3>🙋 손님 / ⛔ 밴</h3>
-    <p>손님 등록·검색·수정(닉/메모), 익명 표시. 밴은 사유 선택해 등록 → 밴된 번호는 예약·거래 차단.</p>
-    <div class="shot"><b>[캡쳐: 손님/밴 화면]</b></div>
+    <p>손님을 등록·검색·수정(닉/메모)하고, 익명 표시도 켤 수 있습니다. 문제 손님은 사유를 골라 밴 등록하며, 밴된 번호는 예약·거래가 자동으로 차단됩니다.</p>
+    <div class="shot"><b>[캡쳐: 손님 / 밴]</b></div>
 
     <h3>💰 수금 / 정산</h3>
-    <p>거래(TC/대화료/2차) + 주류·메뉴 판매 등록 → 미수금 표시 → (사장)수금 처리 → 정산 분배 자동 계산(지급상태 포함). 전원 열람.</p>
-    <div class="shot"><b>[캡쳐: 수금/정산 화면]</b></div>
+    <p>거래(TC·대화료·2차)와 주류·메뉴 판매를 등록하면 미수금으로 잡히고, 사장이 수금 처리하면 정산 분배가 자동 계산됩니다. 인원별 지급/미지급 상태도 표시됩니다. 화면은 전원이 볼 수 있고, 수금·지급 버튼은 사장만 사용합니다.</p>
+    <div class="shot"><b>[캡쳐: 수금 / 정산]</b></div>
 
     <h3>📢 찌라시</h3>
-    <p>날짜 선택 → 출근/가용 공주 사진·이름·가능시간을 홍보 이미지(PNG)로 생성 → 디스코드 배포.</p>
-    <div class="shot"><b>[캡쳐: 찌라시 화면]</b></div>
+    <p>날짜를 고르면 출근한 공주님들의 사진·이름·가능시간을 모아 홍보 이미지(PNG)로 만들어 줍니다. 디스코드에 그대로 올려 손님을 모읍니다.</p>
+    <div class="shot"><b>[캡쳐: 찌라시]</b></div>
 
     <h3>🙍 내 프로필</h3>
-    <p>본인 사진 등록/변경 (찌라시에 사용).</p>
-    <div class="shot"><b>[캡쳐: 내 프로필 화면]</b></div>
+    <p>본인 사진을 등록·변경합니다. 이 사진이 찌라시에 사용됩니다.</p>
+    <div class="shot"><b>[캡쳐: 내 프로필]</b></div>
 
-    <h2 id="rules">6. 필수 규칙</h2>
+    <!-- 4 규칙 -->
+    <h2 id="rules">4. 필수 규칙</h2>
     <ul>
-      <li><strong>20세 이상</strong>만. 성희롱·욕설·패드립·혐오 무관용 → 즉시 출입거부·신고.</li>
-      <li>모든 활동은 <strong>게임 내 RP·게임 내 화폐</strong>. 현금 거래 아님.</li>
-      <li><strong>출근(체크인) 안 하면 정산 못 받음.</strong> 허위 출근은 기록으로 추적됨.</li>
-      <li>팁만 개인, 나머지 모든 현금은 <strong>사장에게 집결 → 장부 → 지분 분배</strong>(당일).</li>
-      <li>서버 갈등은 RP 안에서, 마무리 후 F3. 외부(디코 등)로 분쟁 끌고 가지 않기.</li>
+      <li><strong>20세 이상만.</strong> 성희롱·욕설·패드립·혐오는 무관용 → 즉시 출입거부·신고.</li>
+      <li><strong>게임 내 RP·게임 내 화폐만.</strong> 현금 거래가 아닙니다.</li>
+      <li><strong>출근 안 하면 정산 못 받습니다.</strong> 출근 버튼은 꼭.</li>
+      <li><strong>팁만 개인, 나머지 현금은 전부 사장 집결 → 장부 → 당일 지분 정산.</strong></li>
+      <li><strong>분쟁은 RP 안에서, F3로.</strong> 외부로 끌고 가지 않습니다.</li>
     </ul>
-    <div class="ok">자세한 합법성·보안 규정은 <a href="https://gta5-rho.vercel.app/report.html" target="_blank">통합보고서</a> 참고.</div>
+    <div class="ok">자세한 합법성·보안 규정은 <a href="https://gta5-rho.vercel.app/report.html" target="_blank">통합보고서</a>를 참고하세요.</div>
 
-    <p style="color:var(--muted);margin-top:36px;font-size:.85rem">본 매뉴얼은 내부 직원용이며, 내용은 운영하며 업데이트됩니다.</p>
+    <p style="color:var(--muted);margin-top:36px;font-size:.85rem">본 매뉴얼은 내부 직원용이며 운영하며 계속 업데이트됩니다.</p>
   </article></main>
 </div>
 
 <script>
   const links=[...document.querySelectorAll('.side nav a')]
   const map=links.map(a=>({a,sec:document.querySelector(a.getAttribute('href'))})).filter(x=>x.sec)
-  const obs=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(l=>l.classList.remove('active'));const h=map.find(m=>m.sec===e.target);if(h)h.a.classList.add('active')}})},{rootMargin:'-20% 0px -70% 0px'})
+  const obs=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(l=>l.classList.remove('active'));const h=map.find(m=>m.sec===e.target);if(h)h.a.classList.add('active')}})},{rootMargin:'-15% 0px -75% 0px'})
   map.forEach(m=>obs.observe(m.sec))
 </script>
 </body>
