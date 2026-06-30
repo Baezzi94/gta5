@@ -15,6 +15,8 @@ const MENU = [
   { to: '/menu', label: '메뉴 관리', icon: '🍾', roles: ['owner'] },
   { to: '/members', label: '멤버', icon: '👥', roles: ['owner'] },
   { to: '/profile', label: '내 프로필', icon: '🙍', roles: ['owner', 'staff', 'promoter', 'princess'] },
+  { to: '/report.html', label: '사업계획서·규정', icon: '📄', roles: ['owner', 'staff'], external: true },
+  { to: '/deck.html', label: '발표자료', icon: '🖥️', roles: ['owner', 'staff'], external: true },
 ]
 
 export default function Layout() {
@@ -27,21 +29,33 @@ export default function Layout() {
         <div style={{ fontWeight: 800, marginBottom: 4, color: '#ff5ea0' }}>공주님 클럽</div>
         <div style={{ fontSize: 12, color: '#9a93b8', marginBottom: 16 }}>{ROLE_LABEL[role] ?? '미지정'}</div>
         <nav style={{ display: 'grid', gap: 4 }}>
-          {items.map((m) => (
-            <NavLink
-              key={m.to}
-              to={m.to}
-              style={({ isActive }) => ({
-                color: isActive ? '#ff5ea0' : '#cfc9e6',
-                textDecoration: 'none',
-                padding: '8px 10px',
-                borderRadius: 8,
-                background: isActive ? '#1d1930' : 'transparent',
-              })}
-            >
-              <span style={{ marginRight: 8 }}>{m.icon}</span>{m.label}
-            </NavLink>
-          ))}
+          {items.map((m) =>
+            m.external ? (
+              <a
+                key={m.to}
+                href={m.to}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#cfc9e6', textDecoration: 'none', padding: '8px 10px', borderRadius: 8 }}
+              >
+                <span style={{ marginRight: 8 }}>{m.icon}</span>{m.label} ↗
+              </a>
+            ) : (
+              <NavLink
+                key={m.to}
+                to={m.to}
+                style={({ isActive }) => ({
+                  color: isActive ? '#ff5ea0' : '#cfc9e6',
+                  textDecoration: 'none',
+                  padding: '8px 10px',
+                  borderRadius: 8,
+                  background: isActive ? '#1d1930' : 'transparent',
+                })}
+              >
+                <span style={{ marginRight: 8 }}>{m.icon}</span>{m.label}
+              </NavLink>
+            )
+          )}
         </nav>
         <button onClick={signOut} style={{ marginTop: 24, width: '100%' }}>로그아웃</button>
       </aside>
