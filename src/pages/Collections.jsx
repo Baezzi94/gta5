@@ -3,6 +3,7 @@ import { listByDate, createCharge, setCollected, deleteCharge, CHARGE_AMOUNT, CH
 import { findOrCreateByPhone } from '../lib/customers'
 import { isBanned } from '../lib/bans'
 import { listByDate as listAvailByDate } from '../lib/schedule'
+import { listByDate as listPayouts, setPaid } from '../lib/payouts'
 import { listMembers } from '../lib/members'
 import { settle } from '../lib/settlement'
 import { ymd } from '../lib/week'
@@ -19,6 +20,7 @@ export default function Collections() {
   const [date, setDate] = useState(() => ymd(new Date()))
   const [rows, setRows] = useState([])
   const [avail, setAvail] = useState([])
+  const [payouts, setPayouts] = useState([])
   const [members, setMembers] = useState([])
   const [form, setForm] = useState({ type: 'tc', phone: '', nickname: '', princess_id: '' })
   const princesses = members.filter((m) => m.type === 'princess')
@@ -29,6 +31,7 @@ export default function Collections() {
     try {
       setRows(await listByDate(date))
       setAvail(await listAvailByDate(date))
+      setPayouts(await listPayouts(date))
     } catch (e) {
       setError(e.message)
     }
@@ -105,6 +108,17 @@ export default function Collections() {
     .map((pm) => ({ ...pm, name: memberMap[pm.id]?.name ?? '(삭제됨)', role: memberMap[pm.id]?.type }))
     .filter((pm) => pm.total !== 0)
     .sort((a, b) => b.total - a.total)
+  const paidMap = Object.fromEntries(payouts.map((p) => [p.member_id, p.paid]))
+
+  async function onTogglePaid(memberId, paid) {
+    setError('')
+    try {
+      await setPaid(date, memberId, paid)
+      load()
+    } catch (e) {
+      setError(e.message)
+    }
+  }
 
   return (
     <div>
@@ -190,22 +204,35 @@ export default function Collections() {
         <table>
           <thead>
             <tr style={{ color: '#ffcf5a' }}>
-              <th>이름</th><th>역할</th><th>대화료</th><th>2차</th><th>지분</th><th>손님추천</th><th>영입</th><th>합계</th>
+              <th>이름</th><th>역할</th><th>대화료</th><th>2차</th><th>지분</th><th>손님추천</th><th>영입</th><th>합계</th><th>지급</th>
             </tr>
           </thead>
           <tbody>
-            {settleRows.map((m) => (
-              <tr key={m.id}>
-                <td>{m.name}</td>
-                <td>{ROLE_LABEL[m.role] ?? m.role ?? '-'}</td>
-                <td>{m.talk ? won(m.talk) : '-'}</td>
-                <td>{m.date2 ? won(m.date2) : '-'}</td>
-                <td>{m.share ? won(m.share) : '-'}</td>
-                <td>{m.referral ? won(m.referral) : '-'}</td>
-                <td>{m.recruit ? won(m.recruit) : '-'}</td>
-                <td style={{ fontWeight: 800, color: '#5ee0a0' }}>{won(m.total)}</td>
-              </tr>
-            ))}
+            {settleRows.map((m) => {
+              const paid = !!paidMap[m.id]
+              return (
+                <tr key={m.id}>
+                  <td>{m.name}</td>
+                  <td>{ROLE_LABEL[m.role] ?? m.role ?? '-'}</td>
+                  <td>{m.talk ? won(m.talk) : '-'}</td>
+                  <td>{m.date2 ? won(m.date2) : '-'}</td>
+                  <td>{m.share ? won(m.share) : '-'}</td>
+                  <td>{m.referral ? won(m.referral) : '-'}</td>
+                  <td>{m.recruit ? won(m.recruit) : '-'}</td>
+                  <td style={{ fontWeight: 800, color: '#5ee0a0' }}>{won(m.total)}</td>
+                  <td>
+                    <span style={{ color: paid ? '#5ee0a0' : '#ff6b6b', fontWeight: 700, marginRight: 6 }}>
+                      {paid ? '지급완료' : '미지급'}
+                    </span>
+                    {isOwner && (
+                      paid
+                        ? <button onClick={() => onTogglePaid(m.id, false)}>취소</button>
+                        : <button onClick={() => onTogglePaid(m.id, true)}>지급</button>
+                    )}
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       )}
