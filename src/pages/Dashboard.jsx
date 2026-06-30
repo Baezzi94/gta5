@@ -63,8 +63,9 @@ export default function Dashboard() {
   const acc = {}
   for (const d of [...new Set(collected.map((c) => c.date))]) {
     const staffInIds = new Set(avail.filter((a) => a.date === d && a.checked_in_at && a.member?.type === 'staff').map((a) => a.member_id))
+    const ownerInIds = new Set(avail.filter((a) => a.date === d && a.checked_in_at && a.member?.type === 'owner').map((a) => a.member_id))
     const shareMembers = members
-      .filter((m) => m.active && (m.type === 'owner' || (m.type === 'staff' && staffInIds.has(m.id))))
+      .filter((m) => m.active && ((m.type === 'owner' && ownerInIds.has(m.id)) || (m.type === 'staff' && staffInIds.has(m.id))))
       .map((m) => ({ id: m.id, role: m.type }))
     const res = settle(collected.filter((c) => c.date === d && c.type !== 'item').map(enrich), shareMembers)
     for (const pm of res.perMember) {
@@ -74,7 +75,7 @@ export default function Dashboard() {
     // 주류 분배 (출근 전원 N빵, 사장 1.5 + 도매원가 회수)
     const princessInIds = new Set(avail.filter((a) => a.date === d && a.checked_in_at && a.member?.type === 'princess').map((a) => a.member_id))
     const alcParts = members
-      .filter((m) => m.active && (m.type === 'owner' || (m.type === 'staff' && staffInIds.has(m.id)) || (m.type === 'princess' && princessInIds.has(m.id))))
+      .filter((m) => m.active && ((m.type === 'owner' && ownerInIds.has(m.id)) || (m.type === 'staff' && staffInIds.has(m.id)) || (m.type === 'princess' && princessInIds.has(m.id))))
       .map((m) => ({ id: m.id, role: m.type }))
     const alc = settleAlcohol(collected.filter((c) => c.date === d && c.type === 'item').map((c) => ({ amount: c.amount, cost: c.cost })), alcParts)
     for (const [id, amt] of Object.entries(alc.per)) {

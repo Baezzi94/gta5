@@ -25,7 +25,7 @@ export default function StaffAttendance() {
     try {
       setBlocks(await listRange(days[0], days[6]))
       const members = await listMembers()
-      setStaff(members.filter((m) => m.type === 'staff' && m.active))
+      setStaff(members.filter((m) => (m.type === 'staff' || m.type === 'owner') && m.active))
     } catch (e) {
       setError(e.message)
     }
@@ -61,8 +61,8 @@ export default function StaffAttendance() {
 
   return (
     <div>
-      <h1>스탭 출근부 (주간)</h1>
-      <p style={{ color: '#9a93b8', fontSize: 13, marginTop: -8 }}>출근한 스탭만 그날 운영풀 지분을 받습니다. (전원 열람)</p>
+      <h1>스탭 출근부 (주간) <span style={{ color: '#9a93b8', fontSize: 13, fontWeight: 400 }}>· 사장 포함</span></h1>
+      <p style={{ color: '#9a93b8', fontSize: 13, marginTop: -8 }}>출근한 스탭·사장만 그날 운영풀 지분을 받습니다. (전원 열람)</p>
       {error && <p style={{ color: 'salmon' }}>{error}</p>}
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
@@ -96,7 +96,7 @@ export default function StaffAttendance() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6 }}>
         {days.map((d, i) => {
-          const dayBlocks = blocks.filter((b) => b.date === d && b.member?.type === 'staff')
+          const dayBlocks = blocks.filter((b) => b.date === d && (b.member?.type === 'staff' || b.member?.type === 'owner'))
           return (
             <div key={d} style={{ background: '#16131f', borderRadius: 8, padding: 8, minHeight: 120 }}>
               <div style={{ fontWeight: 700, color: i >= 5 ? '#ff8fb0' : '#ffcf5a', fontSize: 13, marginBottom: 6 }}>

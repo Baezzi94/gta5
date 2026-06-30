@@ -138,15 +138,16 @@ export default function Collections() {
   // 그날 출근(체크인)한 스탭만 지분. 사장은 항상 포함.
   const staffInIds = new Set(avail.filter((a) => a.checked_in_at && a.member?.type === 'staff').map((a) => a.member_id))
   const princessInIds = new Set(avail.filter((a) => a.checked_in_at && a.member?.type === 'princess').map((a) => a.member_id))
+  const ownerInIds = new Set(avail.filter((a) => a.checked_in_at && a.member?.type === 'owner').map((a) => a.member_id))
   const shareMembers = members
-    .filter((m) => m.active && (m.type === 'owner' || (m.type === 'staff' && staffInIds.has(m.id))))
+    .filter((m) => m.active && ((m.type === 'owner' && ownerInIds.has(m.id)) || (m.type === 'staff' && staffInIds.has(m.id))))
     .map((m) => ({ id: m.id, role: m.type }))
   const settlement = settle(enriched, shareMembers)
 
   // 주류 분배: 출근 전원(사장+공주+스탭) N빵, 사장 1.5 + 도매원가 회수
   const itemCharges = live.filter((r) => r.collected && r.type === 'item').map((c) => ({ amount: c.amount, cost: c.cost }))
   const alcoholParticipants = members
-    .filter((m) => m.active && (m.type === 'owner' || (m.type === 'staff' && staffInIds.has(m.id)) || (m.type === 'princess' && princessInIds.has(m.id))))
+    .filter((m) => m.active && ((m.type === 'owner' && ownerInIds.has(m.id)) || (m.type === 'staff' && staffInIds.has(m.id)) || (m.type === 'princess' && princessInIds.has(m.id))))
     .map((m) => ({ id: m.id, role: m.type }))
   const alcohol = settleAlcohol(itemCharges, alcoholParticipants)
 

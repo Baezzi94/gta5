@@ -15,6 +15,7 @@ const MENU = [
   { to: '/menu', label: '메뉴 관리', icon: '🍾', roles: ['owner'] },
   { to: '/members', label: '멤버', icon: '👥', roles: ['owner'] },
   { to: '/profile', label: '내 프로필', icon: '🙍', roles: ['owner', 'staff', 'promoter', 'princess'] },
+  { to: '/manual.html', label: '직원매뉴얼', icon: '📖', roles: ['owner', 'staff', 'promoter', 'princess'], external: true },
   { to: '/report.html', label: '사업계획서·규정', icon: '📄', roles: ['owner', 'staff'], external: true },
 ]
 
