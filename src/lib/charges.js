@@ -6,7 +6,7 @@ export const CHARGE_LABEL = { tc: 'TC(입장료)', talk: '대화료', date2: '2�
 export async function listByDate(date) {
   const { data, error } = await supabase
     .from('charges')
-    .select('*, customer:customers(id, nickname, phone, referred_by), princess:members(id, name, referred_by), reservation:reservations(status)')
+    .select('*, customer:customers(id, nickname, phone, referred_by), princess:members(id, name, referred_by), reservation:reservations(status), menu_item:menu_items(name)')
     .eq('date', date)
     .order('created_at', { ascending: true })
   if (error) throw error
@@ -73,6 +73,25 @@ export async function createTcFromReservation(r) {
 // 2차 거래(100만)
 export async function createDate2FromReservation(r) {
   return createFromReservation(r, 'date2', { princess_id: r.princess_id })
+}
+
+// 메뉴(주류·담배) 판매: 수량>0인 항목들을 거래로 일괄 생성 (선불 — 미수금으로 생성 후 수금 처리)
+export async function createMenuSale({ date, customer_id, lines }) {
+  const rows = (lines || [])
+    .filter((l) => l.qty > 0)
+    .map((l) => ({
+      date,
+      type: 'item',
+      menu_item_id: l.menu_item_id,
+      qty: l.qty,
+      amount: l.sale_price * l.qty,
+      cost: l.cost_price * l.qty,
+      customer_id: customer_id ?? null,
+    }))
+  if (rows.length === 0) return []
+  const { data, error } = await supabase.from('charges').insert(rows).select()
+  if (error) throw error
+  return data
 }
 
 export async function setCollected(id, collected) {

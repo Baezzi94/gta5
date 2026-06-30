@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { listRange, CHARGE_LABEL } from '../lib/charges'
 import { listRange as listAvailRange } from '../lib/schedule'
 import { listMembers } from '../lib/members'
-import { settle } from '../lib/settlement'
+import { settle, settleAlcohol } from '../lib/settlement'
 import { ymd, addDays } from '../lib/week'
 import { toCsv, downloadCsv } from '../lib/csv'
 
@@ -37,11 +37,12 @@ export default function Dashboard() {
   }, [])
 
   const memberMap = Object.fromEntries(members.map((m) => [m.id, m]))
-  const collected = charges.filter((c) => c.collected)
+  const isVoid = (c) => c.reservation?.status === 'cancelled' || c.reservation?.status === 'no_show'
+  const collected = charges.filter((c) => c.collected && !isVoid(c))
 
   // KPI
   const totalCollected = collected.reduce((s, c) => s + c.amount, 0)
-  const outstanding = charges.filter((c) => !c.collected).reduce((s, c) => s + c.amount, 0)
+  const outstanding = charges.filter((c) => !c.collected && !isVoid(c)).reduce((s, c) => s + c.amount, 0)
   const opDays = new Set(collected.map((c) => c.date)).size
 
   // 일별 매출
@@ -65,10 +66,20 @@ export default function Dashboard() {
     const shareMembers = members
       .filter((m) => m.active && (m.type === 'owner' || (m.type === 'staff' && staffInIds.has(m.id))))
       .map((m) => ({ id: m.id, role: m.type }))
-    const res = settle(collected.filter((c) => c.date === d).map(enrich), shareMembers)
+    const res = settle(collected.filter((c) => c.date === d && c.type !== 'item').map(enrich), shareMembers)
     for (const pm of res.perMember) {
-      const a = (acc[pm.id] = acc[pm.id] || { talk: 0, date2: 0, share: 0, referral: 0, recruit: 0, total: 0 })
+      const a = (acc[pm.id] = acc[pm.id] || { talk: 0, date2: 0, share: 0, referral: 0, recruit: 0, alcohol: 0, total: 0 })
       a.talk += pm.talk; a.date2 += pm.date2; a.share += pm.share; a.referral += pm.referral; a.recruit += pm.recruit; a.total += pm.total
+    }
+    // 주류 분배 (출근 전원 N빵, 사장 1.5 + 도매원가 회수)
+    const princessInIds = new Set(avail.filter((a) => a.date === d && a.checked_in_at && a.member?.type === 'princess').map((a) => a.member_id))
+    const alcParts = members
+      .filter((m) => m.active && (m.type === 'owner' || (m.type === 'staff' && staffInIds.has(m.id)) || (m.type === 'princess' && princessInIds.has(m.id))))
+      .map((m) => ({ id: m.id, role: m.type }))
+    const alc = settleAlcohol(collected.filter((c) => c.date === d && c.type === 'item').map((c) => ({ amount: c.amount, cost: c.cost })), alcParts)
+    for (const [id, amt] of Object.entries(alc.per)) {
+      const a = (acc[id] = acc[id] || { talk: 0, date2: 0, share: 0, referral: 0, recruit: 0, alcohol: 0, total: 0 })
+      a.alcohol += amt; a.total += amt
     }
   }
   const memberRows = Object.entries(acc)
@@ -99,6 +110,7 @@ export default function Dashboard() {
       { label: '지분', value: 'share' },
       { label: '추천', value: 'referral' },
       { label: '영입', value: 'recruit' },
+      { label: '주류', value: 'alcohol' },
       { label: '합계(원)', value: 'total' },
     ]))
   }
@@ -179,7 +191,7 @@ export default function Dashboard() {
       {/* 인원별 정산 합계 */}
       <h2 style={{ marginTop: 22 }}>인원별 정산 합계 (기간)</h2>
       <table>
-        <thead><tr><th>이름</th><th>역할</th><th>대화료</th><th>2차</th><th>지분</th><th>추천</th><th>영입</th><th>합계</th></tr></thead>
+        <thead><tr><th>이름</th><th>역할</th><th>대화료</th><th>2차</th><th>지분</th><th>추천</th><th>영입</th><th>주류</th><th>합계</th></tr></thead>
         <tbody>
           {memberRows.map((m) => (
             <tr key={m.id}>
@@ -187,10 +199,11 @@ export default function Dashboard() {
               <td>{m.talk ? man(m.talk) : '-'}</td><td>{m.date2 ? man(m.date2) : '-'}</td>
               <td>{m.share ? man(m.share) : '-'}</td><td>{m.referral ? man(m.referral) : '-'}</td>
               <td>{m.recruit ? man(m.recruit) : '-'}</td>
+              <td>{m.alcohol ? man(m.alcohol) : '-'}</td>
               <td style={{ fontWeight: 800, color: '#5ee0a0' }}>{man(m.total)}</td>
             </tr>
           ))}
-          {memberRows.length === 0 && <tr><td colSpan={8} style={{ color: '#9a93b8' }}>수금 완료된 거래가 없습니다.</td></tr>}
+          {memberRows.length === 0 && <tr><td colSpan={9} style={{ color: '#9a93b8' }}>수금 완료된 거래가 없습니다.</td></tr>}
         </tbody>
       </table>
       <p style={{ color: '#9a93b8', fontSize: 12, marginTop: 6 }}>※ 수금완료 기준 · 일별 정산 합산. 팁 제외.</p>

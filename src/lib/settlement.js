@@ -14,6 +14,26 @@
 export const RECRUIT_PER_TALK = 10000 // 공주 영입 1만/타임
 export const CUSTOMER_REFERRAL = 30000 // 손님 추천 3만/명
 
+// 주류·메뉴 마진 분배 (출근 전원 N빵, 사장 1.5배 + 도매원가 회수)
+// itemCharges: [{ amount, cost }]  (수금완료·무효 제외된 item 거래)
+// participants: [{ id, role }]  (사장 + 그날 출근 공주·스탭)
+export function settleAlcohol(itemCharges, participants) {
+  let margin = 0
+  let cost = 0
+  for (const c of itemCharges || []) {
+    margin += (c.amount || 0) - (c.cost || 0)
+    cost += c.cost || 0
+  }
+  const shareOf = (m) => (m.role === 'owner' ? 1.5 : 1.0)
+  const totalShares = (participants || []).reduce((s, m) => s + shareOf(m), 0)
+  const unit = totalShares > 0 ? margin / totalShares : 0
+  const per = {}
+  for (const m of participants || []) {
+    per[m.id] = Math.round(shareOf(m) * unit) + (m.role === 'owner' ? cost : 0)
+  }
+  return { margin, cost, totalShares, per }
+}
+
 export function settle(charges, shareMembers) {
   const per = {}
   const ensure = (id) => {

@@ -12,6 +12,7 @@ const MENU = [
   { to: '/customers', label: '손님', icon: '🙋', roles: ['owner', 'staff'] },
   { to: '/bans', label: '밴', icon: '⛔', roles: ['owner', 'staff'] },
   { to: '/flyer', label: '찌라시', icon: '📢', roles: ['owner', 'staff', 'promoter'] },
+  { to: '/menu', label: '메뉴 관리', icon: '🍾', roles: ['owner'] },
   { to: '/members', label: '멤버', icon: '👥', roles: ['owner'] },
   { to: '/profile', label: '내 프로필', icon: '🙍', roles: ['owner', 'staff', 'promoter', 'princess'] },
 ]

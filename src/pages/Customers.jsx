@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { searchCustomers, createCustomer } from '../lib/customers'
+import { searchCustomers, createCustomer, updateCustomer } from '../lib/customers'
 import { isBanned } from '../lib/bans'
 import { dailyAnonCode } from '../lib/anonCode'
 
@@ -10,6 +10,18 @@ export default function Customers() {
   const [form, setForm] = useState({ phone: '', nickname: '', memo: '' })
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [editing, setEditing] = useState(null) // { id, nickname, memo }
+
+  async function onSaveEdit() {
+    setError('')
+    try {
+      await updateCustomer(editing.id, { nickname: editing.nickname, memo: editing.memo || null })
+      setEditing(null)
+      load()
+    } catch (e) {
+      setError(e.message)
+    }
+  }
 
   async function load() {
     setError('')
@@ -69,17 +81,30 @@ export default function Customers() {
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ textAlign: 'left', color: '#ffcf5a' }}>
-            <th>표시</th><th>전화</th><th>메모</th>
+            <th>표시</th><th>전화</th><th>메모</th><th>관리</th>
           </tr>
         </thead>
         <tbody>
-          {rows.map((c) => (
-            <tr key={c.id} style={{ borderTop: '1px solid #2c2742' }}>
-              <td>{anon ? `익명#${dailyAnonCode(c.phone, now)}` : c.nickname}</td>
-              <td>{anon ? '***' : c.phone}</td>
-              <td>{c.memo ?? '-'}</td>
-            </tr>
-          ))}
+          {rows.map((c) => {
+            const ed = editing && editing.id === c.id
+            return (
+              <tr key={c.id} style={{ borderTop: '1px solid #2c2742' }}>
+                <td>{anon ? `익명#${dailyAnonCode(c.phone, now)}` : (ed ? <input value={editing.nickname} onChange={(e) => setEditing({ ...editing, nickname: e.target.value })} style={{ width: 100 }} /> : c.nickname)}</td>
+                <td>{anon ? '***' : c.phone}</td>
+                <td>{ed ? <input value={editing.memo} onChange={(e) => setEditing({ ...editing, memo: e.target.value })} style={{ width: 160 }} /> : (c.memo ?? '-')}</td>
+                <td style={{ display: 'flex', gap: 4 }}>
+                  {ed ? (
+                    <>
+                      <button onClick={onSaveEdit}>저장</button>
+                      <button onClick={() => setEditing(null)}>취소</button>
+                    </>
+                  ) : (
+                    <button onClick={() => setEditing({ id: c.id, nickname: c.nickname, memo: c.memo ?? '' })}>수정</button>
+                  )}
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </div>

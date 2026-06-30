@@ -13,6 +13,7 @@ import Collections from '../pages/Collections'
 import Flyer from '../pages/Flyer'
 import Profile from '../pages/Profile'
 import Dashboard from '../pages/Dashboard'
+import Menu from '../pages/Menu'
 
 function Root() {
   const { session, loading } = useAuth()
@@ -36,6 +37,7 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="members" element={<Members />} />
+          <Route path="menu" element={<Menu />} />
           <Route path="attendance" element={<Attendance />} />
           <Route path="staff-attendance" element={<StaffAttendance />} />
           <Route path="customers" element={<Customers />} />

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { listByDate, createCharge, setCollected, deleteCharge, CHARGE_AMOUNT, CHARGE_LABEL } from '../lib/charges'
+import { listByDate, createCharge, createMenuSale, setCollected, deleteCharge, CHARGE_AMOUNT, CHARGE_LABEL } from '../lib/charges'
 import { findOrCreateByPhone } from '../lib/customers'
 import { isBanned } from '../lib/bans'
 import { listByDate as listAvailByDate } from '../lib/schedule'
 import { listByDate as listPayouts, setPaid } from '../lib/payouts'
 import { listMembers } from '../lib/members'
-import { settle } from '../lib/settlement'
+import { listMenu } from '../lib/menu'
+import { settle, settleAlcohol } from '../lib/settlement'
 import { ymd } from '../lib/week'
 import { useAuth } from '../app/AuthContext'
 
@@ -24,6 +25,9 @@ export default function Collections() {
   const [members, setMembers] = useState([])
   const [form, setForm] = useState({ type: 'tc', phone: '', nickname: '', princess_id: '' })
   const princesses = members.filter((m) => m.type === 'princess')
+  const [menu, setMenu] = useState([])
+  const [saleCust, setSaleCust] = useState({ phone: '', nickname: '' })
+  const [qty, setQty] = useState({}) // { menu_item_id: 수량 }
   const [error, setError] = useState('')
 
   async function load() {
@@ -44,7 +48,35 @@ export default function Collections() {
   }, [date])
   useEffect(() => {
     listMembers().then(setMembers).catch(() => {})
+    listMenu().then(setMenu).catch(() => {})
   }, [])
+
+  async function onMenuSale(e) {
+    e.preventDefault()
+    setError('')
+    const lines = menu
+      .map((m) => ({ menu_item_id: m.id, qty: Number(qty[m.id] || 0), sale_price: m.sale_price, cost_price: m.cost_price }))
+      .filter((l) => l.qty > 0)
+    if (lines.length === 0) return setError('판매할 메뉴 수량을 입력하세요.')
+    try {
+      if (saleCust.phone && (await isBanned(saleCust.phone))) {
+        setError(`🚫 밴된 번호(${saleCust.phone})입니다. 판매 불가.`)
+        return
+      }
+      let customer_id = null
+      if (saleCust.phone) {
+        const c = await findOrCreateByPhone({ phone: saleCust.phone, nickname: saleCust.nickname })
+        customer_id = c.id
+      }
+      await createMenuSale({ date, customer_id, lines })
+      setQty({})
+      setSaleCust({ phone: '', nickname: '' })
+      load()
+    } catch (e) {
+      setError(e.message)
+    }
+  }
+  const saleTotal = menu.reduce((s, m) => s + m.sale_price * Number(qty[m.id] || 0), 0)
 
   async function onAdd(e) {
     e.preventDefault()
@@ -94,7 +126,7 @@ export default function Collections() {
   // 정산 (수금완료 기준, 무효 제외)
   const memberMap = Object.fromEntries(members.map((m) => [m.id, m]))
   const enriched = live
-    .filter((r) => r.collected)
+    .filter((r) => r.collected && r.type !== 'item') // 주류는 따로 분배
     .map((c) => ({
       type: c.type,
       amount: c.amount,
@@ -105,13 +137,33 @@ export default function Collections() {
     }))
   // 그날 출근(체크인)한 스탭만 지분. 사장은 항상 포함.
   const staffInIds = new Set(avail.filter((a) => a.checked_in_at && a.member?.type === 'staff').map((a) => a.member_id))
+  const princessInIds = new Set(avail.filter((a) => a.checked_in_at && a.member?.type === 'princess').map((a) => a.member_id))
   const shareMembers = members
     .filter((m) => m.active && (m.type === 'owner' || (m.type === 'staff' && staffInIds.has(m.id))))
     .map((m) => ({ id: m.id, role: m.type }))
   const settlement = settle(enriched, shareMembers)
-  const settleRows = settlement.perMember
-    .map((pm) => ({ ...pm, name: memberMap[pm.id]?.name ?? '(삭제됨)', role: memberMap[pm.id]?.type }))
-    .filter((pm) => pm.total !== 0)
+
+  // 주류 분배: 출근 전원(사장+공주+스탭) N빵, 사장 1.5 + 도매원가 회수
+  const itemCharges = live.filter((r) => r.collected && r.type === 'item').map((c) => ({ amount: c.amount, cost: c.cost }))
+  const alcoholParticipants = members
+    .filter((m) => m.active && (m.type === 'owner' || (m.type === 'staff' && staffInIds.has(m.id)) || (m.type === 'princess' && princessInIds.has(m.id))))
+    .map((m) => ({ id: m.id, role: m.type }))
+  const alcohol = settleAlcohol(itemCharges, alcoholParticipants)
+
+  // 합산
+  const combined = {}
+  const ensure = (id) => {
+    if (!combined[id]) combined[id] = { id, talk: 0, date2: 0, share: 0, referral: 0, recruit: 0, alcohol: 0 }
+    return combined[id]
+  }
+  for (const pm of settlement.perMember) {
+    const e = ensure(pm.id)
+    e.talk = pm.talk; e.date2 = pm.date2; e.share = pm.share; e.referral = pm.referral; e.recruit = pm.recruit
+  }
+  for (const [id, amt] of Object.entries(alcohol.per)) ensure(id).alcohol += amt
+  const settleRows = Object.values(combined)
+    .map((e) => ({ ...e, name: memberMap[e.id]?.name ?? '(삭제됨)', role: memberMap[e.id]?.type, total: e.talk + e.date2 + e.share + e.referral + e.recruit + e.alcohol }))
+    .filter((r) => r.total !== 0)
     .sort((a, b) => b.total - a.total)
   const paidMap = Object.fromEntries(payouts.map((p) => [p.member_id, p.paid]))
 
@@ -173,6 +225,36 @@ export default function Collections() {
         </form>
       )}
 
+      {/* 주류·메뉴 판매 (선불) */}
+      {canAdd && menu.length > 0 && (
+        <form onSubmit={onMenuSale} style={{ marginBottom: 16, padding: 12, background: '#16131f', borderRadius: 10 }}>
+          <strong>🍾 주류·메뉴 판매</strong>
+          <div style={{ display: 'flex', gap: 6, margin: '8px 0' }}>
+            <input placeholder="손님 전화" value={saleCust.phone} onChange={(e) => setSaleCust({ ...saleCust, phone: e.target.value })} />
+            <input placeholder="닉" value={saleCust.nickname} onChange={(e) => setSaleCust({ ...saleCust, nickname: e.target.value })} />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 8 }}>
+            {menu.map((m) => (
+              <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#1d1930', borderRadius: 8, padding: '6px 8px' }}>
+                <span style={{ flex: 1 }}>{m.name} <span style={{ color: '#9a93b8', fontSize: 12 }}>{man(m.sale_price)}</span></span>
+                <input
+                  type="number"
+                  min="0"
+                  value={qty[m.id] || ''}
+                  onChange={(e) => setQty({ ...qty, [m.id]: e.target.value })}
+                  placeholder="0"
+                  style={{ width: 56 }}
+                />
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <strong style={{ color: '#ffcf5a' }}>합계: {man(saleTotal)} ({won(saleTotal)})</strong>
+            <button type="submit">판매 등록 (미수금)</button>
+          </div>
+        </form>
+      )}
+
       {/* 수금현황 */}
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
@@ -185,7 +267,7 @@ export default function Collections() {
             const voided = isVoid(r)
             return (
             <tr key={r.id} style={{ borderTop: '1px solid #2c2742', background: voided ? 'transparent' : (r.collected ? 'transparent' : 'rgba(255,94,94,.07)'), opacity: voided ? 0.5 : 1 }}>
-              <td>{CHARGE_LABEL[r.type]}</td>
+              <td>{r.type === 'item' ? `${r.menu_item?.name ?? '메뉴'} ×${r.qty}` : CHARGE_LABEL[r.type]}</td>
               <td>{r.customer?.nickname ?? '-'}</td>
               <td>{r.princess?.name ?? '-'}</td>
               <td style={{ textDecoration: voided ? 'line-through' : 'none' }}>{man(r.amount)}</td>
@@ -214,7 +296,7 @@ export default function Collections() {
         <table>
           <thead>
             <tr style={{ color: '#ffcf5a' }}>
-              <th>이름</th><th>역할</th><th>대화료</th><th>2차</th><th>지분</th><th>손님추천</th><th>영입</th><th>합계</th><th>지급</th>
+              <th>이름</th><th>역할</th><th>대화료</th><th>2차</th><th>지분</th><th>손님추천</th><th>영입</th><th>주류</th><th>합계</th><th>지급</th>
             </tr>
           </thead>
           <tbody>
@@ -229,6 +311,7 @@ export default function Collections() {
                   <td>{m.share ? won(m.share) : '-'}</td>
                   <td>{m.referral ? won(m.referral) : '-'}</td>
                   <td>{m.recruit ? won(m.recruit) : '-'}</td>
+                  <td>{m.alcohol ? won(m.alcohol) : '-'}</td>
                   <td style={{ fontWeight: 800, color: '#5ee0a0' }}>{won(m.total)}</td>
                   <td>
                     <span style={{ color: paid ? '#5ee0a0' : '#ff6b6b', fontWeight: 700, marginRight: 6 }}>

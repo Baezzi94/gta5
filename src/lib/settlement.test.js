@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { settle } from './settlement'
+import { settle, settleAlcohol } from './settlement'
 
 describe('settle()', () => {
   const charges = [
@@ -32,6 +32,25 @@ describe('settle()', () => {
     expect(o).toBeGreaterThan(s)
     expect(o + s).toBeLessThanOrEqual(410000 + 1) // 반올림 오차 허용
   })
+  it('주류: 마진 N빵(사장1.5) + 도매원가 사장 회수, 공주 포함', () => {
+    // 판매 30만(도매12만) 1병 → 마진 18만, 도매 12만
+    const items = [{ amount: 300000, cost: 120000 }]
+    const parts = [
+      { id: 'O', role: 'owner' },
+      { id: 'P1', role: 'princess' },
+      { id: 'S1', role: 'staff' },
+    ]
+    const a = settleAlcohol(items, parts)
+    expect(a.margin).toBe(180000)
+    expect(a.cost).toBe(120000)
+    // 총지분 1.5+1+1=3.5, unit=180000/3.5≈51428.57
+    // 공주 = round(51428.57)=51429
+    expect(a.per['P1']).toBe(51429)
+    expect(a.per['S1']).toBe(51429)
+    // 사장 = round(1.5*unit)+도매12만 = round(77142.86)+120000 = 77143+120000
+    expect(a.per['O']).toBe(77143 + 120000)
+  })
+
   it('손님추천은 동일 손님 1회만', () => {
     const dup = settle(
       [
