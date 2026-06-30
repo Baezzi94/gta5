@@ -50,6 +50,7 @@ export default function Reservations() {
   // 그 날짜 가용 공주님별 (윈도우 + 예약) 묶기 → 타임테이블/드롭다운
   const byPrincess = {}
   for (const a of avail) {
+    if (a.member?.type !== 'princess') continue // 스탭 등 공주 아닌 출근은 예약판에서 제외
     const id = a.member_id
     if (!byPrincess[id]) byPrincess[id] = { id, name: a.member?.name, windows: [], reservations: [], checkedIn: false }
     byPrincess[id].windows.push({ start: a.start_min, end: a.end_min })

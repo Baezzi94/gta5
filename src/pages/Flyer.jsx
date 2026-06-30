@@ -28,6 +28,7 @@ export default function Flyer() {
 
   const map = {}
   for (const a of avail) {
+    if (a.member?.type !== 'princess') continue // 찌라시는 공주님만
     const id = a.member_id
     if (!map[id]) map[id] = { id, name: a.member?.name, photo: a.member?.profile_photo_url, checkedIn: false, windows: [] }
     map[id].windows.push({ start: a.start_min, end: a.end_min })
