@@ -47,6 +47,9 @@
   .r-staff{background:rgba(90,215,255,.16);color:#7ad0ff}
   .r-promoter{background:rgba(255,207,90,.16);color:#ffcf5a}
   .shot{border:2px dashed #3a3458;border-radius:12px;background:#120f1c;color:#6f688c;text-align:center;padding:34px 16px;margin:12px 0}
+  .cap{margin:12px 0}
+  .cap img{width:100%;border:1px solid var(--line);border-radius:10px;display:block}
+  .cap figcaption{color:var(--muted);font-size:.85rem;margin-top:6px;text-align:center}
   strong{color:#fff}
   code{font-family:'D2Coding',monospace;background:#0a0810;padding:2px 6px;border-radius:6px}
   @media(max-width:820px){.side{display:none}}
@@ -102,6 +105,14 @@
     </table>
     <p><strong>운영풀</strong>이란 TC·대화료의 가게 몫·2차의 가게 몫이 모이는 <strong>공동 주머니</strong>입니다. 이 운영풀을 그날 일한 사람들의 <strong>지분</strong>대로 나눕니다(사장 1.2 : 운영스탭 1.0). 공주님은 대화료를 직접 가져가므로 운영풀 지분에는 들어가지 않지만, 그만큼 본인 몫이 확실히 보장됩니다.</p>
 
+    <h3>🎁 공주 영입 인센티브 (전 직원 공통)</h3>
+    <p>이건 삐끼만의 보상이 아니라 <strong>모든 직원에게 열린 공통 인센티브</strong>입니다. 직업이 공주님이든 운영스탭이든, <strong>내가 새 공주님을 데려오면</strong> 그 공주님이 일하는 동안 <strong>타임당 1만</strong>이 계속 내 몫으로 들어옵니다. 한 명만 잘 영입해도 그가 일하는 내내 수입이 쌓이는, 우리 가게에서 가장 강력한 부수입입니다.</p>
+    <ul>
+      <li><strong>받는 사람:</strong> 직업 무관 전 직원 누구나.</li>
+      <li><strong>조건:</strong> 그 공주님이 <strong>가입(또는 멤버 등록)할 때 추천인이 "나"로 매핑</strong>되어 있어야 합니다. 공주님 가입 시 "추천인 전화/닉"에 나를 넣게 하거나, 사장이 멤버 등록 시 추천인을 지정합니다.</li>
+      <li><strong>지급:</strong> 그 공주님의 대화료 타임마다 1만씩(운영풀에서 차감), 일하는 내내 지속.</li>
+    </ul>
+
     <h3>출근과 정산의 대원칙</h3>
     <ul>
       <li><strong>그날 번 것은 그날 나눕니다.</strong> 영업이 끝나면 운영풀을 지분대로 정산해 지급합니다.</li>
@@ -126,6 +137,7 @@
           <li><strong>팁은 전액 본인 소유(+@).</strong> 앱 장부에 기록하지 않고 직접 받아 보관합니다. 매너가 좋고 인기가 많으면 기본 대화료보다 팁이 더 클 수도 있습니다. 상한이 없습니다.</li>
           <li><strong>2차(외부 데이트) 70만 / 건.</strong> 100% 본인 선택이며 거부권이 보장됩니다. 부담 갖지 말고, 원할 때만 하면 됩니다.</li>
           <li><strong>주류 마진 N빵.</strong> 출근한 날 가게에서 술이 팔리면 그 마진을 출근 전원이 함께 나눕니다. 손님에게 "술 한잔 사주세요"라고 자연스럽게 권하면 매출도, 내 몫도 늘어납니다.</li>
+          <li><strong>공주 영입 1만 / 타임.</strong> 다른 공주님을 데려와도 전 직원 공통 인센티브로 받습니다(1번 공통 가이드 참고).</li>
         </ul>
         <h3>업무 흐름 (이 순서대로)</h3>
         <ol>
@@ -149,6 +161,7 @@
           <li><strong>운영풀 지분 1.0(출근한 날).</strong> 그날 매출(TC·대화료 가게몫·2차 가게몫)을 사장 1.2 : 스탭 각 1.0으로 나눠 가집니다. 손님이 많은 날일수록 내 몫도 커집니다.</li>
           <li><strong>팁.</strong> 웨이터 턴에 손님이 주는 팁은 본인 소유입니다.</li>
           <li><strong>주류 마진 N빵.</strong> 출근한 날 술 매출 마진을 함께 나눕니다.</li>
+          <li><strong>공주 영입 1만 / 타임.</strong> 공주님을 데려오면 전 직원 공통 인센티브로 받습니다(1번 공통 가이드 참고).</li>
         </ul>
         <div class="warn"><strong>반드시 출근(체크인)하세요.</strong> [스탭 출근부]에서 근무시간을 등록하고 출근 버튼을 눌러야 그날 지분을 받습니다. 안 누르면 아무리 일해도 정산 0원입니다.</div>
         <h3>웨이터 턴 업무</h3>
@@ -173,17 +186,19 @@
       <summary><span class="role r-promoter">삐끼</span> 삐끼 가이드 (성과제 · 한도 없음)</summary>
       <div class="acc-body">
         <h3>내가 버는 방식</h3>
-        <p>삐끼는 일당이나 지분이 없는 대신, <strong>데려온 만큼 무한대로</strong> 버는 순수 성과제입니다. 능력이 곧 수입입니다.</p>
+        <p>삐끼는 일당이나 지분이 없는 대신, <strong>손님을 데려온 만큼 무한대로</strong> 버는 순수 성과제입니다. 능력이 곧 수입입니다.</p>
         <ul>
-          <li><strong>손님 추천 3만 / 명.</strong> 내가 데려온 손님이 가게를 이용하면 한 명당 3만이 내 몫이 됩니다.</li>
-          <li><strong>공주 영입 1만 / 타임.</strong> 내가 데려온 공주님이 일하는 동안 그가 받는 타임마다 1만이 계속 내게 들어옵니다. 한 명만 잘 영입해도 그가 일하는 내내 수입이 쌓입니다 — 가장 강력한 무기입니다.</li>
+          <li><strong>손님 추천 3만 / 명.</strong> 내가 데려온 손님이 가게를 이용하면 한 명당 3만이 내 몫이 됩니다. 한도가 없어, 많이 데려올수록 그대로 수입이 됩니다.</li>
         </ul>
+        <div class="warn">공주 영입 보상(타임당 1만)은 삐끼 전용이 아니라 <strong>전 직원 공통 인센티브</strong>입니다. 삐끼도 당연히 받을 수 있으니, 손님뿐 아니라 공주님 영입도 챙기면 좋습니다. (1번 공통 가이드 참고)</div>
         <h3>업무 흐름</h3>
         <ol>
-          <li><strong>홍보·유치.</strong> 핫스팟에서 손님을 끌어오고, 새 공주님을 적극적으로 섭외합니다.</li>
-          <li><strong>반드시 "내 추천"으로 등록되게.</strong> 손님을 데려오면 예약 시 추천인이 나로 기록되도록, 공주님을 영입하면 그 공주님 가입 시 추천인이 나로 입력되도록 챙깁니다. 등록되지 않으면 보상이 인정되지 않습니다.</li>
-          <li><strong>실적 확인.</strong> [대시보드]의 추천/영입 실적에서 내 성과를 확인할 수 있습니다.</li>
+          <li><strong>손님 끌어오기.</strong> 핫스팟·길거리에서 손님을 가게로 유치합니다. 이게 삐끼의 본업입니다.</li>
+          <li><strong>"OO(내 이름) 초대로 왔다"고 꼭 말하게 하기.</strong> 손님이 입장할 때 본인(삐끼) 이름을 대도록 안내하세요. 그래야 그 손님이 내 추천으로 잡힙니다.</li>
+          <li><strong>삐끼 리스트에 등록.</strong> 데려온 손님은 삐끼 명단(추천 기록)에 입력해 두면 나중에 정산에 등록됩니다. 기록이 없으면 보상도 없습니다.</li>
+          <li><strong>실적 확인.</strong> [대시보드]의 추천/영입 실적에서 내 성과를 봅니다.</li>
         </ol>
+        <div class="callout"><strong>중요:</strong> 손님 추천 보상은 <strong>등록된 삐끼(직원)에게만</strong> 지급됩니다. 일반 유저가 가게를 홍보해 줘도 보상은 없습니다(얄짤 없음). 보상을 받으려면 정식 삐끼로 가입되어 있어야 합니다.</div>
       </div>
     </details>
 
@@ -193,31 +208,33 @@
 
     <h3>📊 대시보드</h3>
     <p>로그인하면 처음 보이는 화면입니다. 기간을 골라 총 매출·미수금, 일별 매출 추이, 공주님 수익 랭킹과 추천/영입 실적, 인원별 정산 합계를 한눈에 봅니다. 운영 상태를 파악하는 출발점입니다.</p>
-    <div class="shot"><b>[캡쳐: 대시보드]</b></div>
+    <figure class="cap"><img src="img/dashboard.png" alt="대시보드"><figcaption>대시보드</figcaption></figure>
 
     <h3>📅 예약판</h3>
     <p>날짜를 고르면 그날 출근한 공주님들의 가능시간이 타임테이블로 보입니다. 공주님·손님·시간을 넣어 예약하고, 진행/완료/노쇼/취소로 상태를 바꿉니다. 노쇼·취소한 예약의 거래는 정산에서 "취소됨"으로 빠집니다. (예약 삭제는 사장만)</p>
-    <div class="shot"><b>[캡쳐: 예약판]</b></div>
+    <figure class="cap"><img src="img/reservations.png" alt="예약판"><figcaption>예약판</figcaption></figure>
 
     <h3>🗓️ 출근부 (공주·스탭)</h3>
     <p>주간 캘린더입니다. 본인의 가용시간을 등록하고, 영업일에 출근/퇴근/재출근을 누릅니다. 본인 것만 수정할 수 있고, 사장만 전체를 관리합니다.</p>
-    <div class="shot"><b>[캡쳐: 출근부]</b></div>
+    <figure class="cap"><img src="img/attendance_princess.png" alt="공주 출근부"><figcaption>공주 출근부</figcaption></figure>
+    <figure class="cap"><img src="img/attendance_staff.png" alt="스탭 출근부"><figcaption>스탭 출근부</figcaption></figure>
 
     <h3>🙋 손님 / ⛔ 밴</h3>
     <p>손님을 등록·검색·수정(닉/메모)하고, 익명 표시도 켤 수 있습니다. 문제 손님은 사유를 골라 밴 등록하며, 밴된 번호는 예약·거래가 자동으로 차단됩니다.</p>
-    <div class="shot"><b>[캡쳐: 손님 / 밴]</b></div>
+    <figure class="cap"><img src="img/customers.png" alt="손님 관리"><figcaption>손님 관리</figcaption></figure>
+    <figure class="cap"><img src="img/bans.png" alt="밴 관리"><figcaption>밴 관리</figcaption></figure>
 
     <h3>💰 수금 / 정산</h3>
     <p>거래(TC·대화료·2차)와 주류·메뉴 판매를 등록하면 미수금으로 잡히고, 사장이 수금 처리하면 정산 분배가 자동 계산됩니다. 인원별 지급/미지급 상태도 표시됩니다. 화면은 전원이 볼 수 있고, 수금·지급 버튼은 사장만 사용합니다.</p>
-    <div class="shot"><b>[캡쳐: 수금 / 정산]</b></div>
+    <figure class="cap"><img src="img/collections.png" alt="수금/정산"><figcaption>수금 / 정산</figcaption></figure>
 
     <h3>📢 찌라시</h3>
     <p>날짜를 고르면 출근한 공주님들의 사진·이름·가능시간을 모아 홍보 이미지(PNG)로 만들어 줍니다. 디스코드에 그대로 올려 손님을 모읍니다.</p>
-    <div class="shot"><b>[캡쳐: 찌라시]</b></div>
+    <figure class="cap"><img src="img/flyer.png" alt="찌라시"><figcaption>찌라시 생성</figcaption></figure>
 
     <h3>🙍 내 프로필</h3>
     <p>본인 사진을 등록·변경합니다. 이 사진이 찌라시에 사용됩니다.</p>
-    <div class="shot"><b>[캡쳐: 내 프로필]</b></div>
+    <figure class="cap"><img src="img/profile.png" alt="내 프로필"><figcaption>내 프로필</figcaption></figure>
 
     <!-- 4 규칙 -->
     <h2 id="rules">4. 필수 규칙</h2>
