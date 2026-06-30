@@ -16,7 +16,6 @@ const MENU = [
   { to: '/members', label: '멤버', icon: '👥', roles: ['owner'] },
   { to: '/profile', label: '내 프로필', icon: '🙍', roles: ['owner', 'staff', 'promoter', 'princess'] },
   { to: '/report.html', label: '사업계획서·규정', icon: '📄', roles: ['owner', 'staff'], external: true },
-  { to: '/deck.html', label: '발표자료', icon: '🖥️', roles: ['owner', 'staff'], external: true },
 ]
 
 export default function Layout() {
