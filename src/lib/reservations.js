@@ -83,6 +83,13 @@ export async function startDate2(r, durationMin) {
   return conflicts
 }
 
+// 예약 삭제 (연결된 거래는 보존, 예약 링크만 해제 후 삭제)
+export async function deleteReservation(id) {
+  await supabase.from('charges').update({ reservation_id: null }).eq('reservation_id', id)
+  const { error } = await supabase.from('reservations').delete().eq('id', id)
+  if (error) throw error
+}
+
 export async function setStatus(id, status) {
   const { data, error } = await supabase
     .from('reservations')

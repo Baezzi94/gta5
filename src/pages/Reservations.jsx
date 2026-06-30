@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { listByDate as listAvail } from '../lib/schedule'
-import { listByDate as listReservations, createReservation, updateReservation, setStatus, startDate2 } from '../lib/reservations'
+import { listByDate as listReservations, createReservation, updateReservation, setStatus, startDate2, deleteReservation } from '../lib/reservations'
+import { useAuth } from '../app/AuthContext'
 import { findOrCreateByPhone } from '../lib/customers'
 import { createTalkFromReservation, createTcFromReservation, createDate2FromReservation } from '../lib/charges'
 import { listMembers } from '../lib/members'
@@ -19,6 +20,7 @@ const STATUS = [
 const STATUS_LABEL = { booked: '예약', in_progress: '진행', done: '완료', no_show: '노쇼', cancelled: '취소' }
 
 export default function Reservations() {
+  const { role } = useAuth()
   const [date, setDate] = useState(() => ymd(new Date()))
   const [avail, setAvail] = useState([])
   const [rows, setRows] = useState([])
@@ -121,6 +123,17 @@ export default function Reservations() {
           ? `⚠️ 2차로 ${dur}분 자리가 빕니다. 밀어야 할 예약: ${names.join(', ')} — 수정/취소로 조정하세요. (2차 100만 미수금 생성)`
           : `2차 등록 완료 (겹치는 예약 없음). 2차 100만 미수금 생성됨.`
       )
+    } catch (e) {
+      setError(e.message)
+    }
+  }
+
+  async function onDelete(r) {
+    if (!window.confirm(`${r.customer?.nickname ?? '이'} 예약을 삭제할까요? (되돌릴 수 없음)`)) return
+    setError('')
+    try {
+      await deleteReservation(r.id)
+      load()
     } catch (e) {
       setError(e.message)
     }
@@ -249,6 +262,7 @@ export default function Reservations() {
                       ))}
                       <button onClick={() => setEditing({ id: r.id, princess_id: r.princess_id, start: minToHm(r.start_min), end: minToHm(r.end_min) })}>수정</button>
                       {!r.is_date2 && <button onClick={() => setDate2For({ id: r.id, minutes: '60' })}>2차</button>}
+                      {role === 'owner' && <button onClick={() => onDelete(r)} style={{ color: '#ff6b6b' }}>삭제</button>}
                     </>
                   )}
                 </td>
