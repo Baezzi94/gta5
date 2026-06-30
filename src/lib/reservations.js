@@ -14,6 +14,14 @@ export async function listByDate(date) {
   return data
 }
 
+// 출근(체크인)한 시간대만 반환 — 출근 안 했으면 빈 배열
+async function checkedInWindows(date, princessId) {
+  const blocks = await listByDatePrincess(date, princessId)
+  return blocks
+    .filter((b) => b.checked_in_at && !b.checked_out_at)
+    .map((b) => ({ start: b.start_min, end: b.end_min }))
+}
+
 async function listForPrincessOnDate(date, princessId) {
   const { data, error } = await supabase
     .from('reservations')
@@ -27,9 +35,12 @@ async function listForPrincessOnDate(date, princessId) {
 // 날짜+시각(자정 기준 분) 기반 예약 생성. 가용 블록 내 + 충돌 없음 검사.
 export async function createReservation({ date, customer_id, princess_id, start_min, end_min }) {
   const slot = { start: start_min, end: end_min }
-  const windows = (await listByDatePrincess(date, princess_id)).map((w) => ({ start: w.start_min, end: w.end_min }))
+  const windows = await checkedInWindows(date, princess_id)
+  if (windows.length === 0) {
+    throw new Error('공주님이 아직 출근(체크인)하지 않았습니다. 출근 후 예약 가능합니다.')
+  }
   if (!withinAnyWindow(windows, slot)) {
-    throw new Error('공주님 가용시간(예정) 밖입니다. 출근부에서 그 날짜 가용시간을 먼저 등록하세요.')
+    throw new Error('공주님 출근 시간대 밖입니다.')
   }
   const existing = await listForPrincessOnDate(date, princess_id)
   if (!isAvailable(reservationsToBusy(existing), slot)) {
@@ -47,9 +58,12 @@ export async function createReservation({ date, customer_id, princess_id, start_
 // 예약 수정 (공주/시간 변경) — 가용시간·충돌 재검사(자기 자신 제외)
 export async function updateReservation(id, { date, princess_id, start_min, end_min }) {
   const slot = { start: start_min, end: end_min }
-  const windows = (await listByDatePrincess(date, princess_id)).map((w) => ({ start: w.start_min, end: w.end_min }))
+  const windows = await checkedInWindows(date, princess_id)
+  if (windows.length === 0) {
+    throw new Error('공주님이 아직 출근(체크인)하지 않았습니다.')
+  }
   if (!withinAnyWindow(windows, slot)) {
-    throw new Error('공주님 가용시간(예정) 밖입니다.')
+    throw new Error('공주님 출근 시간대 밖입니다.')
   }
   const others = (await listForPrincessOnDate(date, princess_id)).filter((r) => r.id !== id)
   if (!isAvailable(reservationsToBusy(others), slot)) {

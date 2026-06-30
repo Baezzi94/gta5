@@ -173,7 +173,7 @@ export default function Reservations() {
         <select value={form.princess_id} onChange={(e) => setForm({ ...form, princess_id: e.target.value })}>
           <option value="">공주님 선택 (타임테이블 클릭으로도 선택 가능)</option>
           {timetableRows.map((p) => (
-            <option key={p.id} value={p.id}>{p.checkedIn ? '🟢출근 ' : ''}{p.name} (가능 {p.windows.map((w) => `${minToHm(w.start)}~${minToHm(w.end)}`).join(', ')})</option>
+            <option key={p.id} value={p.id}>{p.checkedIn ? '🟢출근 ' : '⛔미출근 '}{p.name} (가능 {p.windows.map((w) => `${minToHm(w.start)}~${minToHm(w.end)}`).join(', ')})</option>
           ))}
         </select>
         <div style={{ display: 'flex', gap: 6 }}>

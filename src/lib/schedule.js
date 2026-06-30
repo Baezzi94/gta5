@@ -17,7 +17,7 @@ export async function listRange(startDate, endDate) {
 export async function listByDatePrincess(date, memberId) {
   const { data, error } = await supabase
     .from('availability')
-    .select('start_min, end_min')
+    .select('start_min, end_min, checked_in_at, checked_out_at')
     .eq('date', date)
     .eq('member_id', memberId)
   if (error) throw error
