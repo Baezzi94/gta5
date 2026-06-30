@@ -99,7 +99,7 @@ export default function Members() {
       await deleteMember(id)
       load()
     } catch (e) {
-      setError(e.message + ' (예약·추천 등 연결된 기록이 있으면 삭제 대신 비활성화하세요)')
+      setError('삭제 실패: ' + e.message)
     }
   }
 

@@ -32,6 +32,20 @@ export async function deactivateMember(id) {
 }
 
 export async function deleteMember(id) {
+  // FK 참조 정리: 다른 테이블이 이 멤버를 가리키면 삭제가 막히므로 먼저 해제/삭제
+  await supabase.from('customers').update({ referred_by: null }).eq('referred_by', id)
+  await supabase.from('customers').update({ preferred_princess: null }).eq('preferred_princess', id)
+  await supabase.from('members').update({ referred_by: null }).eq('referred_by', id)
+  await supabase.from('bans').update({ created_by: null }).eq('created_by', id)
+  await supabase.from('charges').update({ princess_id: null }).eq('princess_id', id)
+  await supabase.from('reservations').update({ created_by: null }).eq('created_by', id)
+  // not-null FK라 null 불가 → 해당 멤버의 행 삭제
+  await supabase.from('reservations').delete().eq('princess_id', id)
+  await supabase.from('availability').delete().eq('member_id', id)
+  await supabase.from('attendance').delete().eq('member_id', id)
+  // 로그인 계정 연결이 있으면 멤버 링크만 해제(계정은 보존)
+  await supabase.from('profiles').update({ member_id: null }).eq('member_id', id)
+
   const { error } = await supabase.from('members').delete().eq('id', id)
   if (error) throw error
 }
