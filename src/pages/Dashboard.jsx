@@ -28,6 +28,8 @@ export default function Dashboard() {
   }
   useEffect(() => {
     load()
+    const t = setInterval(load, 15000) // 자동 새로고침(준실시간)
+    return () => clearInterval(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [from, to])
   useEffect(() => {

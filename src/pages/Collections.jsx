@@ -38,6 +38,8 @@ export default function Collections() {
   }
   useEffect(() => {
     load()
+    const t = setInterval(load, 12000) // 자동 새로고침(준실시간)
+    return () => clearInterval(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date])
   useEffect(() => {
