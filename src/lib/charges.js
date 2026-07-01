@@ -6,7 +6,7 @@ export const CHARGE_LABEL = { tc: 'TC(입장료)', talk: '대화료', date2: '2�
 export async function listByDate(date) {
   const { data, error } = await supabase
     .from('charges')
-    .select('*, customer:customers(id, nickname, phone, referred_by), princess:members(id, name, referred_by), reservation:reservations(status), menu_item:menu_items(name)')
+    .select('*, customer:customers(id, nickname, phone, referred_by), princess:members!princess_id(id, name, referred_by), server:members!sold_by(id, name), reservation:reservations(status), menu_item:menu_items(name)')
     .eq('date', date)
     .order('created_at', { ascending: true })
   if (error) throw error
@@ -16,7 +16,7 @@ export async function listByDate(date) {
 export async function listRange(startDate, endDate) {
   const { data, error } = await supabase
     .from('charges')
-    .select('*, customer:customers(id, nickname, referred_by), princess:members(id, name, referred_by), reservation:reservations(status)')
+    .select('*, customer:customers(id, nickname, referred_by), princess:members!princess_id(id, name, referred_by), reservation:reservations(status)')
     .gte('date', startDate)
     .lte('date', endDate)
     .order('date', { ascending: true })
@@ -76,7 +76,7 @@ export async function createDate2FromReservation(r) {
 }
 
 // 메뉴(주류·담배) 판매: 수량>0인 항목들을 거래로 일괄 생성 (선불 — 미수금으로 생성 후 수금 처리)
-export async function createMenuSale({ date, customer_id, lines }) {
+export async function createMenuSale({ date, customer_id, sold_by, lines }) {
   const rows = (lines || [])
     .filter((l) => l.qty > 0)
     .map((l) => ({
@@ -87,6 +87,7 @@ export async function createMenuSale({ date, customer_id, lines }) {
       amount: l.sale_price * l.qty,
       cost: l.cost_price * l.qty,
       customer_id: customer_id ?? null,
+      sold_by: sold_by ?? null,
     }))
   if (rows.length === 0) return []
   const { data, error } = await supabase.from('charges').insert(rows).select()

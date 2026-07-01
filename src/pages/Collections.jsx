@@ -25,8 +25,9 @@ export default function Collections() {
   const [members, setMembers] = useState([])
   const [form, setForm] = useState({ type: 'tc', phone: '', nickname: '', princess_id: '' })
   const princesses = members.filter((m) => m.type === 'princess')
+  const servers = members.filter((m) => (m.type === 'owner' || m.type === 'staff') && m.active)
   const [menu, setMenu] = useState([])
-  const [saleCust, setSaleCust] = useState({ phone: '', nickname: '' })
+  const [saleCust, setSaleCust] = useState({ phone: '', nickname: '', sold_by: '' })
   const [qty, setQty] = useState({}) // { menu_item_id: 수량 }
   const [error, setError] = useState('')
 
@@ -58,6 +59,7 @@ export default function Collections() {
       .map((m) => ({ menu_item_id: m.id, qty: Number(qty[m.id] || 0), sale_price: m.sale_price, cost_price: m.cost_price }))
       .filter((l) => l.qty > 0)
     if (lines.length === 0) return setError('판매할 메뉴 수량을 입력하세요.')
+    if (!saleCust.sold_by) return setError('판매 담당(웨이터)을 선택하세요.')
     try {
       if (saleCust.phone && (await isBanned(saleCust.phone))) {
         setError(`🚫 밴된 번호(${saleCust.phone})입니다. 판매 불가.`)
@@ -68,9 +70,9 @@ export default function Collections() {
         const c = await findOrCreateByPhone({ phone: saleCust.phone, nickname: saleCust.nickname })
         customer_id = c.id
       }
-      await createMenuSale({ date, customer_id, lines })
+      await createMenuSale({ date, customer_id, sold_by: saleCust.sold_by, lines })
       setQty({})
-      setSaleCust({ phone: '', nickname: '' })
+      setSaleCust({ phone: '', nickname: '', sold_by: '' })
       load()
     } catch (e) {
       setError(e.message)
@@ -231,9 +233,15 @@ export default function Collections() {
       {canAdd && menu.length > 0 && (
         <form onSubmit={onMenuSale} style={{ marginBottom: 16, padding: 12, background: '#16131f', borderRadius: 10 }}>
           <strong>🍾 주류·메뉴 판매</strong>
-          <div style={{ display: 'flex', gap: 6, margin: '8px 0' }}>
+          <div style={{ display: 'flex', gap: 6, margin: '8px 0', flexWrap: 'wrap' }}>
             <input placeholder="손님 전화" value={saleCust.phone} onChange={(e) => setSaleCust({ ...saleCust, phone: e.target.value })} />
             <input placeholder="닉" value={saleCust.nickname} onChange={(e) => setSaleCust({ ...saleCust, nickname: e.target.value })} />
+            <select value={saleCust.sold_by} onChange={(e) => setSaleCust({ ...saleCust, sold_by: e.target.value })}>
+              <option value="">담당 웨이터 *</option>
+              {servers.map((s) => (
+                <option key={s.id} value={s.id}>{s.name} ({ROLE_LABEL[s.type]})</option>
+              ))}
+            </select>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 8 }}>
             {menu.map((m) => (
@@ -261,7 +269,7 @@ export default function Collections() {
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ textAlign: 'left', color: '#ffcf5a' }}>
-            <th>유형</th><th>손님</th><th>공주님</th><th>금액</th><th>수금</th>{isOwner && <th>처리</th>}
+            <th>유형</th><th>손님</th><th>공주님</th><th>담당</th><th>금액</th><th>수금</th>{isOwner && <th>처리</th>}
           </tr>
         </thead>
         <tbody>
@@ -272,6 +280,7 @@ export default function Collections() {
               <td>{r.type === 'item' ? `${r.menu_item?.name ?? '메뉴'} ×${r.qty}` : CHARGE_LABEL[r.type]}</td>
               <td>{r.customer?.nickname ?? '-'}</td>
               <td>{r.princess?.name ?? '-'}</td>
+              <td>{r.server?.name ?? '-'}</td>
               <td style={{ textDecoration: voided ? 'line-through' : 'none' }}>{man(r.amount)}</td>
               <td style={{ fontWeight: 700, color: voided ? '#9a93b8' : (r.collected ? '#5ee0a0' : '#ff5e5e') }}>
                 {voided ? '취소됨' : (r.collected ? '수금완료' : '미수금')}

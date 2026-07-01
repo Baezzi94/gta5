@@ -38,6 +38,7 @@ export async function deleteMember(id) {
   await supabase.from('members').update({ referred_by: null }).eq('referred_by', id)
   await supabase.from('bans').update({ created_by: null }).eq('created_by', id)
   await supabase.from('charges').update({ princess_id: null }).eq('princess_id', id)
+  await supabase.from('charges').update({ sold_by: null }).eq('sold_by', id)
   await supabase.from('reservations').update({ created_by: null }).eq('created_by', id)
   // 이 공주의 예약을 물고 있는 거래(reservation_id)는 ON DELETE가 없어 예약 삭제를 막음 → 먼저 링크 해제
   const { data: resRows } = await supabase.from('reservations').select('id').eq('princess_id', id)
