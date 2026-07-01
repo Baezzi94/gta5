@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../app/AuthContext'
-import { getMember, updateMember } from '../lib/members'
+import { getMember, setMyPhoto } from '../lib/members'
 import { uploadAvatar } from '../lib/storage'
 
 const ROLE_LABEL = { owner: '사장', staff: '운영스탭', promoter: '삐끼', princess: '공주님' }
@@ -31,7 +31,7 @@ export default function Profile() {
     setError('')
     try {
       const url = await uploadAvatar(memberId, file)
-      await updateMember(memberId, { profile_photo_url: url })
+      await setMyPhoto(url)
       await load()
     } catch (e) {
       setError(e.message)

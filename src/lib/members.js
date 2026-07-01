@@ -31,6 +31,13 @@ export async function deactivateMember(id) {
   return updateMember(id, { active: false })
 }
 
+// 본인 프로필 사진만 수정 (members는 사장만 쓰기라 SECURITY DEFINER 함수로 우회)
+export async function setMyPhoto(url) {
+  const { data, error } = await supabase.rpc('set_my_photo', { p_url: url })
+  if (error) throw error
+  return data
+}
+
 export async function deleteMember(id) {
   // FK 참조 정리: 다른 테이블이 이 멤버를 가리키면 삭제가 막히므로 먼저 해제/삭제
   await supabase.from('customers').update({ referred_by: null }).eq('referred_by', id)
