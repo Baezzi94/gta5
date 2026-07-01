@@ -20,17 +20,12 @@
   .head::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg, rgba(13,8,18,.15) 0%, rgba(13,8,18,.55) 55%, #0d0812 100%)}
   .head .title{position:absolute; left:0; right:0; bottom:26px; text-align:center; z-index:2}
   .title h1{
-    font-family:'Black Han Sans',sans-serif; font-size:68px; letter-spacing:2px; line-height:1;
-    color:#ff6fb0;
-    -webkit-text-stroke:0.4px rgba(255,255,255,.35);
-    text-shadow:
-      0 0 3px #ffd9ec,
-      0 0 8px #ff5ea0,
-      0 0 16px #ff2e86,
-      0 0 30px rgba(255,46,134,.75),
-      0 3px 10px rgba(0,0,0,.65);
+    font-family:'Black Han Sans',sans-serif; font-size:64px; letter-spacing:1px; line-height:1;
+    background:linear-gradient(180deg,#ffe3f0 0%,#ff8fbf 40%,#ff2e86 78%,#ff6fae 100%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
+    filter:drop-shadow(0 0 9px rgba(255,46,134,.55)) drop-shadow(0 3px 7px rgba(0,0,0,.55));
   }
-  .title .en{font-family:'Black Han Sans';font-size:19px;color:#ffcf5a;letter-spacing:6px;margin-top:10px;text-shadow:0 2px 6px rgba(0,0,0,.8)}
+  .title .en{font-family:'Noto Sans KR';font-weight:700;font-size:15px;color:#ffcf5a;letter-spacing:8px;margin-top:12px;text-shadow:0 2px 6px rgba(0,0,0,.85);opacity:.92}
 
   .body{padding:24px 30px 30px}
   .badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
