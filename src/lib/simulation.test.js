@@ -119,13 +119,13 @@ describe('시뮬레이션: 반올림 드리프트(소액 다건)', () => {
 })
 
 describe('⚠️ 발견 이슈(현재 동작 기록)', () => {
-  it('재출근 시 원래 출근시각이 사라져 이전 판매를 못 받음(reCheckIn 버그)', () => {
-    // reCheckIn은 checked_in_at을 now로 덮어씀 → 원래 20시 출근 기록 소실.
-    // 실제로 21시에 판 술인데, 재출근(23시) 후 window는 {in:23시}라 21시 판매서 제외됨.
-    const wAfterReCheckin = [win('ria', 'staff', t(23))] // 원래 20~22 근무했지만 기록 덮임
+  it('재출근 후에도 원래 출근시각 보존 → 퇴근 전 판매 정상 귀속(reCheckIn 수정됨)', () => {
+    // 수정: reCheckIn은 checked_out_at만 해제, checked_in_at(20시) 유지.
+    // 20시 출근→22시 퇴근→23시 재출근 후 window는 {in:20시, out:null} → 21시 판매 정상 귀속.
+    const wAfterReCheckin = [win('ria', 'staff', t(20))]
     const a = settleAlcohol([{ amount: 300000, cost: 120000, at: t(21) }], wAfterReCheckin)
-    expect(a.per['ria']).toBeUndefined() // ← 억울하게 0
-    expect(a.marginUnattributed).toBe(180000)
+    expect(a.per['ria']).toBe(180000)
+    expect(a.marginUnattributed).toBe(0)
   })
   it('손님추천 3만이 방문일마다 재지급됨(하루 1회 x N일)', () => {
     // settle는 하루 단위 호출 → 같은 손님이 다른 날 또 오면 추천자에게 또 3만.

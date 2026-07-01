@@ -46,12 +46,21 @@ export async function isBanned(phone) {
   return (data?.length ?? 0) > 0
 }
 
-// 전화 OR 손님id 로 밴 여부 (전화 없는 워크인 손님도 잡기 위함)
-export async function isBannedCustomer({ phone, customer_id }) {
+// 전화 OR 손님id OR 닉네임 으로 밴 여부 (전화 없는 워크인·닉네임 밴도 잡기 위함)
+export async function isBannedCustomer({ phone, customer_id, nickname }) {
+  const ids = new Set()
+  if (customer_id) ids.add(customer_id)
+  const nk = (nickname || '').trim()
+  if (nk) {
+    // 같은 닉네임의 모든 손님 행(밴은 특정 행에 걸려 있어도 잡히게)
+    const { data: custs, error: cErr } = await supabase.from('customers').select('id').eq('nickname', nk)
+    if (cErr) throw cErr
+    for (const c of custs || []) ids.add(c.id)
+  }
   const conds = []
   const norm = normPhone(phone)
   if (norm) conds.push(`phone.eq.${norm}`)
-  if (customer_id) conds.push(`customer_id.eq.${customer_id}`)
+  for (const id of ids) conds.push(`customer_id.eq.${id}`)
   if (!conds.length) return false
   const { data, error } = await supabase
     .from('bans')

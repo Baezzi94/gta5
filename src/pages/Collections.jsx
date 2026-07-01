@@ -66,7 +66,7 @@ export default function Collections() {
         const c = await findOrCreateCustomer({ nickname: saleCust.nickname, phone: saleCust.phone, daily_no: saleCust.daily_no })
         customer_id = c.id
       }
-      if (await isBannedCustomer({ phone: saleCust.phone, customer_id })) {
+      if (await isBannedCustomer({ phone: saleCust.phone, customer_id, nickname: saleCust.nickname })) {
         setError(`🚫 밴된 손님입니다. 판매 불가 — 밴 관리에서 해제 후 가능.`)
         return
       }
@@ -83,13 +83,14 @@ export default function Collections() {
   async function onAdd(e) {
     e.preventDefault()
     setError('')
+    if (form.type !== 'tc' && !form.princess_id) return setError('대화료·2차는 공주님을 선택해야 합니다. (안 그러면 공주 몫이 누락됩니다)')
     try {
       let customer_id = null
       if (form.nickname.trim() || form.phone.trim()) {
         const c = await findOrCreateCustomer({ nickname: form.nickname, phone: form.phone, daily_no: form.daily_no })
         customer_id = c.id
       }
-      if (await isBannedCustomer({ phone: form.phone, customer_id })) {
+      if (await isBannedCustomer({ phone: form.phone, customer_id, nickname: form.nickname })) {
         setError(`🚫 밴된 손님입니다. 거래 불가 — 밴 관리에서 해제 후 가능.`)
         return
       }
@@ -299,9 +300,12 @@ export default function Collections() {
 
       {/* 정산 대시보드 (수금완료 기준) */}
       <h2 style={{ marginTop: 28 }}>정산 분배 <span style={{ color: '#9a93b8', fontSize: 13, fontWeight: 400 }}>(수금완료 기준 · 운영풀 {won(settlement.pool)} · 지분 사장1.2 : 스탭1.0)</span></h2>
-      {settlement.poolUnattributed > 0 && (
+      {(settlement.poolUnattributed > 0 || alcohol.marginUnattributed > 0) && (
         <p style={{ background: '#3a1620', border: '1px solid #ff5e7a', color: '#ffb3c1', padding: '8px 12px', borderRadius: 8 }}>
-          ⚠️ 운영풀 {won(settlement.poolUnattributed)}이 <b>거래 발생 시각에 출근중이던 사장/운영스탭이 없어</b> 미분배 상태입니다. (해당 시간대 출근 체크인 필요)
+          ⚠️ <b>거래 발생 시각에 출근중이던 사람이 없어 미분배</b>된 금액이 있습니다
+          {settlement.poolUnattributed > 0 && <> · 운영풀 {won(settlement.poolUnattributed)}</>}
+          {alcohol.marginUnattributed > 0 && <> · 주류마진 {won(alcohol.marginUnattributed)}</>}
+          . (해당 시간대 출근 체크인 필요)
         </p>
       )}
       {settleRows.length === 0 ? (

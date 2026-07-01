@@ -67,11 +67,13 @@ export async function checkOut(id) {
   return data
 }
 
-// 재출근: 퇴근 기록을 지워 다시 출근중 상태로
+// 재출근: 퇴근 기록만 지워 다시 출근중 상태로.
+// (checked_in_at은 원래 출근시각 그대로 둔다 — 시간귀속 정산에서 퇴근 전 판매를 잃지 않도록.
+//  퇴근~재출근 사이 공백은 출근으로 간주되지만, 실제 일한 매출을 잃는 것보다 안전.)
 export async function reCheckIn(id) {
   const { data, error } = await supabase
     .from('availability')
-    .update({ checked_out_at: null, checked_in_at: new Date().toISOString() })
+    .update({ checked_out_at: null })
     .eq('id', id)
     .select()
     .single()
