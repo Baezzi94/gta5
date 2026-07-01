@@ -43,6 +43,7 @@ export async function deleteMember(id) {
   await supabase.from('reservations').delete().eq('princess_id', id)
   await supabase.from('availability').delete().eq('member_id', id)
   await supabase.from('attendance').delete().eq('member_id', id)
+  await supabase.from('payouts').delete().eq('member_id', id)
   // 로그인 계정 연결이 있으면 멤버 링크만 해제(계정은 보존)
   await supabase.from('profiles').update({ member_id: null }).eq('member_id', id)
 
