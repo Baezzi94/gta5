@@ -62,7 +62,8 @@ export default function StaffAttendance() {
   return (
     <div>
       <h1>스탭 출근부 (주간) <span style={{ color: '#9a93b8', fontSize: 13, fontWeight: 400 }}>· 사장 포함</span></h1>
-      <p style={{ color: '#9a93b8', fontSize: 13, marginTop: -8 }}>출근한 스탭·사장만 그날 운영풀 지분을 받습니다. (전원 열람)</p>
+      <p style={{ color: '#9a93b8', fontSize: 13, marginTop: -8 }}>출근한 스탭·사장만 그날 운영풀 지분을 받습니다. (전원 열람 · 본인 것만 편집, 사장은 전체)</p>
+      {canAdd && <p style={{ color: '#ffcf5a', fontSize: 12, marginTop: -4 }}>👉 {isOwner ? '본인(사장) 선택 → ' : ''}근무시간 추가 → 카드의 <b>출근</b> 버튼을 눌러야 정산에 포함됩니다.</p>}
       {error && <p style={{ color: 'salmon' }}>{error}</p>}
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
@@ -76,7 +77,7 @@ export default function StaffAttendance() {
         <form onSubmit={onAdd} style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16, padding: 10, background: '#16131f', borderRadius: 10 }}>
           {isOwner && (
             <select value={form.member_id} onChange={(e) => setForm({ ...form, member_id: e.target.value })}>
-              <option value="">스탭</option>
+              <option value="">— 이름 선택 (사장/스탭) —</option>
               {staff.map((p) => (
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
