@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { listByDate, createCharge, createMenuSale, setCollected, deleteCharge, CHARGE_AMOUNT, CHARGE_LABEL } from '../lib/charges'
-import { findOrCreateByPhone } from '../lib/customers'
-import { isBanned } from '../lib/bans'
+import { findOrCreateCustomer } from '../lib/customers'
+import { isBannedCustomer } from '../lib/bans'
 import { listByDate as listAvailByDate } from '../lib/schedule'
 import { listByDate as listPayouts, setPaid } from '../lib/payouts'
 import { listMembers } from '../lib/members'
@@ -23,11 +23,11 @@ export default function Collections() {
   const [avail, setAvail] = useState([])
   const [payouts, setPayouts] = useState([])
   const [members, setMembers] = useState([])
-  const [form, setForm] = useState({ type: 'tc', phone: '', nickname: '', princess_id: '' })
+  const [form, setForm] = useState({ type: 'tc', nickname: '', daily_no: '', phone: '', princess_id: '' })
   const princesses = members.filter((m) => m.type === 'princess')
   const servers = members.filter((m) => (m.type === 'owner' || m.type === 'staff') && m.active)
   const [menu, setMenu] = useState([])
-  const [saleCust, setSaleCust] = useState({ phone: '', nickname: '', sold_by: '' })
+  const [saleCust, setSaleCust] = useState({ nickname: '', daily_no: '', phone: '', sold_by: '' })
   const [qty, setQty] = useState({}) // { menu_item_id: 수량 }
   const [error, setError] = useState('')
 
@@ -61,18 +61,18 @@ export default function Collections() {
     if (lines.length === 0) return setError('판매할 메뉴 수량을 입력하세요.')
     if (!saleCust.sold_by) return setError('판매 담당(웨이터)을 선택하세요.')
     try {
-      if (saleCust.phone && (await isBanned(saleCust.phone))) {
-        setError(`🚫 밴된 번호(${saleCust.phone})입니다. 판매 불가.`)
-        return
-      }
       let customer_id = null
-      if (saleCust.phone) {
-        const c = await findOrCreateByPhone({ phone: saleCust.phone, nickname: saleCust.nickname })
+      if (saleCust.nickname.trim() || saleCust.phone.trim()) {
+        const c = await findOrCreateCustomer({ nickname: saleCust.nickname, phone: saleCust.phone, daily_no: saleCust.daily_no })
         customer_id = c.id
+      }
+      if (await isBannedCustomer({ phone: saleCust.phone, customer_id })) {
+        setError(`🚫 밴된 손님입니다. 판매 불가 — 밴 관리에서 해제 후 가능.`)
+        return
       }
       await createMenuSale({ date, customer_id, sold_by: saleCust.sold_by, lines })
       setQty({})
-      setSaleCust({ phone: '', nickname: '', sold_by: '' })
+      setSaleCust({ nickname: '', daily_no: '', phone: '', sold_by: '' })
       load()
     } catch (e) {
       setError(e.message)
@@ -84,14 +84,14 @@ export default function Collections() {
     e.preventDefault()
     setError('')
     try {
-      if (form.phone && (await isBanned(form.phone))) {
-        setError(`🚫 밴된 번호(${form.phone})입니다. 거래 불가 — 밴 관리에서 해제 후 가능.`)
-        return
-      }
       let customer_id = null
-      if (form.phone) {
-        const c = await findOrCreateByPhone({ phone: form.phone, nickname: form.nickname })
+      if (form.nickname.trim() || form.phone.trim()) {
+        const c = await findOrCreateCustomer({ nickname: form.nickname, phone: form.phone, daily_no: form.daily_no })
         customer_id = c.id
+      }
+      if (await isBannedCustomer({ phone: form.phone, customer_id })) {
+        setError(`🚫 밴된 손님입니다. 거래 불가 — 밴 관리에서 해제 후 가능.`)
+        return
       }
       await createCharge({
         date,
@@ -100,7 +100,7 @@ export default function Collections() {
         customer_id,
         princess_id: form.type === 'tc' ? null : form.princess_id || null,
       })
-      setForm({ type: 'tc', phone: '', nickname: '', princess_id: '' })
+      setForm({ type: 'tc', nickname: '', daily_no: '', phone: '', princess_id: '' })
       load()
     } catch (e) {
       setError(e.message)
@@ -215,8 +215,9 @@ export default function Collections() {
             <option value="talk">대화료 25만</option>
             <option value="date2">2차 100만</option>
           </select>
-          <input placeholder="손님 전화" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-          <input placeholder="닉" value={form.nickname} onChange={(e) => setForm({ ...form, nickname: e.target.value })} />
+          <input placeholder="손님 닉네임" value={form.nickname} onChange={(e) => setForm({ ...form, nickname: e.target.value })} />
+          <input placeholder="데일리번호(옵션)" value={form.daily_no} onChange={(e) => setForm({ ...form, daily_no: e.target.value })} style={{ width: 110 }} />
+          <input placeholder="전화(옵션)" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} style={{ width: 110 }} />
           {form.type !== 'tc' && (
             <select value={form.princess_id} onChange={(e) => setForm({ ...form, princess_id: e.target.value })}>
               <option value="">공주님</option>
@@ -234,8 +235,9 @@ export default function Collections() {
         <form onSubmit={onMenuSale} style={{ marginBottom: 16, padding: 12, background: '#16131f', borderRadius: 10 }}>
           <strong>🍾 주류·메뉴 판매</strong>
           <div style={{ display: 'flex', gap: 6, margin: '8px 0', flexWrap: 'wrap' }}>
-            <input placeholder="손님 전화" value={saleCust.phone} onChange={(e) => setSaleCust({ ...saleCust, phone: e.target.value })} />
-            <input placeholder="닉" value={saleCust.nickname} onChange={(e) => setSaleCust({ ...saleCust, nickname: e.target.value })} />
+            <input placeholder="손님 닉네임" value={saleCust.nickname} onChange={(e) => setSaleCust({ ...saleCust, nickname: e.target.value })} />
+            <input placeholder="데일리번호(옵션)" value={saleCust.daily_no} onChange={(e) => setSaleCust({ ...saleCust, daily_no: e.target.value })} style={{ width: 120 }} />
+            <input placeholder="전화(옵션)" value={saleCust.phone} onChange={(e) => setSaleCust({ ...saleCust, phone: e.target.value })} style={{ width: 120 }} />
             <select value={saleCust.sold_by} onChange={(e) => setSaleCust({ ...saleCust, sold_by: e.target.value })}>
               <option value="">담당 웨이터 *</option>
               {servers.map((s) => (

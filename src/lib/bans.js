@@ -15,8 +15,8 @@ export async function listBans() {
 }
 
 export async function createBan(b) {
-  const payload = b.phone ? { ...b, phone: normPhone(b.phone) } : b
-  const { data, error } = await supabase.from('bans').insert(payload).select().single()
+  const phone = b.phone && b.phone.trim() ? normPhone(b.phone) : null
+  const { data, error } = await supabase.from('bans').insert({ ...b, phone }).select().single()
   if (error) throw error
   return data
 }
@@ -41,6 +41,23 @@ export async function isBanned(phone) {
     .select('id')
     .eq('phone', norm)
     .eq('lifted', false)
+    .limit(1)
+  if (error) throw error
+  return (data?.length ?? 0) > 0
+}
+
+// 전화 OR 손님id 로 밴 여부 (전화 없는 워크인 손님도 잡기 위함)
+export async function isBannedCustomer({ phone, customer_id }) {
+  const conds = []
+  const norm = normPhone(phone)
+  if (norm) conds.push(`phone.eq.${norm}`)
+  if (customer_id) conds.push(`customer_id.eq.${customer_id}`)
+  if (!conds.length) return false
+  const { data, error } = await supabase
+    .from('bans')
+    .select('id')
+    .eq('lifted', false)
+    .or(conds.join(','))
     .limit(1)
   if (error) throw error
   return (data?.length ?? 0) > 0

@@ -1,21 +1,26 @@
 import { useEffect, useState } from 'react'
 import { searchCustomers, createCustomer, updateCustomer } from '../lib/customers'
-import { isBanned } from '../lib/bans'
+import { isBannedCustomer } from '../lib/bans'
 import { dailyAnonCode } from '../lib/anonCode'
 
 export default function Customers() {
   const [query, setQuery] = useState('')
   const [rows, setRows] = useState([])
   const [anon, setAnon] = useState(false)
-  const [form, setForm] = useState({ phone: '', nickname: '', memo: '' })
+  const [form, setForm] = useState({ nickname: '', daily_no: '', phone: '', memo: '' })
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
-  const [editing, setEditing] = useState(null) // { id, nickname, memo }
+  const [editing, setEditing] = useState(null) // { id, nickname, phone, daily_no, memo }
 
   async function onSaveEdit() {
     setError('')
     try {
-      await updateCustomer(editing.id, { nickname: editing.nickname, memo: editing.memo || null })
+      await updateCustomer(editing.id, {
+        nickname: editing.nickname,
+        phone: editing.phone?.trim() || null,
+        daily_no: editing.daily_no?.trim() || null,
+        memo: editing.memo || null,
+      })
       setEditing(null)
       load()
     } catch (e) {
@@ -40,15 +45,16 @@ export default function Customers() {
     setError('')
     setNotice('')
     try {
-      if (await isBanned(form.phone)) {
+      if (form.phone.trim() && (await isBannedCustomer({ phone: form.phone }))) {
         setNotice('⚠️ 이 전화번호는 현재 밴 상태입니다. 등록은 되지만 주의하세요.')
       }
       await createCustomer({
-        phone: form.phone,
+        phone: form.phone.trim() || null,
         nickname: form.nickname,
+        daily_no: form.daily_no.trim() || null,
         memo: form.memo || null,
       })
-      setForm({ phone: '', nickname: '', memo: '' })
+      setForm({ nickname: '', daily_no: '', phone: '', memo: '' })
       load()
     } catch (e) {
       setError(e.message)
@@ -64,8 +70,9 @@ export default function Customers() {
       {notice && <p style={{ color: '#ffb35e' }}>{notice}</p>}
 
       <form onSubmit={onCreate} style={{ display: 'grid', gap: 8, maxWidth: 420, marginBottom: 20 }}>
-        <input placeholder="전화번호(고정 ID)" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required />
-        <input placeholder="닉네임" value={form.nickname} onChange={(e) => setForm({ ...form, nickname: e.target.value })} required />
+        <input placeholder="닉네임 (주 식별)" value={form.nickname} onChange={(e) => setForm({ ...form, nickname: e.target.value })} required />
+        <input placeholder="데일리번호 (선택)" value={form.daily_no} onChange={(e) => setForm({ ...form, daily_no: e.target.value })} />
+        <input placeholder="전화번호 (선택 · 나중에 연결 가능)" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
         <input placeholder="메모(선호/특이사항)" value={form.memo} onChange={(e) => setForm({ ...form, memo: e.target.value })} />
         <button type="submit">손님 등록</button>
       </form>
@@ -89,8 +96,10 @@ export default function Customers() {
             const ed = editing && editing.id === c.id
             return (
               <tr key={c.id} style={{ borderTop: '1px solid #2c2742' }}>
-                <td>{anon ? `익명#${dailyAnonCode(c.phone, now)}` : (ed ? <input value={editing.nickname} onChange={(e) => setEditing({ ...editing, nickname: e.target.value })} style={{ width: 100 }} /> : c.nickname)}</td>
-                <td>{anon ? '***' : c.phone}</td>
+                <td>{anon ? `익명#${dailyAnonCode(c.phone || c.id, now)}` : (ed ? <input value={editing.nickname} onChange={(e) => setEditing({ ...editing, nickname: e.target.value })} style={{ width: 100 }} /> : c.nickname)}</td>
+                <td>{anon ? '***' : (ed
+                  ? <input value={editing.phone} placeholder="전화 연결" onChange={(e) => setEditing({ ...editing, phone: e.target.value })} style={{ width: 120 }} />
+                  : (c.phone ?? (c.daily_no ? `데일리 ${c.daily_no}` : '-')))}</td>
                 <td>{ed ? <input value={editing.memo} onChange={(e) => setEditing({ ...editing, memo: e.target.value })} style={{ width: 160 }} /> : (c.memo ?? '-')}</td>
                 <td style={{ display: 'flex', gap: 4 }}>
                   {ed ? (
@@ -99,7 +108,7 @@ export default function Customers() {
                       <button onClick={() => setEditing(null)}>취소</button>
                     </>
                   ) : (
-                    <button onClick={() => setEditing({ id: c.id, nickname: c.nickname, memo: c.memo ?? '' })}>수정</button>
+                    <button onClick={() => setEditing({ id: c.id, nickname: c.nickname, phone: c.phone ?? '', daily_no: c.daily_no ?? '', memo: c.memo ?? '' })}>수정</button>
                   )}
                 </td>
               </tr>
