@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공주님 클럽 — 포스터</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0a0a10;display:flex;justify-content:center;padding:24px;font-family:'Noto Sans KR',sans-serif}
+  .note{position:fixed;top:8px;left:8px;color:#6f688c;font-size:12px}
+
+  .poster{
+    width:820px; background:#0d0812; color:#fff; border-radius:14px; overflow:hidden;
+    border:1px solid #3a1f3a; box-shadow:0 0 60px rgba(255,60,150,.15);
+  }
+  /* 헤더: 건물사진 */
+  .head{position:relative; height:340px; overflow:hidden}
+  .head img{width:100%; height:100%; object-fit:cover; filter:brightness(.62) saturate(1.15)}
+  .head::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg, rgba(13,8,18,.15) 0%, rgba(13,8,18,.55) 55%, #0d0812 100%)}
+  .head .title{position:absolute; left:0; right:0; bottom:26px; text-align:center; z-index:2}
+  .title h1{
+    font-family:'Black Han Sans',sans-serif; font-size:64px; letter-spacing:2px; line-height:1;
+    color:#ff5ea0; text-shadow:0 0 8px #ff2e86,0 0 22px #ff2e86,0 0 42px rgba(255,46,134,.7);
+  }
+  .title .en{font-family:'Black Han Sans';font-size:20px;color:#ffcf5a;letter-spacing:6px;margin-top:8px;text-shadow:0 0 10px rgba(255,207,90,.7)}
+
+  .body{padding:24px 30px 30px}
+  .badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+  .badge{border:1px solid #ff5ea0;color:#ff9ec6;border-radius:999px;padding:7px 14px;font-size:13px;font-weight:700;box-shadow:0 0 10px rgba(255,94,160,.25) inset}
+
+  .sect-title{font-family:'Black Han Sans';color:#ffcf5a;font-size:22px;margin:22px 0 12px;letter-spacing:1px;text-shadow:0 0 10px rgba(255,207,90,.4)}
+  .menu{background:#140d1e;border:1px solid #35223f;border-radius:12px;padding:14px 18px}
+  .menu .row{display:flex;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px dashed #3a2a44;font-size:17px}
+  .menu .row:last-child{border-bottom:none}
+  .menu .name{font-weight:700;white-space:nowrap}
+  .menu .dots{flex:1;border-bottom:2px dotted #4a3a55;transform:translateY(-4px)}
+  .menu .price{font-weight:900;color:#ff8fb0;white-space:nowrap}
+  .menu .hint{color:#ffcf5a;font-size:12px;margin-left:4px}
+  .menu .sub{color:#9a8fb0;font-size:12px}
+
+  .wink{background:linear-gradient(160deg,#241026,#180c1f);border:1px solid #ff5ea0;border-radius:12px;padding:16px 18px;margin-top:16px;color:#ffd6e8;font-size:15px;line-height:1.7}
+  .wink b{color:#fff}
+
+  .reserve{background:#140d1e;border:1px dashed #ffcf5a;border-radius:12px;padding:16px 18px;margin-top:16px;text-align:center}
+  .reserve .big{font-family:'Black Han Sans';font-size:24px;color:#ff5ea0;text-shadow:0 0 12px rgba(255,94,160,.6)}
+  .reserve .sub{color:#cbb8d8;margin-top:6px;font-size:14px}
+
+  .contacts{margin-top:16px;display:grid;gap:8px}
+  .contacts .c{display:flex;justify-content:space-between;background:#181022;border:1px solid #35223f;border-radius:10px;padding:11px 16px;font-size:16px}
+  .contacts .role{color:#9a8fb0} .contacts .num{font-weight:900;color:#ffcf5a;letter-spacing:1px}
+
+  .foot{margin-top:22px;text-align:center;color:#7a6f8c;font-size:12px;letter-spacing:1px}
+  .foot .cx{color:#ff8fb0;font-weight:700}
+</style>
+</head>
+<body>
+  <div class="note">캡쳐: Win+Shift+S · 또는 브라우저 인쇄 → PDF</div>
+  <div class="poster">
+    <div class="head">
+      <img src="참고/바하마마마스/건물사진.webp" alt="공주님 클럽">
+      <div class="title">
+        <h1>공주님 클럽</h1>
+        <div class="en">PRINCESS CLUB · CLIMAX</div>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="badges">
+        <span class="badge">🍾 진짜 술 팝니다</span>
+        <span class="badge">👑 진짜 공주님과 1:1</span>
+        <span class="badge">✅ 합법·공식 RP</span>
+      </div>
+
+      <div class="sect-title">MENU</div>
+      <div class="menu">
+        <div class="row"><span class="name">T/C (입장료)</span><span class="dots"></span><span class="price">5만</span><span class="hint">음료 2잔 포함</span></div>
+        <div class="row"><span class="name">대화료</span><span class="dots"></span><span class="price">25만</span><span class="hint">^^ 숨은 혜택 있음</span></div>
+        <div class="row"><span class="name">양주 (보틀)</span><span class="dots"></span><span class="price">30만</span></div>
+        <div class="row"><span class="name">프리미엄 양주</span><span class="dots"></span><span class="price">50만</span></div>
+        <div class="row"><span class="name">맥주</span><span class="dots"></span><span class="price">3만</span></div>
+        <div class="row"><span class="name">담배</span><span class="dots"></span><span class="price">2만</span></div>
+        <div class="row"><span class="name">2차</span><span class="dots"></span><span class="price">문의</span><span class="hint">😉 문의 주시면 알려드려요</span></div>
+      </div>
+
+      <div class="wink">
+        불법은 <b>무조건 지양</b>합니다. 저희가 바라는 방향은 절대 아닙니다.<br>
+        …근데 2차는 <b>밖에 나가시니</b> 제가 알 방도가 없네요 ^^..
+      </div>
+
+      <div class="reserve">
+        <div class="big">🚫 철저한 예약제</div>
+        <div class="sub">그냥 오시면 정중히 뺀찌… 자세한 <b>위치는 예약하신 분께만</b> 안내드립니다.</div>
+      </div>
+
+      <div class="contacts">
+        <div class="c"><span class="role">예약 · 사장) 시진핑</span><span class="num">010-4499-3016</span></div>
+        <div class="c"><span class="role">예약 · 스텝) 박두팔</span><span class="num">010-2603-6713</span></div>
+        <div class="c"><span class="role">예약 · 스텝) 리아시</span><span class="num">010-7628-0544</span></div>
+      </div>
+
+      <div class="foot">오늘 밤, 공주님이 기다립니다 🍷 · <span class="cx">Bahama Mamas West · CLIMAX</span></div>
+    </div>
+  </div>
+</body>
+</html>
