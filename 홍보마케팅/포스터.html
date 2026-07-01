@@ -20,10 +20,11 @@
   .head::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg, rgba(13,8,18,.15) 0%, rgba(13,8,18,.55) 55%, #0d0812 100%)}
   .head .title{position:absolute; left:0; right:0; bottom:26px; text-align:center; z-index:2}
   .title h1{
-    font-family:'Black Han Sans',sans-serif; font-size:64px; letter-spacing:2px; line-height:1;
-    color:#ff5ea0; text-shadow:0 0 8px #ff2e86,0 0 22px #ff2e86,0 0 42px rgba(255,46,134,.7);
+    font-family:'Black Han Sans',sans-serif; font-size:66px; letter-spacing:2px; line-height:1;
+    color:#fff;
+    text-shadow:0 0 2px #ff2e86, 0 0 6px rgba(255,46,134,.85), 0 3px 8px rgba(0,0,0,.85);
   }
-  .title .en{font-family:'Black Han Sans';font-size:20px;color:#ffcf5a;letter-spacing:6px;margin-top:8px;text-shadow:0 0 10px rgba(255,207,90,.7)}
+  .title .en{font-family:'Black Han Sans';font-size:19px;color:#ffcf5a;letter-spacing:6px;margin-top:10px;text-shadow:0 2px 6px rgba(0,0,0,.8)}
 
   .body{padding:24px 30px 30px}
   .badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
@@ -38,6 +39,15 @@
   .menu .price{font-weight:900;color:#ff8fb0;white-space:nowrap}
   .menu .hint{color:#ffcf5a;font-size:12px;margin-left:4px}
   .menu .sub{color:#9a8fb0;font-size:12px}
+  .menu .cat{color:#ff8fb0;font-weight:900;font-size:13px;letter-spacing:1px;padding:6px 0 4px;border-bottom:none}
+  .menu .cat:first-child{padding-top:0}
+  .menu .div{height:1px;background:#3a2a44;margin:8px 0}
+
+  .notice{background:#130f0a;border:1px solid #4a3a1f;border-left:4px solid #ffcf5a;border-radius:12px;padding:14px 18px 14px 20px;margin-top:16px}
+  .notice ul{list-style:none;display:grid;gap:9px}
+  .notice li{font-size:14px;line-height:1.55;color:#e9dfc8;padding-left:22px;position:relative}
+  .notice li::before{content:'▪';position:absolute;left:4px;color:#ffcf5a}
+  .notice b{color:#fff}
 
   .wink{background:linear-gradient(160deg,#241026,#180c1f);border:1px solid #ff5ea0;border-radius:12px;padding:16px 18px;margin-top:16px;color:#ffd6e8;font-size:15px;line-height:1.7}
   .wink b{color:#fff}
@@ -74,13 +84,28 @@
 
       <div class="sect-title">MENU</div>
       <div class="menu">
+        <div class="cat">◆ 기본 요금 (착석 시 부과)</div>
         <div class="row"><span class="name">T/C (입장료)</span><span class="dots"></span><span class="price">5만</span><span class="hint">음료 2잔 포함</span></div>
         <div class="row"><span class="name">대화료</span><span class="dots"></span><span class="price">25만</span><span class="hint">^^ 숨은 혜택 있음</span></div>
+        <div class="div"></div>
+        <div class="cat">◆ 주문 메뉴 (주류 · 담배)</div>
         <div class="row"><span class="name">양주 (보틀)</span><span class="dots"></span><span class="price">30만</span></div>
         <div class="row"><span class="name">프리미엄 양주</span><span class="dots"></span><span class="price">50만</span></div>
         <div class="row"><span class="name">맥주</span><span class="dots"></span><span class="price">3만</span></div>
         <div class="row"><span class="name">담배</span><span class="dots"></span><span class="price">2만</span></div>
-        <div class="row"><span class="name">2차</span><span class="dots"></span><span class="price">문의</span><span class="hint">😉 문의 주시면 알려드려요</span></div>
+        <div class="div"></div>
+        <div class="row"><span class="name">2차 (외부)</span><span class="dots"></span><span class="price">문의</span><span class="hint">😉 문의 주시면</span></div>
+      </div>
+
+      <div class="sect-title">📢 이용 안내 (공식)</div>
+      <div class="notice">
+        <ul>
+          <li><b>성희롱 · 폭력 · 기물파손 · 깽판</b> = 경고 없이 <b>즉시 영구 밴.</b> 예외 없습니다.</li>
+          <li>철저한 <b>1:1 매칭 시스템.</b> 아무나 붙는 "그런 밭" 아닙니다.</li>
+          <li><b>법률 검토 완료 · 위법사항 없음.</b> 처음부터 끝까지 <b>합법 · 공식</b>으로 운영합니다.</li>
+          <li>공주님을 사적으로 꾀어내 조르는 <b>로맨스 진상</b> — 저희가 <b>직접 찾아가 응징</b>합니다.</li>
+          <li>공주님 · 직원 보호가 최우선. <b>매너 지키는 신사</b>만 모십니다.</li>
+        </ul>
       </div>
 
       <div class="wink">
