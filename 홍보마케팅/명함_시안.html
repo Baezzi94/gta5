@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공주님 클럽 — 구인 명함 시안 4종</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bebas+Neue&family=Hahmlet:wght@600;800&family=Noto+Sans+KR:wght@400;700;900&family=Nanum+Pen+Script&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#08060d;min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:28px;padding:40px 16px 80px;font-family:'Noto Sans KR',sans-serif}
+  h2{color:#ff8fb0;font-weight:800;text-align:center}
+  .lead{color:#9a8fb0;font-size:13px;text-align:center;margin-top:-18px}
+  .wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .cap{color:#6f688c;font-size:12px}
+  .savebtn{background:linear-gradient(90deg,#ff5ea0,#ffcf5a);color:#1a1020;border:none;border-radius:9px;padding:8px 16px;font-weight:800;cursor:pointer;font-family:'Noto Sans KR'}
+  .savebtn:disabled{opacity:.5;cursor:wait}
+  .num{font-family:'Black Han Sans'}
+
+  /* ===== 공통 카드 ===== */
+  .card{position:relative;overflow:hidden;color:#fff}
+
+  /* ===== 1. 네온 비교형 (가로) ===== */
+  .c1{width:940px;height:540px;border-radius:18px;padding:46px 52px;
+    background:radial-gradient(600px 300px at 90% 0,rgba(255,94,160,.22),transparent 55%),linear-gradient(160deg,#1a0b1f,#0b0710 70%);
+    border:1px solid #3a2440;box-shadow:0 0 50px rgba(255,60,150,.15)}
+  .c1 .brand{font-family:'Black Han Sans';font-size:24px;background:linear-gradient(90deg,#ff5ea0,#ffcf5a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .c1 .strike{margin-top:24px;color:#8a7fa0;font-size:26px;font-weight:700;text-decoration:line-through;text-decoration-color:#ff5e7a}
+  .c1 .big{font-family:'Hahmlet',serif;font-weight:800;font-size:50px;line-height:1.1;margin-top:4px;text-shadow:0 0 14px rgba(255,46,134,.5)}
+  .c1 .big .g{color:#ffcf5a}
+  .c1 .sub{margin-top:14px;color:#ffd6e8;font-size:17px}
+  .c1 .chips{position:absolute;left:52px;bottom:40px;display:flex;gap:7px}
+  .c1 .chip{border:1px solid #ff5ea0;color:#ff9ec6;border-radius:999px;padding:4px 11px;font-size:12px;font-weight:700}
+  .c1 .con{position:absolute;right:46px;bottom:38px;text-align:right}
+  .c1 .con .n{font-family:'Black Han Sans';font-size:34px;background:linear-gradient(90deg,#ffcf5a,#ff5ea0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .c1 .con .w{color:#ffd6e8;font-size:13px}
+
+  /* ===== 2. 블랙&골드 미니멀 (가로) ===== */
+  .c2{width:940px;height:540px;border-radius:18px;padding:0;
+    background:linear-gradient(135deg,#0a0a0a,#161215);border:1px solid #6b551f}
+  .c2 .inner{position:absolute;inset:14px;border:1px solid #7a611f;border-radius:12px;padding:40px 48px;display:flex;flex-direction:column;justify-content:space-between}
+  .c2 .top{text-align:center}
+  .c2 .en{letter-spacing:8px;color:#c9a94a;font-size:12px;font-weight:700}
+  .c2 .kr{font-family:'Hahmlet',serif;font-weight:800;font-size:46px;margin-top:10px;
+    background:linear-gradient(180deg,#f7e39b,#c9992f);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .c2 .mid{text-align:center;color:#e9dcc0;font-size:18px;line-height:1.7}
+  .c2 .mid b{color:#f2d98a}
+  .c2 .line{height:1px;background:linear-gradient(90deg,transparent,#c9a94a,transparent);margin:6px 0}
+  .c2 .bot{display:flex;justify-content:space-between;align-items:flex-end}
+  .c2 .who{color:#9a8a5f;font-size:13px}
+  .c2 .n{font-family:'Bebas Neue';font-size:40px;letter-spacing:2px;color:#f2d98a}
+
+  /* ===== 3. 옐로 급구 전단 (가로) ===== */
+  .c3{width:940px;height:540px;border-radius:14px;padding:40px 46px;color:#141414;
+    background:repeating-linear-gradient(-45deg,#ffd21e,#ffd21e 22px,#ffe37a 22px,#ffe37a 44px)}
+  .c3 .sheet{position:absolute;inset:22px;background:#fffdf3;border:3px solid #141414;border-radius:8px;padding:26px 34px}
+  .c3 .tag{display:inline-block;background:#e10f0f;color:#fff;font-family:'Black Han Sans';font-size:26px;padding:2px 14px;transform:rotate(-3deg)}
+  .c3 .h{font-family:'Black Han Sans';font-size:52px;margin-top:10px;line-height:1}
+  .c3 .h .r{color:#e10f0f}
+  .c3 ul{margin:16px 0 0 4px;list-style:none;font-size:18px;font-weight:700;line-height:1.9}
+  .c3 li::before{content:'✔ ';color:#e10f0f}
+  .c3 .stamp{position:absolute;right:30px;top:28px;border:4px solid #e10f0f;color:#e10f0f;font-family:'Black Han Sans';font-size:30px;padding:6px 12px;border-radius:8px;transform:rotate(9deg);opacity:.85}
+  .c3 .con{position:absolute;left:34px;bottom:26px;font-family:'Black Han Sans';font-size:30px}
+  .c3 .con .p{color:#e10f0f}
+  .c3 .con small{display:block;font-family:'Noto Sans KR';font-weight:700;font-size:13px;color:#555}
+
+  /* ===== 4. 핑크 글로우 세로형 ===== */
+  .c4{width:500px;height:760px;border-radius:20px;padding:44px 38px;text-align:center;
+    background:radial-gradient(400px 400px at 50% 12%,rgba(255,94,160,.35),transparent 60%),linear-gradient(180deg,#220c1c,#0c0710);
+    border:1px solid #5a2440;box-shadow:0 0 60px rgba(255,46,134,.25)}
+  .c4 .crown{font-size:44px}
+  .c4 .brand{font-family:'Black Han Sans';font-size:34px;margin-top:6px;background:linear-gradient(90deg,#ff77b4,#ffcf5a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .c4 .en{letter-spacing:5px;color:#c98fb0;font-size:11px;font-weight:700;margin-top:2px}
+  .c4 .hook{font-family:'Nanum Pen Script',cursive;font-size:52px;line-height:1.15;margin-top:34px;color:#ffb3d6;text-shadow:0 0 16px rgba(255,46,134,.7)}
+  .c4 .big{font-family:'Hahmlet',serif;font-weight:800;font-size:40px;margin-top:8px;color:#fff;text-shadow:0 0 14px rgba(255,46,134,.6)}
+  .c4 .big .g{color:#ffcf5a}
+  .c4 .list{margin-top:26px;display:grid;gap:9px}
+  .c4 .item{background:rgba(255,94,160,.1);border:1px solid #6a2a48;border-radius:10px;padding:9px;color:#ffd6e8;font-weight:700}
+  .c4 .con{margin-top:auto;padding-top:26px}
+  .c4 .n{font-family:'Black Han Sans';font-size:38px;background:linear-gradient(90deg,#ffcf5a,#ff5ea0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .c4 .w{color:#ffd6e8;font-size:13px}
+  .c4 .tags{margin-top:12px;color:#c98fb0;font-size:12px}
+</style>
+</head>
+<body>
+  <h2>공주님 클럽 — 구인 명함 시안 4종</h2>
+  <p class="lead">마음에 드는 카드 아래 "이미지 저장(PNG)" 눌러서 뽑아 · 문의 전부 시진핑 010-4499-3016</p>
+
+  <!-- 1. 네온 비교형 -->
+  <div class="wrap">
+    <span class="cap">① 네온 비교형 (가로)</span>
+    <div class="card c1" id="c1">
+      <div class="brand">공주님 클럽 · PRINCESS CLUB</div>
+      <div class="strike">노가다 시급 30만?</div>
+      <div class="big">우린 <span class="g">앉아서</span> 그 이상 ㅎㅎ</div>
+      <div class="sub">한 타임(20분) 15만 · 팁 전액 본인(+@) · 당일 정산</div>
+      <div class="chips"><span class="chip">👑 공주님 상시 구인</span><span class="chip">거부권 100% · 강요 없음</span><span class="chip">초보 환영</span></div>
+      <div class="con"><div class="n">010-4499-3016</div><div class="w">사장 ) 시진핑 · 문자/전화</div></div>
+    </div>
+    <button class="savebtn" data-target="c1" data-name="명함_네온비교형">🖼️ 이미지 저장 (PNG)</button>
+  </div>
+
+  <!-- 2. 블랙&골드 미니멀 -->
+  <div class="wrap">
+    <span class="cap">② 블랙&골드 미니멀 (가로)</span>
+    <div class="card c2" id="c2">
+      <div class="inner">
+        <div class="top">
+          <div class="en">PRINCESS CLUB · CLIMAX</div>
+          <div class="kr">공주님을 모십니다</div>
+        </div>
+        <div class="mid">
+          <div class="line"></div>
+          앉아서 버는 <b>고페이</b> · 출근 자유 · 당일 정산<br>
+          강요 없는 <b>거부권 100%</b> 보장 · 초보 환영
+          <div class="line"></div>
+        </div>
+        <div class="bot">
+          <div class="who">상시 구인 · 문자/전화 문의<br>사장 ) 시진핑</div>
+          <div class="n">010 4499 3016</div>
+        </div>
+      </div>
+    </div>
+    <button class="savebtn" data-target="c2" data-name="명함_블랙골드">🖼️ 이미지 저장 (PNG)</button>
+  </div>
+
+  <!-- 3. 옐로 급구 전단 -->
+  <div class="wrap">
+    <span class="cap">③ 옐로 급구 전단 (싼마이)</span>
+    <div class="card c3" id="c3">
+      <div class="sheet">
+        <span class="tag">급 구</span>
+        <div class="stamp">고페이</div>
+        <div class="h">공주님 <span class="r">알바</span> 모집</div>
+        <ul>
+          <li>한 타임 20분 = <b>15만</b> (앉아서)</li>
+          <li>팁 전액 본인 · <b>당일 정산</b></li>
+          <li>출근 자유 · 거부권 100% · 강요 없음</li>
+          <li>초보·미경험 대환영</li>
+        </ul>
+        <div class="con"><span class="p">☎ 010-4499-3016</span><small>사장 ) 시진핑 · 문자/전화 · #CLIMAX #꽈추ㄲㅈ</small></div>
+      </div>
+    </div>
+    <button class="savebtn" data-target="c3" data-name="명함_급구전단">🖼️ 이미지 저장 (PNG)</button>
+  </div>
+
+  <!-- 4. 핑크 글로우 세로형 -->
+  <div class="wrap">
+    <span class="cap">④ 핑크 글로우 (세로)</span>
+    <div class="card c4" id="c4">
+      <div class="crown">👑</div>
+      <div class="brand">공주님 클럽</div>
+      <div class="en">PRINCESS CLUB · CLIMAX</div>
+      <div class="hook">일 안 하고<br>돈 벌래?</div>
+      <div class="big">앉아서 4시간 <span class="g">180만+</span></div>
+      <div class="list">
+        <div class="item">한 타임 20분 = 15만 · 팁 전액 본인</div>
+        <div class="item">출근 자유 · 당일 정산 · 초보 환영</div>
+        <div class="item">거부권 100% 보장 · 강요 없음</div>
+      </div>
+      <div class="con">
+        <div class="n">010-4499-3016</div>
+        <div class="w">사장 ) 시진핑 · 문자/전화</div>
+        <div class="tags">#CLIMAX　#꽈추ㄲㅈ</div>
+      </div>
+    </div>
+    <button class="savebtn" data-target="c4" data-name="명함_핑크세로">🖼️ 이미지 저장 (PNG)</button>
+  </div>
+
+  <script type="module">
+    import { toPng } from 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/+esm'
+    document.querySelectorAll('.savebtn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        btn.disabled = true
+        const label = btn.textContent
+        btn.textContent = '만드는 중…'
+        try {
+          await document.fonts.ready
+          await new Promise((r) => setTimeout(r, 200))
+          const node = document.getElementById(btn.dataset.target)
+          const url = await toPng(node, { pixelRatio: 3, cacheBust: true, backgroundColor: '#0d0812' })
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `공주님클럽_${btn.dataset.name}.png`
+          a.click()
+        } catch (e) {
+          alert('저장 실패: ' + e.message + '\n\nWin+Shift+S 캡쳐를 사용하세요.')
+        }
+        btn.disabled = false
+        btn.textContent = label
+      })
+    })
+  </script>
+</body>
+</html>
