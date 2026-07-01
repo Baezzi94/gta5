@@ -55,6 +55,7 @@ export default function Dashboard() {
   const enrich = (c) => ({
     type: c.type,
     amount: c.amount,
+    at: c.created_at,
     princess_id: c.princess_id,
     customer_id: c.customer_id,
     princess_referred_by: c.princess?.referred_by,
@@ -62,22 +63,16 @@ export default function Dashboard() {
   })
   const acc = {}
   for (const d of [...new Set(collected.map((c) => c.date))]) {
-    const staffInIds = new Set(avail.filter((a) => a.date === d && a.checked_in_at && a.member?.type === 'staff').map((a) => a.member_id))
-    const ownerInIds = new Set(avail.filter((a) => a.date === d && a.checked_in_at && a.member?.type === 'owner').map((a) => a.member_id))
-    const shareMembers = members
-      .filter((m) => m.active && ((m.type === 'owner' && ownerInIds.has(m.id)) || (m.type === 'staff' && staffInIds.has(m.id))))
-      .map((m) => ({ id: m.id, role: m.type }))
-    const res = settle(collected.filter((c) => c.date === d && c.type !== 'item').map(enrich), shareMembers)
+    const windows = avail
+      .filter((a) => a.date === d && a.checked_in_at)
+      .map((a) => ({ id: a.member_id, role: a.member?.type, inAt: a.checked_in_at, outAt: a.checked_out_at }))
+    const res = settle(collected.filter((c) => c.date === d && c.type !== 'item').map(enrich), windows)
     for (const pm of res.perMember) {
       const a = (acc[pm.id] = acc[pm.id] || { talk: 0, date2: 0, share: 0, referral: 0, recruit: 0, alcohol: 0, total: 0 })
       a.talk += pm.talk; a.date2 += pm.date2; a.share += pm.share; a.referral += pm.referral; a.recruit += pm.recruit; a.total += pm.total
     }
-    // 주류 분배 (출근 전원 N빵, 사장 1.5 + 도매원가 회수)
-    const princessInIds = new Set(avail.filter((a) => a.date === d && a.checked_in_at && a.member?.type === 'princess').map((a) => a.member_id))
-    const alcParts = members
-      .filter((m) => m.active && ((m.type === 'owner' && ownerInIds.has(m.id)) || (m.type === 'staff' && staffInIds.has(m.id)) || (m.type === 'princess' && princessInIds.has(m.id))))
-      .map((m) => ({ id: m.id, role: m.type }))
-    const alc = settleAlcohol(collected.filter((c) => c.date === d && c.type === 'item').map((c) => ({ amount: c.amount, cost: c.cost })), alcParts)
+    // 주류 분배 (판매 시각 출근 전원 N빵, 사장 1.5 + 도매원가 회수)
+    const alc = settleAlcohol(collected.filter((c) => c.date === d && c.type === 'item').map((c) => ({ amount: c.amount, cost: c.cost, at: c.created_at })), windows)
     for (const [id, amt] of Object.entries(alc.per)) {
       const a = (acc[id] = acc[id] || { talk: 0, date2: 0, share: 0, referral: 0, recruit: 0, alcohol: 0, total: 0 })
       a.alcohol += amt; a.total += amt

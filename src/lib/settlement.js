@@ -1,42 +1,45 @@
-// 정산 엔진 (순수). 입력은 "수금 완료된" 거래만 넣는다.
+// 정산 엔진 (순수) — 거래별 "시간귀속" 분배.
+// 각 거래(charge)의 발생 시각(at = created_at)에 출근중이던 사람만 그 거래를 나눠 가진다.
 //
-// charges: [{ type:'tc'|'talk'|'date2', amount, princess_id, customer_id,
+// windows: [{ id, role, inAt, outAt }]  // 각 직원의 출근~퇴근 구간(ISO 문자열 또는 ms)
+//   - inAt <= 거래시각 < outAt 이면 그 시각 "출근중". outAt=null이면 그날 계속 출근으로 간주.
+//
+// charges: [{ type:'tc'|'talk'|'date2', amount, at, princess_id, customer_id,
 //             princess_referred_by, customer_referred_by }]
-// shareMembers: [{ id, role }]  // 운영풀 지분 참여자 (owner 1.2 / 그 외 1.0)
 //
-// 분배 규칙:
+// 분배 규칙(항목은 그대로):
 //  - tc: 전액 운영풀
 //  - talk: 공주 15/25, 운영풀 10/25, (공주 영입자 있으면 운영풀에서 1만→영입자)
 //  - date2: 공주 70/100, 운영풀 30/100
-//  - 손님추천: referred_by 있는 손님 1명당 3만 (운영풀에서 차감 → 추천자)
-//  - 남은 운영풀: 지분율로 분배
+//  - 손님추천: referred_by 있는 손님 1명당 3만(운영풀에서 차감→추천자)
+//  - 남은 운영풀: 그 거래 시각 출근자(사장·스탭) 지분율로 분배 (사장 1.2 / 그 외 1.0)
 
 export const RECRUIT_PER_TALK = 10000 // 공주 영입 1만/타임
 export const CUSTOMER_REFERRAL = 30000 // 손님 추천 3만/명
 
-// 주류·메뉴 마진 분배 (출근 전원 N빵, 사장 1.5배 + 도매원가 회수)
-// itemCharges: [{ amount, cost }]  (수금완료·무효 제외된 item 거래)
-// participants: [{ id, role }]  (사장 + 그날 출근 공주·스탭)
-export function settleAlcohol(itemCharges, participants) {
-  let margin = 0
-  let cost = 0
-  for (const c of itemCharges || []) {
-    margin += (c.amount || 0) - (c.cost || 0)
-    cost += c.cost || 0
+const ms = (v) => (v == null ? null : (typeof v === 'number' ? v : Date.parse(v)))
+
+// windows 중 시각 at 에 출근중인 참여자 목록(중복 멤버 제거)
+export function participantsAt(windows, at) {
+  const t = ms(at)
+  if (t == null) return []
+  const seen = new Set()
+  const out = []
+  for (const w of windows || []) {
+    const i = ms(w.inAt)
+    if (i == null || i > t) continue
+    const o = ms(w.outAt)
+    if (o != null && o <= t) continue
+    if (seen.has(w.id)) continue
+    seen.add(w.id)
+    out.push({ id: w.id, role: w.role })
   }
-  const shareOf = (m) => (m.role === 'owner' ? 1.5 : 1.0)
-  const totalShares = (participants || []).reduce((s, m) => s + shareOf(m), 0)
-  const unit = totalShares > 0 ? margin / totalShares : 0
-  // 도매원가 회수는 사장 몫. 사장이 2명 이상 출근했으면 중복회수 방지 위해 나눠서 회수
-  const ownerCount = (participants || []).filter((m) => m.role === 'owner').length
-  const per = {}
-  for (const m of participants || []) {
-    per[m.id] = Math.round(shareOf(m) * unit) + (m.role === 'owner' ? Math.round(cost / ownerCount) : 0)
-  }
-  return { margin, cost, totalShares, per }
+  return out
 }
 
-export function settle(charges, shareMembers) {
+const shareOf = (m) => (m.role === 'owner' ? 1.2 : 1.0)
+
+export function settle(charges, windows) {
   const per = {}
   const ensure = (id) => {
     if (!per[id]) per[id] = { talk: 0, date2: 0, share: 0, referral: 0, recruit: 0 }
@@ -48,39 +51,43 @@ export function settle(charges, shareMembers) {
   }
 
   let pool = 0
+  let poolUnattributed = 0 // 그 시각 출근자가 없어 분배 못한 운영풀
   const countedCustomers = new Set()
 
   for (const c of charges || []) {
     const amt = c.amount || 0
+    let cPool = 0
     if (c.type === 'tc') {
-      pool += amt
+      cPool += amt
     } else if (c.type === 'talk') {
       add(c.princess_id, 'talk', Math.round((amt * 15) / 25))
-      pool += Math.round((amt * 10) / 25)
+      cPool += Math.round((amt * 10) / 25)
       if (c.princess_referred_by) {
-        pool -= RECRUIT_PER_TALK
+        cPool -= RECRUIT_PER_TALK
         add(c.princess_referred_by, 'recruit', RECRUIT_PER_TALK)
       }
     } else if (c.type === 'date2') {
       add(c.princess_id, 'date2', Math.round((amt * 70) / 100))
-      pool += Math.round((amt * 30) / 100)
+      cPool += Math.round((amt * 30) / 100)
     }
-    // 손님추천: 추천자 있는 손님 1명당 1회 3만
     if (c.customer_id && c.customer_referred_by && !countedCustomers.has(c.customer_id)) {
       countedCustomers.add(c.customer_id)
-      pool -= CUSTOMER_REFERRAL
+      cPool -= CUSTOMER_REFERRAL
       add(c.customer_referred_by, 'referral', CUSTOMER_REFERRAL)
     }
-  }
 
-  // 추천/영입 차감이 풀 유입보다 커도 지분참여자에게 마이너스 분배는 금지
-  pool = Math.max(0, pool)
+    cPool = Math.max(0, cPool) // 지분참여자에게 마이너스 분배 금지
+    pool += cPool
 
-  const shareOf = (m) => (m.role === 'owner' ? 1.2 : 1.0)
-  const totalShares = (shareMembers || []).reduce((s, m) => s + shareOf(m), 0)
-  const unit = totalShares > 0 ? pool / totalShares : 0
-  for (const m of shareMembers || []) {
-    add(m.id, 'share', Math.round(shareOf(m) * unit))
+    // 이 거래 시각에 출근중인 사장·스탭에게만 분배
+    const sm = participantsAt(windows, c.at).filter((m) => m.role === 'owner' || m.role === 'staff')
+    const totalShares = sm.reduce((s, m) => s + shareOf(m), 0)
+    if (totalShares > 0) {
+      const unit = cPool / totalShares
+      for (const m of sm) add(m.id, 'share', Math.round(shareOf(m) * unit))
+    } else {
+      poolUnattributed += cPool
+    }
   }
 
   const perMember = Object.entries(per).map(([id, b]) => ({
@@ -89,5 +96,34 @@ export function settle(charges, shareMembers) {
     total: b.talk + b.date2 + b.share + b.referral + b.recruit,
   }))
 
-  return { pool, totalShares, unit, perMember }
+  return { pool, poolUnattributed, perMember }
+}
+
+// 주류·메뉴 마진 분배(시간귀속). 각 판매 시각 출근 전원(사장·스탭·공주) N빵, 사장 1.5 + 도매원가 회수.
+// itemCharges: [{ amount, cost, at }]
+export function settleAlcohol(itemCharges, windows) {
+  const per = {}
+  let margin = 0
+  let cost = 0
+  let marginUnattributed = 0
+  const aShare = (m) => (m.role === 'owner' ? 1.5 : 1.0)
+
+  for (const c of itemCharges || []) {
+    const m = (c.amount || 0) - (c.cost || 0)
+    const cst = c.cost || 0
+    margin += m
+    cost += cst
+    const parts = participantsAt(windows, c.at)
+    const owners = parts.filter((p) => p.role === 'owner').length
+    const totalShares = parts.reduce((s, p) => s + aShare(p), 0)
+    if (totalShares <= 0) {
+      marginUnattributed += m
+      continue
+    }
+    const unit = m / totalShares
+    for (const p of parts) {
+      per[p.id] = (per[p.id] || 0) + Math.round(aShare(p) * unit) + (p.role === 'owner' && owners > 0 ? Math.round(cst / owners) : 0)
+    }
+  }
+  return { margin, cost, marginUnattributed, per }
 }

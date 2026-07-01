@@ -132,27 +132,23 @@ export default function Collections() {
     .map((c) => ({
       type: c.type,
       amount: c.amount,
+      at: c.created_at, // 거래 발생 시각(시간귀속)
       princess_id: c.princess_id,
       customer_id: c.customer_id,
       princess_referred_by: c.princess?.referred_by,
       customer_referred_by: c.customer?.referred_by,
     }))
-  // 그날 출근 중(체크인 O·퇴근 X)인 사람만 지분. 사장도 출근 안 하면 제외.
-  const isIn = (a, t) => a.checked_in_at && !a.checked_out_at && a.member?.type === t
-  const staffInIds = new Set(avail.filter((a) => isIn(a, 'staff')).map((a) => a.member_id))
-  const princessInIds = new Set(avail.filter((a) => isIn(a, 'princess')).map((a) => a.member_id))
-  const ownerInIds = new Set(avail.filter((a) => isIn(a, 'owner')).map((a) => a.member_id))
-  const shareMembers = members
-    .filter((m) => m.active && ((m.type === 'owner' && ownerInIds.has(m.id)) || (m.type === 'staff' && staffInIds.has(m.id))))
-    .map((m) => ({ id: m.id, role: m.type }))
-  const settlement = settle(enriched, shareMembers)
+  // 출근 구간(체크인~퇴근). 거래 시각이 이 구간에 들면 그 거래를 나눠 가짐. 퇴근 안 눌렀으면 계속 출근으로 간주.
+  const windows = avail
+    .filter((a) => a.checked_in_at)
+    .map((a) => ({ id: a.member_id, role: a.member?.type, inAt: a.checked_in_at, outAt: a.checked_out_at }))
+  const settlement = settle(enriched, windows)
 
-  // 주류 분배: 출근 전원(사장+공주+스탭) N빵, 사장 1.5 + 도매원가 회수
-  const itemCharges = live.filter((r) => r.collected && r.type === 'item').map((c) => ({ amount: c.amount, cost: c.cost }))
-  const alcoholParticipants = members
-    .filter((m) => m.active && ((m.type === 'owner' && ownerInIds.has(m.id)) || (m.type === 'staff' && staffInIds.has(m.id)) || (m.type === 'princess' && princessInIds.has(m.id))))
-    .map((m) => ({ id: m.id, role: m.type }))
-  const alcohol = settleAlcohol(itemCharges, alcoholParticipants)
+  // 주류 분배: 판매 시각 출근 전원(사장+공주+스탭) N빵, 사장 1.5 + 도매원가 회수
+  const itemCharges = live
+    .filter((r) => r.collected && r.type === 'item')
+    .map((c) => ({ amount: c.amount, cost: c.cost, at: c.created_at }))
+  const alcohol = settleAlcohol(itemCharges, windows)
 
   // 합산
   const combined = {}
@@ -303,9 +299,9 @@ export default function Collections() {
 
       {/* 정산 대시보드 (수금완료 기준) */}
       <h2 style={{ marginTop: 28 }}>정산 분배 <span style={{ color: '#9a93b8', fontSize: 13, fontWeight: 400 }}>(수금완료 기준 · 운영풀 {won(settlement.pool)} · 지분 사장1.2 : 스탭1.0)</span></h2>
-      {settlement.pool > 0 && shareMembers.length === 0 && (
+      {settlement.poolUnattributed > 0 && (
         <p style={{ background: '#3a1620', border: '1px solid #ff5e7a', color: '#ffb3c1', padding: '8px 12px', borderRadius: 8 }}>
-          ⚠️ 운영풀 {won(settlement.pool)}이 분배될 지분 참여자가 없습니다. 사장/운영스탭이 <b>스탭 출근부에서 출근(체크인)</b>해야 운영풀이 분배됩니다.
+          ⚠️ 운영풀 {won(settlement.poolUnattributed)}이 <b>거래 발생 시각에 출근중이던 사장/운영스탭이 없어</b> 미분배 상태입니다. (해당 시간대 출근 체크인 필요)
         </p>
       )}
       {settleRows.length === 0 ? (
