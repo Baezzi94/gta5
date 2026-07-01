@@ -7,7 +7,7 @@ import { listByDate as listPayouts, setPaid } from '../lib/payouts'
 import { listMembers } from '../lib/members'
 import { listMenu } from '../lib/menu'
 import { settle, settleAlcohol } from '../lib/settlement'
-import { ymd } from '../lib/week'
+import { businessYmd } from '../lib/week'
 import { useAuth } from '../app/AuthContext'
 
 const man = (won) => `${Math.round(won / 10000)}만`
@@ -18,7 +18,7 @@ export default function Collections() {
   const { role } = useAuth()
   const isOwner = role === 'owner'
   const canAdd = role === 'owner' || role === 'staff'
-  const [date, setDate] = useState(() => ymd(new Date()))
+  const [date, setDate] = useState(() => businessYmd(new Date()))
   const [rows, setRows] = useState([])
   const [avail, setAvail] = useState([])
   const [payouts, setPayouts] = useState([])
@@ -185,7 +185,7 @@ export default function Collections() {
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
         <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-        <button onClick={() => setDate(ymd(new Date()))}>오늘</button>
+        <button onClick={() => setDate(businessYmd(new Date()))}>오늘</button>
       </div>
 
       {/* 요약 */}

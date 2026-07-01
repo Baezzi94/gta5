@@ -3,15 +3,15 @@ import { listRange, CHARGE_LABEL } from '../lib/charges'
 import { listRange as listAvailRange } from '../lib/schedule'
 import { listMembers } from '../lib/members'
 import { settle, settleAlcohol } from '../lib/settlement'
-import { ymd, addDays } from '../lib/week'
+import { businessYmd, addDays } from '../lib/week'
 import { toCsv, downloadCsv } from '../lib/csv'
 
 const man = (won) => `${Math.round(won / 10000).toLocaleString()}만`
 const ROLE_LABEL = { owner: '사장', staff: '운영스탭', promoter: '삐끼', princess: '공주님' }
 
 export default function Dashboard() {
-  const [from, setFrom] = useState(() => ymd(addDays(new Date(), -6)))
-  const [to, setTo] = useState(() => ymd(new Date()))
+  const [from, setFrom] = useState(() => businessYmd(addDays(new Date(), -6)))
+  const [to, setTo] = useState(() => businessYmd(new Date()))
   const [charges, setCharges] = useState([])
   const [avail, setAvail] = useState([])
   const [members, setMembers] = useState([])
@@ -125,8 +125,8 @@ export default function Dashboard() {
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16, flexWrap: 'wrap' }}>
         <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /> ~
         <input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
-        <button onClick={() => { setFrom(ymd(addDays(new Date(), -6))); setTo(ymd(new Date())) }}>최근 7일</button>
-        <button onClick={() => { setFrom(ymd(addDays(new Date(), -29))); setTo(ymd(new Date())) }}>최근 30일</button>
+        <button onClick={() => { setFrom(businessYmd(addDays(new Date(), -6))); setTo(businessYmd(new Date())) }}>최근 7일</button>
+        <button onClick={() => { setFrom(businessYmd(addDays(new Date(), -29))); setTo(businessYmd(new Date())) }}>최근 30일</button>
         <span style={{ flex: 1 }} />
         <button onClick={exportCharges}>거래내역 CSV</button>
         <button onClick={exportSettlement}>정산합계 CSV</button>

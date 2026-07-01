@@ -6,6 +6,14 @@ export function ymd(d) {
   return `${y}-${m}-${day}`
 }
 
+// 영업일 경계 시각(새벽 6시). 이 이전은 전날 영업일로 귀속.
+export const BUSINESS_DAY_START_HOUR = 6
+
+// 영업일 기준 'YYYY-MM-DD' — 자정~새벽6시 사이는 전날로 잡아 야간영업이 하루로 묶이게.
+export function businessYmd(d) {
+  return ymd(new Date(d.getTime() - BUSINESS_DAY_START_HOUR * 3600 * 1000))
+}
+
 export function addDays(d, n) {
   const x = new Date(d)
   x.setDate(x.getDate() + n)

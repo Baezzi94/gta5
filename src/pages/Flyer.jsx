@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { listByDate } from '../lib/schedule'
-import { ymd } from '../lib/week'
+import { businessYmd } from '../lib/week'
 import { minToHm } from '../lib/time'
 import { toPng } from 'html-to-image'
 
 export default function Flyer() {
-  const [date, setDate] = useState(() => ymd(new Date()))
+  const [date, setDate] = useState(() => businessYmd(new Date()))
   const [avail, setAvail] = useState([])
   const [title, setTitle] = useState('공주님 클럽')
   const [sub, setSub] = useState('오늘의 공주님')
@@ -60,7 +60,7 @@ export default function Flyer() {
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginBottom: 14 }}>
         <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-        <button onClick={() => setDate(ymd(new Date()))}>오늘</button>
+        <button onClick={() => setDate(businessYmd(new Date()))}>오늘</button>
         <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="제목" />
         <input value={sub} onChange={(e) => setSub(e.target.value)} placeholder="부제" />
         <label style={{ color: '#9a93b8' }}>

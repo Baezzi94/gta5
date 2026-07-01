@@ -7,7 +7,7 @@ import { createTalkFromReservation, createTcFromReservation, createDate2FromRese
 import { listMembers } from '../lib/members'
 import { isBannedCustomer } from '../lib/bans'
 import { hmToMin, minToHm } from '../lib/time'
-import { ymd } from '../lib/week'
+import { businessYmd } from '../lib/week'
 import DayTimetable from '../components/DayTimetable'
 import TimeField from '../components/TimeField'
 
@@ -21,7 +21,7 @@ const STATUS_LABEL = { booked: '예약', in_progress: '진행', done: '완료', 
 
 export default function Reservations() {
   const { role } = useAuth()
-  const [date, setDate] = useState(() => ymd(new Date()))
+  const [date, setDate] = useState(() => businessYmd(new Date()))
   const [avail, setAvail] = useState([])
   const [rows, setRows] = useState([])
   const [members, setMembers] = useState([])
@@ -164,7 +164,7 @@ export default function Reservations() {
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
         <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-        <button onClick={() => setDate(ymd(new Date()))}>오늘</button>
+        <button onClick={() => setDate(businessYmd(new Date()))}>오늘</button>
         <span style={{ color: '#9a93b8' }}>가용 공주님 {timetableRows.length}명</span>
       </div>
 

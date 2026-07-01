@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { listMembers } from '../lib/members'
 import { listRange, addAvailability, checkIn, checkOut, reCheckIn, removeAvailability } from '../lib/schedule'
 import { hmToMin, minToHm } from '../lib/time'
-import { startOfWeek, weekDates, addDays, ymd } from '../lib/week'
+import { startOfWeek, weekDates, addDays, businessYmd } from '../lib/week'
 import { useAuth } from '../app/AuthContext'
 import TimeField from '../components/TimeField'
 
@@ -15,7 +15,7 @@ export default function Attendance() {
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()))
   const [blocks, setBlocks] = useState([])
   const [princesses, setPrincesses] = useState([])
-  const [form, setForm] = useState({ member_id: '', date: ymd(new Date()), start: '', end: '' })
+  const [form, setForm] = useState({ member_id: '', date: businessYmd(new Date()), start: '', end: '' })
   const [error, setError] = useState('')
 
   const days = weekDates(weekStart)

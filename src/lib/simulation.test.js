@@ -127,12 +127,30 @@ describe('⚠️ 발견 이슈(현재 동작 기록)', () => {
     expect(a.per['ria']).toBe(180000)
     expect(a.marginUnattributed).toBe(0)
   })
-  it('손님추천 3만이 방문일마다 재지급됨(하루 1회 x N일)', () => {
-    // settle는 하루 단위 호출 → 같은 손님이 다른 날 또 오면 추천자에게 또 3만.
-    const day1 = settle([{ type: 'tc', amount: 50000, customer_id: 'C1', customer_referred_by: 'R1', at: t(21) }], [win('S1', 'staff', t(20))])
-    const day2 = settle([{ type: 'tc', amount: 50000, customer_id: 'C1', customer_referred_by: 'R1', at: t(21) }], [win('S1', 'staff', t(20))])
-    expect(day1.perMember.find((m) => m.id === 'R1').referral).toBe(30000)
-    expect(day2.perMember.find((m) => m.id === 'R1').referral).toBe(30000)
-    // 이틀 방문 → 삐끼가 총 6만 획득. "손님 1명당 3만(1회)" 의도면 과지급.
+  it('손님추천 3만이 공주 예약 방문일마다 재지급(정책: 방문마다, 공주세션 조건)', () => {
+    // 공주 세션(talk) 포함된 방문이라 지급. 다른 날 또 오면 또 3만(정책상 정상).
+    const mk = () => settle([
+      { type: 'tc', amount: 50000, customer_id: 'C1', customer_referred_by: 'R1', at: t(21) },
+      { type: 'talk', amount: 250000, princess_id: 'P1', customer_id: 'C1', at: t(21) },
+    ], [win('S1', 'staff', t(20))])
+    expect(mk().perMember.find((m) => m.id === 'R1').referral).toBe(30000)
+    expect(mk().perMember.find((m) => m.id === 'R1').referral).toBe(30000)
+  })
+})
+
+describe('시뮬레이션: 손님추천 게이팅(공주 예약 도움 시에만)', () => {
+  const w = [win('S1', 'staff', t(20))]
+  it('공주 세션 있는 방문 → 삐끼 3만 지급', () => {
+    const r = settle([
+      { type: 'tc', amount: 50000, customer_id: 'C1', customer_referred_by: 'BK', at: t(21) },
+      { type: 'talk', amount: 250000, princess_id: 'P1', customer_id: 'C1', at: t(21) },
+    ], w)
+    expect(r.perMember.find((m) => m.id === 'BK').referral).toBe(30000)
+  })
+  it('술만 마신 방문(공주 세션 없음) → 삐끼 미지급', () => {
+    const r = settle([
+      { type: 'tc', amount: 50000, customer_id: 'C1', customer_referred_by: 'BK', at: t(21) },
+    ], w)
+    expect(r.perMember.find((m) => m.id === 'BK')).toBeUndefined()
   })
 })

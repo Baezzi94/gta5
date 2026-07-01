@@ -1,5 +1,20 @@
 import { describe, it, expect } from 'vitest'
-import { ymd, addDays, startOfWeek, weekDates } from './week'
+import { ymd, addDays, startOfWeek, weekDates, businessYmd } from './week'
+
+describe('businessYmd() — 영업일 경계(새벽6시)', () => {
+  it('새벽 2시는 전날 영업일', () => {
+    expect(businessYmd(new Date(2026, 6, 3, 2, 0))).toBe('2026-07-02')
+  })
+  it('새벽 5시59분도 전날', () => {
+    expect(businessYmd(new Date(2026, 6, 3, 5, 59))).toBe('2026-07-02')
+  })
+  it('새벽 6시는 당일', () => {
+    expect(businessYmd(new Date(2026, 6, 3, 6, 0))).toBe('2026-07-03')
+  })
+  it('낮/저녁은 당일 그대로', () => {
+    expect(businessYmd(new Date(2026, 6, 3, 22, 0))).toBe('2026-07-03')
+  })
+})
 
 describe('ymd()', () => {
   it('YYYY-MM-DD 포맷', () => {

@@ -54,6 +54,13 @@ export function settle(charges, windows) {
   let poolUnattributed = 0 // 그 시각 출근자가 없어 분배 못한 운영풀
   const countedCustomers = new Set()
 
+  // 손님추천 3만은 "그날 공주 세션(대화료/2차)이 있는 손님"에 대해서만 지급
+  // (삐끼가 공주 예약을 도운 방문만 인정 — 그냥 술만 마시고 가면 미지급)
+  const princessSessionCustomers = new Set()
+  for (const c of charges || []) {
+    if ((c.type === 'talk' || c.type === 'date2') && c.customer_id) princessSessionCustomers.add(c.customer_id)
+  }
+
   for (const c of charges || []) {
     const amt = c.amount || 0
     let cPool = 0
@@ -70,7 +77,7 @@ export function settle(charges, windows) {
       add(c.princess_id, 'date2', Math.round((amt * 70) / 100))
       cPool += Math.round((amt * 30) / 100)
     }
-    if (c.customer_id && c.customer_referred_by && !countedCustomers.has(c.customer_id)) {
+    if (c.customer_id && c.customer_referred_by && !countedCustomers.has(c.customer_id) && princessSessionCustomers.has(c.customer_id)) {
       countedCustomers.add(c.customer_id)
       cPool -= CUSTOMER_REFERRAL
       add(c.customer_referred_by, 'referral', CUSTOMER_REFERRAL)
