@@ -39,6 +39,10 @@ export async function deleteMember(id) {
   await supabase.from('bans').update({ created_by: null }).eq('created_by', id)
   await supabase.from('charges').update({ princess_id: null }).eq('princess_id', id)
   await supabase.from('reservations').update({ created_by: null }).eq('created_by', id)
+  // 이 공주의 예약을 물고 있는 거래(reservation_id)는 ON DELETE가 없어 예약 삭제를 막음 → 먼저 링크 해제
+  const { data: resRows } = await supabase.from('reservations').select('id').eq('princess_id', id)
+  const resIds = (resRows || []).map((r) => r.id)
+  if (resIds.length) await supabase.from('charges').update({ reservation_id: null }).in('reservation_id', resIds)
   // not-null FK라 null 불가 → 해당 멤버의 행 삭제
   await supabase.from('reservations').delete().eq('princess_id', id)
   await supabase.from('availability').delete().eq('member_id', id)

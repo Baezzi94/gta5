@@ -51,6 +51,27 @@ describe('settle()', () => {
     expect(a.per['O']).toBe(77143 + 120000)
   })
 
+  it('운영풀은 마이너스로 안 감(추천 차감이 유입보다 커도 0으로 clamp)', () => {
+    // tc/talk 유입 없이 손님추천 3만만 차감 → 풀 -3만 → 0으로
+    const neg = settle(
+      [{ type: 'talk', amount: 0, princess_id: 'P1', customer_id: 'C1', customer_referred_by: 'R1' }],
+      [{ id: 'O', role: 'owner' }]
+    )
+    expect(neg.pool).toBe(0)
+    expect(neg.perMember.find((m) => m.id === 'O')?.share ?? 0).toBe(0)
+  })
+  it('주류: 사장 2명 출근 시 도매원가 중복회수 안 함(사장 수로 분배)', () => {
+    const items = [{ amount: 300000, cost: 120000 }] // 마진18만, 도매12만
+    const a = settleAlcohol(items, [
+      { id: 'O1', role: 'owner' },
+      { id: 'O2', role: 'owner' },
+    ])
+    // 도매 12만을 두 사장이 6만씩만 회수 (합계 12만, 중복회수 없음)
+    const recovered = (a.per['O1'] - Math.round(1.5 * a.margin / a.totalShares)) +
+                      (a.per['O2'] - Math.round(1.5 * a.margin / a.totalShares))
+    expect(recovered).toBe(120000)
+  })
+
   it('손님추천은 동일 손님 1회만', () => {
     const dup = settle(
       [

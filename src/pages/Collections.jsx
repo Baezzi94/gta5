@@ -135,10 +135,11 @@ export default function Collections() {
       princess_referred_by: c.princess?.referred_by,
       customer_referred_by: c.customer?.referred_by,
     }))
-  // 그날 출근(체크인)한 스탭만 지분. 사장은 항상 포함.
-  const staffInIds = new Set(avail.filter((a) => a.checked_in_at && a.member?.type === 'staff').map((a) => a.member_id))
-  const princessInIds = new Set(avail.filter((a) => a.checked_in_at && a.member?.type === 'princess').map((a) => a.member_id))
-  const ownerInIds = new Set(avail.filter((a) => a.checked_in_at && a.member?.type === 'owner').map((a) => a.member_id))
+  // 그날 출근 중(체크인 O·퇴근 X)인 사람만 지분. 사장도 출근 안 하면 제외.
+  const isIn = (a, t) => a.checked_in_at && !a.checked_out_at && a.member?.type === t
+  const staffInIds = new Set(avail.filter((a) => isIn(a, 'staff')).map((a) => a.member_id))
+  const princessInIds = new Set(avail.filter((a) => isIn(a, 'princess')).map((a) => a.member_id))
+  const ownerInIds = new Set(avail.filter((a) => isIn(a, 'owner')).map((a) => a.member_id))
   const shareMembers = members
     .filter((m) => m.active && ((m.type === 'owner' && ownerInIds.has(m.id)) || (m.type === 'staff' && staffInIds.has(m.id))))
     .map((m) => ({ id: m.id, role: m.type }))
@@ -291,6 +292,11 @@ export default function Collections() {
 
       {/* 정산 대시보드 (수금완료 기준) */}
       <h2 style={{ marginTop: 28 }}>정산 분배 <span style={{ color: '#9a93b8', fontSize: 13, fontWeight: 400 }}>(수금완료 기준 · 운영풀 {won(settlement.pool)} · 지분 사장1.2 : 스탭1.0)</span></h2>
+      {settlement.pool > 0 && shareMembers.length === 0 && (
+        <p style={{ background: '#3a1620', border: '1px solid #ff5e7a', color: '#ffb3c1', padding: '8px 12px', borderRadius: 8 }}>
+          ⚠️ 운영풀 {won(settlement.pool)}이 분배될 지분 참여자가 없습니다. 사장/운영스탭이 <b>스탭 출근부에서 출근(체크인)</b>해야 운영풀이 분배됩니다.
+        </p>
+      )}
       {settleRows.length === 0 ? (
         <p style={{ color: '#9a93b8' }}>수금 완료된 거래가 없습니다. 거래를 "수금" 처리하면 자동 분배됩니다.</p>
       ) : (

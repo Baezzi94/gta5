@@ -27,9 +27,11 @@ export function settleAlcohol(itemCharges, participants) {
   const shareOf = (m) => (m.role === 'owner' ? 1.5 : 1.0)
   const totalShares = (participants || []).reduce((s, m) => s + shareOf(m), 0)
   const unit = totalShares > 0 ? margin / totalShares : 0
+  // 도매원가 회수는 사장 몫. 사장이 2명 이상 출근했으면 중복회수 방지 위해 나눠서 회수
+  const ownerCount = (participants || []).filter((m) => m.role === 'owner').length
   const per = {}
   for (const m of participants || []) {
-    per[m.id] = Math.round(shareOf(m) * unit) + (m.role === 'owner' ? cost : 0)
+    per[m.id] = Math.round(shareOf(m) * unit) + (m.role === 'owner' ? Math.round(cost / ownerCount) : 0)
   }
   return { margin, cost, totalShares, per }
 }
@@ -70,6 +72,9 @@ export function settle(charges, shareMembers) {
       add(c.customer_referred_by, 'referral', CUSTOMER_REFERRAL)
     }
   }
+
+  // 추천/영입 차감이 풀 유입보다 커도 지분참여자에게 마이너스 분배는 금지
+  pool = Math.max(0, pool)
 
   const shareOf = (m) => (m.role === 'owner' ? 1.2 : 1.0)
   const totalShares = (shareMembers || []).reduce((s, m) => s + shareOf(m), 0)
