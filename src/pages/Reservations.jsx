@@ -113,6 +113,9 @@ export default function Reservations() {
     if (!dur || dur <= 0) return setError('2차 시간을 분으로 입력하세요.')
     try {
       const conflictIds = await startDate2(r, dur)
+      // 2차만 눌러도 기본 TC·대화료 누락 없게 함께 생성(이미 있으면 dedup으로 건너뜀)
+      await createTcFromReservation(r)
+      await createTalkFromReservation(r)
       await createDate2FromReservation(r)
       const names = conflictIds.map((id) => {
         const c = rows.find((x) => x.id === id)

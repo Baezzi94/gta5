@@ -37,7 +37,7 @@ export default function Dashboard() {
   }, [])
 
   const memberMap = Object.fromEntries(members.map((m) => [m.id, m]))
-  const isVoid = (c) => c.reservation?.status === 'cancelled' || c.reservation?.status === 'no_show'
+  const isVoid = (c) => (c.reservation?.status === 'cancelled' || c.reservation?.status === 'no_show') && !c.collected
   const collected = charges.filter((c) => c.collected && !isVoid(c))
 
   // KPI

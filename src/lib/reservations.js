@@ -97,8 +97,11 @@ export async function startDate2(r, durationMin) {
   return conflicts
 }
 
-// 예약 삭제 (연결된 거래는 보존, 예약 링크만 해제 후 삭제)
+// 예약 삭제:
+//  - 수금 안 된 거래(가상/미수금)는 함께 삭제 → 삭제 후 무효거래가 정산에 되살아나는 것 방지
+//  - 수금완료된 거래(실제 받은 돈)는 링크만 해제해 보존
 export async function deleteReservation(id) {
+  await supabase.from('charges').delete().eq('reservation_id', id).eq('collected', false)
   await supabase.from('charges').update({ reservation_id: null }).eq('reservation_id', id)
   const { error } = await supabase.from('reservations').delete().eq('id', id)
   if (error) throw error

@@ -119,7 +119,8 @@ export default function Collections() {
   }
 
   // 노쇼/취소된 예약의 거래는 무효 처리(집계·정산 제외)
-  const isVoid = (r) => r.reservation?.status === 'cancelled' || r.reservation?.status === 'no_show'
+  // 취소/노쇼는 무효 처리하되, 이미 수금된 거래는 실제 받은 돈이므로 계속 포함
+  const isVoid = (r) => (r.reservation?.status === 'cancelled' || r.reservation?.status === 'no_show') && !r.collected
   const live = rows.filter((r) => !isVoid(r))
   const total = live.reduce((s, r) => s + r.amount, 0)
   const collected = live.filter((r) => r.collected).reduce((s, r) => s + r.amount, 0)
