@@ -111,7 +111,8 @@ export function settle(charges, windows) {
 //  - 도매원가: 사장이 재고를 대므로 출근 여부와 무관하게 항상 사장(ownerIds)에게 회수(균등)
 // itemCharges: [{ amount, cost, at }]  ·  costOwnerIds: 도매(재고) 대는 사장 멤버 id 배열(보통 시진핑 1명)
 export function settleAlcohol(itemCharges, windows, costOwnerIds = []) {
-  const per = {}          // 멤버별 총 주류 정산(마진분배 + 원가회수)
+  const per = {}          // 멤버별 총 주류 정산(마진분배 + 원가회수, 호환용)
+  const marginPer = {}    // 마진 분배만
   const costRecovery = {} // 사장별 도매원가 회수(장부)
   let margin = 0
   let cost = 0
@@ -132,7 +133,11 @@ export function settleAlcohol(itemCharges, windows, costOwnerIds = []) {
       continue
     }
     const unit = dist / totalShares
-    for (const p of parts) per[p.id] = (per[p.id] || 0) + Math.round(aShare(p) * unit)
+    for (const p of parts) {
+      const v = Math.round(aShare(p) * unit)
+      marginPer[p.id] = (marginPer[p.id] || 0) + v
+      per[p.id] = (per[p.id] || 0) + v
+    }
   }
 
   // 2) 도매원가 회수 — 출근 무관, 도매 담당 사장에게 (보통 시진핑 1명; 여럿이면 균등)
@@ -150,5 +155,5 @@ export function settleAlcohol(itemCharges, windows, costOwnerIds = []) {
     costUnrecovered = cost // 사장이 아예 없을 때(방어)
   }
 
-  return { margin, cost, marginUnattributed, costUnrecovered, per, costRecovery }
+  return { margin, cost, marginUnattributed, costUnrecovered, per, marginPer, costRecovery }
 }

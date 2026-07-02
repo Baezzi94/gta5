@@ -158,16 +158,17 @@ export default function Collections() {
   // 합산
   const combined = {}
   const ensure = (id) => {
-    if (!combined[id]) combined[id] = { id, talk: 0, date2: 0, share: 0, referral: 0, recruit: 0, alcohol: 0 }
+    if (!combined[id]) combined[id] = { id, talk: 0, date2: 0, share: 0, referral: 0, recruit: 0, alcohol: 0, cost: 0 }
     return combined[id]
   }
   for (const pm of settlement.perMember) {
     const e = ensure(pm.id)
     e.talk = pm.talk; e.date2 = pm.date2; e.share = pm.share; e.referral = pm.referral; e.recruit = pm.recruit
   }
-  for (const [id, amt] of Object.entries(alcohol.per)) ensure(id).alcohol += amt
+  for (const [id, amt] of Object.entries(alcohol.marginPer)) ensure(id).alcohol += amt // 주류 마진
+  for (const [id, amt] of Object.entries(alcohol.costRecovery)) ensure(id).cost += amt // 도매원가 회수(별도)
   const settleRows = Object.values(combined)
-    .map((e) => ({ ...e, name: memberMap[e.id]?.name ?? '(삭제됨)', role: memberMap[e.id]?.type, total: e.talk + e.date2 + e.share + e.referral + e.recruit + e.alcohol }))
+    .map((e) => ({ ...e, name: memberMap[e.id]?.name ?? '(삭제됨)', role: memberMap[e.id]?.type, total: e.talk + e.date2 + e.share + e.referral + e.recruit + e.alcohol + e.cost }))
     .filter((r) => r.total !== 0)
     .sort((a, b) => b.total - a.total)
   const paidMap = Object.fromEntries(payouts.map((p) => [p.member_id, p]))
@@ -318,7 +319,7 @@ export default function Collections() {
         <table>
           <thead>
             <tr style={{ color: '#ffcf5a' }}>
-              <th>이름</th><th>역할</th><th>대화료</th><th>2차</th><th>지분</th><th>손님추천</th><th>영입</th><th>주류</th><th>합계</th><th>지급</th>
+              <th>이름</th><th>역할</th><th>대화료</th><th>2차</th><th>지분</th><th>손님추천</th><th>영입</th><th>주류</th><th>도매원가</th><th>합계</th><th>지급</th>
             </tr>
           </thead>
           <tbody>
@@ -336,6 +337,7 @@ export default function Collections() {
                   <td>{m.referral ? won(m.referral) : '-'}</td>
                   <td>{m.recruit ? won(m.recruit) : '-'}</td>
                   <td>{m.alcohol ? won(m.alcohol) : '-'}</td>
+                  <td style={{ color: '#ff9ec6' }} title="도매원가 회수(재고값 반환, 수익 아님)">{m.cost ? won(m.cost) : '-'}</td>
                   <td style={{ fontWeight: 800, color: '#5ee0a0' }}>{won(m.total)}</td>
                   <td>
                     <span style={{ color: paid ? '#5ee0a0' : '#ff6b6b', fontWeight: 700, marginRight: 6 }}>
