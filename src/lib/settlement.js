@@ -118,16 +118,17 @@ export function settleAlcohol(itemCharges, windows) {
   for (const c of itemCharges || []) {
     const m = (c.amount || 0) - (c.cost || 0)
     const cst = c.cost || 0
+    const dist = Math.max(0, m) // 역마진(판매가<도매가)이면 직원에게 마이너스 분배 금지 — 손실은 사장이 흡수
     margin += m
     cost += cst
     const parts = participantsAt(windows, c.at)
     const owners = parts.filter((p) => p.role === 'owner').length
     const totalShares = parts.reduce((s, p) => s + aShare(p), 0)
     if (totalShares <= 0) {
-      marginUnattributed += m
+      marginUnattributed += dist
       continue
     }
-    const unit = m / totalShares
+    const unit = dist / totalShares
     for (const p of parts) {
       per[p.id] = (per[p.id] || 0) + Math.round(aShare(p) * unit) + (p.role === 'owner' && owners > 0 ? Math.round(cst / owners) : 0)
     }

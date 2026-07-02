@@ -118,6 +118,16 @@ describe('시뮬레이션: 반올림 드리프트(소액 다건)', () => {
   })
 })
 
+describe('시뮬레이션: 주류 역마진(메뉴 오설정 방어)', () => {
+  it('판매가<도매가면 직원 분배 0(마이너스 없음), 사장은 원가만 회수', () => {
+    const w = [win('O', 'owner', t(20)), win('S1', 'staff', t(20))]
+    const a = settleAlcohol([{ amount: 100000, cost: 120000, at: t(21) }], w) // 역마진 -2만
+    expect(a.margin).toBe(-20000) // 실제 마진은 음수로 집계(참고용)
+    expect(a.per['S1']).toBe(0) // 스탭 분배 0 (마이너스 아님)
+    expect(a.per['O']).toBe(120000) // 사장 도매원가 회수만
+  })
+})
+
 describe('⚠️ 발견 이슈(현재 동작 기록)', () => {
   it('재출근 후에도 원래 출근시각 보존 → 퇴근 전 판매 정상 귀속(reCheckIn 수정됨)', () => {
     // 수정: reCheckIn은 checked_out_at만 해제, checked_in_at(20시) 유지.
