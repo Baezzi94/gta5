@@ -78,7 +78,7 @@ describe('settleAlcohol() — 시간귀속', () => {
       { id: 'P1', role: 'princess', inAt: IN, outAt: null },
       { id: 'S1', role: 'staff', inAt: IN, outAt: null },
     ]
-    const a = settleAlcohol([{ amount: 300000, cost: 120000, at: T }], w) // 마진18만, 도매12만
+    const a = settleAlcohol([{ amount: 300000, cost: 120000, at: T }], w, ['O']) // 마진18만, 도매12만, 도매담당 O
     expect(a.margin).toBe(180000)
     // 총지분 1.5+1+1=3.5, unit≈51428.57
     expect(a.per['P1']).toBe(51429)
@@ -105,10 +105,10 @@ describe('settleAlcohol() — 시간귀속', () => {
       { id: 'O1', role: 'owner', inAt: IN, outAt: null },
       { id: 'O2', role: 'owner', inAt: IN, outAt: null },
     ]
-    const a = settleAlcohol([{ amount: 300000, cost: 120000, at: T }], w)
+    const a = settleAlcohol([{ amount: 300000, cost: 120000, at: T }], w, ['O1', 'O2'])
     const marginEach = Math.round((1.5 * a.margin) / 3.0) // 총지분 1.5+1.5=3
     const recovered = (a.per['O1'] - marginEach) + (a.per['O2'] - marginEach)
-    expect(recovered).toBe(120000)
+    expect(recovered).toBe(120000) // 도매원가 12만을 두 도매담당이 6만씩(중복 아님)
   })
 })
 

@@ -61,6 +61,8 @@ export default function Dashboard() {
     princess_referred_by: c.princess?.referred_by,
     customer_referred_by: c.customer?.referred_by,
   })
+  const wholesaleOwners = members.filter((m) => m.wholesale_owner && m.active).map((m) => m.id)
+  const costOwnerIds = wholesaleOwners.length ? wholesaleOwners : members.filter((m) => m.type === 'owner' && m.active).map((m) => m.id)
   const acc = {}
   for (const d of [...new Set(collected.map((c) => c.date))]) {
     const windows = avail
@@ -72,7 +74,7 @@ export default function Dashboard() {
       a.talk += pm.talk; a.date2 += pm.date2; a.share += pm.share; a.referral += pm.referral; a.recruit += pm.recruit; a.total += pm.total
     }
     // 주류 분배 (판매 시각 출근 전원 N빵, 사장 1.5 + 도매원가 회수)
-    const alc = settleAlcohol(collected.filter((c) => c.date === d && c.type === 'item').map((c) => ({ amount: c.amount, cost: c.cost, at: c.created_at })), windows)
+    const alc = settleAlcohol(collected.filter((c) => c.date === d && c.type === 'item').map((c) => ({ amount: c.amount, cost: c.cost, at: c.created_at })), windows, costOwnerIds)
     for (const [id, amt] of Object.entries(alc.per)) {
       const a = (acc[id] = acc[id] || { talk: 0, date2: 0, share: 0, referral: 0, recruit: 0, alcohol: 0, total: 0 })
       a.alcohol += amt; a.total += amt

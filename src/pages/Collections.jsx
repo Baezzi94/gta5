@@ -150,7 +150,10 @@ export default function Collections() {
   const itemCharges = live
     .filter((r) => r.collected && r.type === 'item')
     .map((c) => ({ amount: c.amount, cost: c.cost, at: c.created_at }))
-  const alcohol = settleAlcohol(itemCharges, windows)
+  // 도매원가 회수 대상 = 도매 담당 사장(wholesale_owner). 없으면 활성 사장 전체로 폴백.
+  const wholesaleOwners = members.filter((m) => m.wholesale_owner && m.active).map((m) => m.id)
+  const costOwnerIds = wholesaleOwners.length ? wholesaleOwners : members.filter((m) => m.type === 'owner' && m.active).map((m) => m.id)
+  const alcohol = settleAlcohol(itemCharges, windows, costOwnerIds)
 
   // 합산
   const combined = {}
@@ -355,8 +358,16 @@ export default function Collections() {
           </tbody>
         </table>
       )}
+      {alcohol.cost > 0 && (
+        <div style={{ marginTop: 10, padding: '10px 14px', background: '#140d1e', border: '1px solid #33253f', borderRadius: 10, fontSize: 13 }}>
+          🍾 <b style={{ color: '#ffcf5a' }}>주류 장부</b> · 마진 {won(alcohol.margin)} (출근자 분배) · 도매원가 <b style={{ color: '#ff9ec6' }}>{won(alcohol.cost)}</b> → 사장 회수
+          {alcohol.costUnrecovered > 0 && (
+            <span style={{ color: '#ff6b6b' }}> · ⚠️ 도매 담당 사장 미지정으로 원가 {won(alcohol.costUnrecovered)} 미회수</span>
+          )}
+        </div>
+      )}
       <p style={{ color: '#9a93b8', fontSize: 12, marginTop: 6 }}>
-        ※ 팁은 정산 제외(개인 수령). 지분은 활성 사장·운영스탭 기준 자동 분배. 수금 처리할수록 실시간 반영됩니다.
+        ※ 팁은 정산 제외(개인 수령). 지분은 출근 시각 기준 자동 분배. 도매원가는 출근 여부와 무관하게 도매 담당 사장이 회수합니다.
       </p>
     </div>
   )

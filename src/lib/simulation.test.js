@@ -39,7 +39,7 @@ describe('시뮬레이션: 정상 영업 한 판', () => {
       { amount: 300000, cost: 120000, at: t(21) },
       { amount: 300000, cost: 120000, at: t(22) },
     ]
-    const a = settleAlcohol(items, w)
+    const a = settleAlcohol(items, w, ['O'])
     expect(a.margin).toBe(360000)
     expect(a.cost).toBe(240000)
     // 사장은 원가 24만 회수 포함
@@ -121,10 +121,24 @@ describe('시뮬레이션: 반올림 드리프트(소액 다건)', () => {
 describe('시뮬레이션: 주류 역마진(메뉴 오설정 방어)', () => {
   it('판매가<도매가면 직원 분배 0(마이너스 없음), 사장은 원가만 회수', () => {
     const w = [win('O', 'owner', t(20)), win('S1', 'staff', t(20))]
-    const a = settleAlcohol([{ amount: 100000, cost: 120000, at: t(21) }], w) // 역마진 -2만
+    const a = settleAlcohol([{ amount: 100000, cost: 120000, at: t(21) }], w, ['O']) // 역마진 -2만, 도매담당 O
     expect(a.margin).toBe(-20000) // 실제 마진은 음수로 집계(참고용)
     expect(a.per['S1']).toBe(0) // 스탭 분배 0 (마이너스 아님)
     expect(a.per['O']).toBe(120000) // 사장 도매원가 회수만
+  })
+})
+
+describe('시뮬레이션: 도매원가는 미출근 도매담당 사장도 항상 회수', () => {
+  it('500만 판매(도매200만) · 스탭3명만 출근 · 사장 미출근 → 스탭 100만씩 + 사장 원가 200만', () => {
+    const w = [win('A', 'staff', t(20)), win('B', 'staff', t(20)), win('C', 'staff', t(20))]
+    const a = settleAlcohol([{ amount: 5000000, cost: 2000000, at: t(21) }], w, ['SJP']) // 도매담당 시진핑(미출근)
+    expect(a.per['A']).toBe(1000000)
+    expect(a.per['B']).toBe(1000000)
+    expect(a.per['C']).toBe(1000000)
+    expect(a.per['SJP']).toBe(2000000) // 출근 안 했어도 도매원가 회수
+    expect(a.costUnrecovered).toBe(0)
+    const total = Object.values(a.per).reduce((s, v) => s + v, 0)
+    expect(total).toBe(5000000) // 500만 전액 장부에 잡힘(마진300 + 원가200)
   })
 })
 
