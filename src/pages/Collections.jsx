@@ -167,12 +167,12 @@ export default function Collections() {
     .map((e) => ({ ...e, name: memberMap[e.id]?.name ?? '(삭제됨)', role: memberMap[e.id]?.type, total: e.talk + e.date2 + e.share + e.referral + e.recruit + e.alcohol }))
     .filter((r) => r.total !== 0)
     .sort((a, b) => b.total - a.total)
-  const paidMap = Object.fromEntries(payouts.map((p) => [p.member_id, p.paid]))
+  const paidMap = Object.fromEntries(payouts.map((p) => [p.member_id, p]))
 
-  async function onTogglePaid(memberId, paid) {
+  async function onTogglePaid(memberId, paid, amount) {
     setError('')
     try {
-      await setPaid(date, memberId, paid)
+      await setPaid(date, memberId, paid, amount)
       load()
     } catch (e) {
       setError(e.message)
@@ -320,7 +320,9 @@ export default function Collections() {
           </thead>
           <tbody>
             {settleRows.map((m) => {
-              const paid = !!paidMap[m.id]
+              const prow = paidMap[m.id]
+              const paid = !!prow?.paid
+              const mismatch = paid && prow?.paid_amount != null && prow.paid_amount !== m.total
               return (
                 <tr key={m.id}>
                   <td>{m.name}</td>
@@ -336,10 +338,15 @@ export default function Collections() {
                     <span style={{ color: paid ? '#5ee0a0' : '#ff6b6b', fontWeight: 700, marginRight: 6 }}>
                       {paid ? '지급완료' : '미지급'}
                     </span>
+                    {mismatch && (
+                      <span title={`지급 당시 ${won(prow.paid_amount)} → 현재 ${won(m.total)}`} style={{ color: '#ffcf5a', fontSize: 12, marginRight: 6 }}>
+                        ⚠️ 지급 {won(prow.paid_amount)}
+                      </span>
+                    )}
                     {isOwner && (
                       paid
                         ? <button onClick={() => onTogglePaid(m.id, false)}>취소</button>
-                        : <button onClick={() => onTogglePaid(m.id, true)}>지급</button>
+                        : <button onClick={() => onTogglePaid(m.id, true, m.total)}>지급</button>
                     )}
                   </td>
                 </tr>
