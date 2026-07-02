@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { listByDate, createCharge, createMenuSale, setCollected, deleteCharge, CHARGE_AMOUNT, CHARGE_LABEL } from '../lib/charges'
-import { findOrCreateCustomer } from '../lib/customers'
+import { createCustomer } from '../lib/customers'
 import { isBannedCustomer } from '../lib/bans'
 import { listByDate as listAvailByDate } from '../lib/schedule'
 import { listByDate as listPayouts, setPaid } from '../lib/payouts'
@@ -23,11 +23,10 @@ export default function Collections() {
   const [avail, setAvail] = useState([])
   const [payouts, setPayouts] = useState([])
   const [members, setMembers] = useState([])
-  const [form, setForm] = useState({ type: 'tc', nickname: '', daily_no: '', phone: '', princess_id: '' })
+  const [form, setForm] = useState({ type: 'tc', nickname: '', princess_id: '' })
   const princesses = members.filter((m) => m.type === 'princess')
-  const servers = members.filter((m) => (m.type === 'owner' || m.type === 'staff') && m.active)
   const [menu, setMenu] = useState([])
-  const [saleCust, setSaleCust] = useState({ nickname: '', daily_no: '', phone: '', sold_by: '' })
+  const [saleCust, setSaleCust] = useState({ nickname: '' })
   const [qty, setQty] = useState({}) // { menu_item_id: 수량 }
   const [error, setError] = useState('')
 
@@ -59,20 +58,17 @@ export default function Collections() {
       .map((m) => ({ menu_item_id: m.id, qty: Number(qty[m.id] || 0), sale_price: m.sale_price, cost_price: m.cost_price }))
       .filter((l) => l.qty > 0)
     if (lines.length === 0) return setError('판매할 메뉴 수량을 입력하세요.')
-    if (!saleCust.sold_by) return setError('판매 담당(웨이터)을 선택하세요.')
     try {
-      let customer_id = null
-      if (saleCust.nickname.trim() || saleCust.phone.trim()) {
-        const c = await findOrCreateCustomer({ nickname: saleCust.nickname, phone: saleCust.phone, daily_no: saleCust.daily_no })
-        customer_id = c.id
-      }
-      if (await isBannedCustomer({ phone: saleCust.phone, customer_id, nickname: saleCust.nickname })) {
+      const nick = saleCust.nickname.trim()
+      if (nick && (await isBannedCustomer({ nickname: nick }))) {
         setError(`🚫 밴된 손님입니다. 판매 불가 — 밴 관리에서 해제 후 가능.`)
         return
       }
-      await createMenuSale({ date, customer_id, sold_by: saleCust.sold_by, lines })
+      let customer_id = null
+      if (nick) customer_id = (await createCustomer({ nickname: nick, phone: null })).id
+      await createMenuSale({ date, customer_id, sold_by: null, lines })
       setQty({})
-      setSaleCust({ nickname: '', daily_no: '', phone: '', sold_by: '' })
+      setSaleCust({ nickname: '' })
       load()
     } catch (e) {
       setError(e.message)
@@ -85,15 +81,13 @@ export default function Collections() {
     setError('')
     if (form.type !== 'tc' && !form.princess_id) return setError('대화료·2차는 공주님을 선택해야 합니다. (안 그러면 공주 몫이 누락됩니다)')
     try {
-      let customer_id = null
-      if (form.nickname.trim() || form.phone.trim()) {
-        const c = await findOrCreateCustomer({ nickname: form.nickname, phone: form.phone, daily_no: form.daily_no })
-        customer_id = c.id
-      }
-      if (await isBannedCustomer({ phone: form.phone, customer_id, nickname: form.nickname })) {
+      const nick = form.nickname.trim()
+      if (nick && (await isBannedCustomer({ nickname: nick }))) {
         setError(`🚫 밴된 손님입니다. 거래 불가 — 밴 관리에서 해제 후 가능.`)
         return
       }
+      let customer_id = null
+      if (nick) customer_id = (await createCustomer({ nickname: nick, phone: null })).id
       await createCharge({
         date,
         type: form.type,
@@ -101,7 +95,7 @@ export default function Collections() {
         customer_id,
         princess_id: form.type === 'tc' ? null : form.princess_id || null,
       })
-      setForm({ type: 'tc', nickname: '', daily_no: '', phone: '', princess_id: '' })
+      setForm({ type: 'tc', nickname: '', princess_id: '' })
       load()
     } catch (e) {
       setError(e.message)
@@ -141,9 +135,11 @@ export default function Collections() {
       customer_referred_by: c.customer?.referred_by,
     }))
   // 출근 구간(체크인~퇴근). 거래 시각이 이 구간에 들면 그 거래를 나눠 가짐. 퇴근 안 눌렀으면 계속 출근으로 간주.
+  // 운영풀 지분 가중치: 시진핑(wholesale_owner)만 1.2, 그 외(다른 사장 포함) 1.0
+  const headOwner = Object.fromEntries(members.map((m) => [m.id, !!m.wholesale_owner]))
   const windows = avail
     .filter((a) => a.checked_in_at)
-    .map((a) => ({ id: a.member_id, role: a.member?.type, inAt: a.checked_in_at, outAt: a.checked_out_at }))
+    .map((a) => ({ id: a.member_id, role: a.member?.type, inAt: a.checked_in_at, outAt: a.checked_out_at, weight: headOwner[a.member_id] ? 1.2 : 1.0 }))
   const settlement = settle(enriched, windows)
 
   // 주류 분배: 판매 시각 출근 전원(사장+공주+스탭) N빵, 사장 1.5 + 도매원가 회수
@@ -213,9 +209,7 @@ export default function Collections() {
             <option value="talk">대화료 25만</option>
             <option value="date2">2차 100만</option>
           </select>
-          <input placeholder="손님 닉네임" value={form.nickname} onChange={(e) => setForm({ ...form, nickname: e.target.value })} />
-          <input placeholder="데일리번호(옵션)" value={form.daily_no} onChange={(e) => setForm({ ...form, daily_no: e.target.value })} style={{ width: 110 }} />
-          <input placeholder="전화(옵션)" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} style={{ width: 110 }} />
+          <input placeholder="손님 닉네임(선택)" value={form.nickname} onChange={(e) => setForm({ ...form, nickname: e.target.value })} />
           {form.type !== 'tc' && (
             <select value={form.princess_id} onChange={(e) => setForm({ ...form, princess_id: e.target.value })}>
               <option value="">공주님</option>
@@ -233,15 +227,7 @@ export default function Collections() {
         <form onSubmit={onMenuSale} style={{ marginBottom: 16, padding: 12, background: '#16131f', borderRadius: 10 }}>
           <strong>🍾 주류·메뉴 판매</strong>
           <div style={{ display: 'flex', gap: 6, margin: '8px 0', flexWrap: 'wrap' }}>
-            <input placeholder="손님 닉네임" value={saleCust.nickname} onChange={(e) => setSaleCust({ ...saleCust, nickname: e.target.value })} />
-            <input placeholder="데일리번호(옵션)" value={saleCust.daily_no} onChange={(e) => setSaleCust({ ...saleCust, daily_no: e.target.value })} style={{ width: 120 }} />
-            <input placeholder="전화(옵션)" value={saleCust.phone} onChange={(e) => setSaleCust({ ...saleCust, phone: e.target.value })} style={{ width: 120 }} />
-            <select value={saleCust.sold_by} onChange={(e) => setSaleCust({ ...saleCust, sold_by: e.target.value })}>
-              <option value="">담당 웨이터 *</option>
-              {servers.map((s) => (
-                <option key={s.id} value={s.id}>{s.name} ({ROLE_LABEL[s.type]})</option>
-              ))}
-            </select>
+            <input placeholder="손님 닉네임(선택)" value={saleCust.nickname} onChange={(e) => setSaleCust({ ...saleCust, nickname: e.target.value })} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 8 }}>
             {menu.map((m) => (
@@ -269,7 +255,7 @@ export default function Collections() {
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ textAlign: 'left', color: '#ffcf5a' }}>
-            <th>유형</th><th>손님</th><th>공주님</th><th>담당</th><th>금액</th><th>수금</th>{isOwner && <th>처리</th>}
+            <th>유형</th><th>손님</th><th>공주님</th><th>금액</th><th>수금</th>{isOwner && <th>처리</th>}
           </tr>
         </thead>
         <tbody>
@@ -280,7 +266,6 @@ export default function Collections() {
               <td>{r.type === 'item' ? `${r.menu_item?.name ?? '메뉴'} ×${r.qty}` : CHARGE_LABEL[r.type]}</td>
               <td>{r.customer?.nickname ?? '-'}</td>
               <td>{r.princess?.name ?? '-'}</td>
-              <td>{r.server?.name ?? '-'}</td>
               <td style={{ textDecoration: voided ? 'line-through' : 'none' }}>{man(r.amount)}</td>
               <td style={{ fontWeight: 700, color: voided ? '#9a93b8' : (r.collected ? '#5ee0a0' : '#ff5e5e') }}>
                 {voided ? '취소됨' : (r.collected ? '수금완료' : '미수금')}
@@ -300,7 +285,7 @@ export default function Collections() {
       </table>
 
       {/* 정산 대시보드 (수금완료 기준) */}
-      <h2 style={{ marginTop: 28 }}>정산 분배 <span style={{ color: '#9a93b8', fontSize: 13, fontWeight: 400 }}>(수금완료 기준 · 운영풀 {won(settlement.pool)} · 지분 사장1.2 : 스탭1.0)</span></h2>
+      <h2 style={{ marginTop: 28 }}>정산 분배 <span style={{ color: '#9a93b8', fontSize: 13, fontWeight: 400 }}>(수금완료 기준 · 운영풀 {won(settlement.pool)} · 지분 시진핑1.2 : 그 외 1.0)</span></h2>
       {(settlement.poolUnattributed > 0 || alcohol.marginUnattributed > 0) && (
         <p style={{ background: '#3a1620', border: '1px solid #ff5e7a', color: '#ffb3c1', padding: '8px 12px', borderRadius: 8 }}>
           ⚠️ <b>거래 발생 시각에 출근중이던 사람이 없어 미분배</b>된 금액이 있습니다

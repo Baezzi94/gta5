@@ -19,7 +19,7 @@ export const CUSTOMER_REFERRAL = 30000 // 손님 추천 3만/명
 
 const ms = (v) => (v == null ? null : (typeof v === 'number' ? v : Date.parse(v)))
 
-// windows 중 시각 at 에 출근중인 참여자 목록(중복 멤버 제거)
+// windows 중 시각 at 에 출근중인 참여자 목록(중복 멤버 제거). weight(지분 가중치)도 전달.
 export function participantsAt(windows, at) {
   const t = ms(at)
   if (t == null) return []
@@ -32,12 +32,13 @@ export function participantsAt(windows, at) {
     if (o != null && o <= t) continue
     if (seen.has(w.id)) continue
     seen.add(w.id)
-    out.push({ id: w.id, role: w.role })
+    out.push({ id: w.id, role: w.role, weight: w.weight })
   }
   return out
 }
 
-const shareOf = (m) => (m.role === 'owner' ? 1.2 : 1.0)
+// 운영풀 지분: 호출부가 weight를 주면 그걸 쓰고(시진핑 1.2 : 그 외 1.0), 없으면 role 폴백
+const shareOf = (m) => (m.weight != null ? m.weight : (m.role === 'owner' ? 1.2 : 1.0))
 
 export function settle(charges, windows) {
   const per = {}

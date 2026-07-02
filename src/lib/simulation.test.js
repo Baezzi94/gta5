@@ -128,6 +128,20 @@ describe('시뮬레이션: 주류 역마진(메뉴 오설정 방어)', () => {
   })
 })
 
+describe('시뮬레이션: 운영풀 지분 — 시진핑만 1.2, 다른 사장은 1.0', () => {
+  it('시진핑(weight 1.2) > 박두팔(사장,weight 1.0) = 스탭(1.0)', () => {
+    const w = [
+      { id: 'SJP', role: 'owner', inAt: t(20), outAt: null, weight: 1.2 },
+      { id: 'BDP', role: 'owner', inAt: t(20), outAt: null, weight: 1.0 },
+      { id: 'ST', role: 'staff', inAt: t(20), outAt: null, weight: 1.0 },
+    ]
+    const r = settle([{ type: 'tc', amount: 320000, at: t(21) }], w) // 총지분 3.2, unit 10만
+    expect(r.perMember.find((m) => m.id === 'SJP').share).toBe(120000)
+    expect(r.perMember.find((m) => m.id === 'BDP').share).toBe(100000)
+    expect(r.perMember.find((m) => m.id === 'ST').share).toBe(100000)
+  })
+})
+
 describe('시뮬레이션: 주류 마진 N빵(도매값은 각자 사입)', () => {
   it('500만 판매(도매200만) · 스탭3명 출근 → 마진 300만 N빵 100만씩(도매원가 회수 없음)', () => {
     const w = [win('A', 'staff', t(20)), win('B', 'staff', t(20)), win('C', 'staff', t(20))]

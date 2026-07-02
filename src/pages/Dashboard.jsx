@@ -61,11 +61,12 @@ export default function Dashboard() {
     princess_referred_by: c.princess?.referred_by,
     customer_referred_by: c.customer?.referred_by,
   })
+  const headOwner = Object.fromEntries(members.map((m) => [m.id, !!m.wholesale_owner]))
   const acc = {}
   for (const d of [...new Set(collected.map((c) => c.date))]) {
     const windows = avail
       .filter((a) => a.date === d && a.checked_in_at)
-      .map((a) => ({ id: a.member_id, role: a.member?.type, inAt: a.checked_in_at, outAt: a.checked_out_at }))
+      .map((a) => ({ id: a.member_id, role: a.member?.type, inAt: a.checked_in_at, outAt: a.checked_out_at, weight: headOwner[a.member_id] ? 1.2 : 1.0 }))
     const res = settle(collected.filter((c) => c.date === d && c.type !== 'item').map(enrich), windows)
     const ensure = (id) => (acc[id] = acc[id] || { talk: 0, date2: 0, share: 0, referral: 0, recruit: 0, alcohol: 0, total: 0 })
     for (const pm of res.perMember) {
