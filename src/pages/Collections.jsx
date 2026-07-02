@@ -150,25 +150,21 @@ export default function Collections() {
   const itemCharges = live
     .filter((r) => r.collected && r.type === 'item')
     .map((c) => ({ amount: c.amount, cost: c.cost, at: c.created_at }))
-  // 도매원가 회수 대상 = 도매 담당 사장(wholesale_owner). 없으면 활성 사장 전체로 폴백.
-  const wholesaleOwners = members.filter((m) => m.wholesale_owner && m.active).map((m) => m.id)
-  const costOwnerIds = wholesaleOwners.length ? wholesaleOwners : members.filter((m) => m.type === 'owner' && m.active).map((m) => m.id)
-  const alcohol = settleAlcohol(itemCharges, windows, costOwnerIds)
+  const alcohol = settleAlcohol(itemCharges, windows)
 
   // 합산
   const combined = {}
   const ensure = (id) => {
-    if (!combined[id]) combined[id] = { id, talk: 0, date2: 0, share: 0, referral: 0, recruit: 0, alcohol: 0, cost: 0 }
+    if (!combined[id]) combined[id] = { id, talk: 0, date2: 0, share: 0, referral: 0, recruit: 0, alcohol: 0 }
     return combined[id]
   }
   for (const pm of settlement.perMember) {
     const e = ensure(pm.id)
     e.talk = pm.talk; e.date2 = pm.date2; e.share = pm.share; e.referral = pm.referral; e.recruit = pm.recruit
   }
-  for (const [id, amt] of Object.entries(alcohol.marginPer)) ensure(id).alcohol += amt // 주류 마진
-  for (const [id, amt] of Object.entries(alcohol.costRecovery)) ensure(id).cost += amt // 도매원가 회수(별도)
+  for (const [id, amt] of Object.entries(alcohol.per)) ensure(id).alcohol += amt // 주류 마진(N빵)
   const settleRows = Object.values(combined)
-    .map((e) => ({ ...e, name: memberMap[e.id]?.name ?? '(삭제됨)', role: memberMap[e.id]?.type, total: e.talk + e.date2 + e.share + e.referral + e.recruit + e.alcohol + e.cost }))
+    .map((e) => ({ ...e, name: memberMap[e.id]?.name ?? '(삭제됨)', role: memberMap[e.id]?.type, total: e.talk + e.date2 + e.share + e.referral + e.recruit + e.alcohol }))
     .filter((r) => r.total !== 0)
     .sort((a, b) => b.total - a.total)
   const paidMap = Object.fromEntries(payouts.map((p) => [p.member_id, p]))
@@ -319,7 +315,7 @@ export default function Collections() {
         <table>
           <thead>
             <tr style={{ color: '#ffcf5a' }}>
-              <th>이름</th><th>역할</th><th>대화료</th><th>2차</th><th>지분</th><th>손님추천</th><th>영입</th><th>주류</th><th>도매원가</th><th>합계</th><th>지급</th>
+              <th>이름</th><th>역할</th><th>대화료</th><th>2차</th><th>지분</th><th>손님추천</th><th>영입</th><th>주류</th><th>합계</th><th>지급</th>
             </tr>
           </thead>
           <tbody>
@@ -337,7 +333,6 @@ export default function Collections() {
                   <td>{m.referral ? won(m.referral) : '-'}</td>
                   <td>{m.recruit ? won(m.recruit) : '-'}</td>
                   <td>{m.alcohol ? won(m.alcohol) : '-'}</td>
-                  <td style={{ color: '#ff9ec6' }} title="도매원가 회수(재고값 반환, 수익 아님)">{m.cost ? won(m.cost) : '-'}</td>
                   <td style={{ fontWeight: 800, color: '#5ee0a0' }}>{won(m.total)}</td>
                   <td>
                     <span style={{ color: paid ? '#5ee0a0' : '#ff6b6b', fontWeight: 700, marginRight: 6 }}>
@@ -360,16 +355,13 @@ export default function Collections() {
           </tbody>
         </table>
       )}
-      {alcohol.cost > 0 && (
+      {alcohol.margin > 0 && (
         <div style={{ marginTop: 10, padding: '10px 14px', background: '#140d1e', border: '1px solid #33253f', borderRadius: 10, fontSize: 13 }}>
-          🍾 <b style={{ color: '#ffcf5a' }}>주류 장부</b> · 마진 {won(alcohol.margin)} (출근자 분배) · 도매원가 <b style={{ color: '#ff9ec6' }}>{won(alcohol.cost)}</b> → 사장 회수
-          {alcohol.costUnrecovered > 0 && (
-            <span style={{ color: '#ff6b6b' }}> · ⚠️ 도매 담당 사장 미지정으로 원가 {won(alcohol.costUnrecovered)} 미회수</span>
-          )}
+          🍾 <b style={{ color: '#ffcf5a' }}>주류 마진</b> {won(alcohol.margin)} — 판매 시각 출근자끼리 균등(N빵) 분배. (도매값은 각자 사입해 본인 매출에서 회수)
         </div>
       )}
       <p style={{ color: '#9a93b8', fontSize: 12, marginTop: 6 }}>
-        ※ 팁은 정산 제외(개인 수령). 지분은 출근 시각 기준 자동 분배. 도매원가는 출근 여부와 무관하게 도매 담당 사장이 회수합니다.
+        ※ 팁은 정산 제외(개인 수령). 지분·주류마진은 출근 시각 기준 자동 분배. 도매값은 각자 자기 돈으로 사입합니다.
       </p>
     </div>
   )

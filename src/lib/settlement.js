@@ -106,54 +106,27 @@ export function settle(charges, windows) {
   return { pool, poolUnattributed, perMember }
 }
 
-// 주류·메뉴 정산(시간귀속).
-//  - 마진(판매가−도매가): 각 판매 시각 출근 전원(사장1.5·스탭·공주 1.0) N빵
-//  - 도매원가: 사장이 재고를 대므로 출근 여부와 무관하게 항상 사장(ownerIds)에게 회수(균등)
-// itemCharges: [{ amount, cost, at }]  ·  costOwnerIds: 도매(재고) 대는 사장 멤버 id 배열(보통 시진핑 1명)
-export function settleAlcohol(itemCharges, windows, costOwnerIds = []) {
-  const per = {}          // 멤버별 총 주류 정산(마진분배 + 원가회수, 호환용)
-  const marginPer = {}    // 마진 분배만
-  const costRecovery = {} // 사장별 도매원가 회수(장부)
+// 주류·메뉴 마진 정산(시간귀속).
+//  - 각자 자기 돈으로 도매 사입 → 자기 매출에서 도매값은 자기가 챙김(앱이 원가 안 건드림).
+//  - 마진(판매가−도매가)만 각 판매 시각 출근자 전원에게 균등(N빵) 분배. 역마진은 0.
+// itemCharges: [{ amount, cost, at }]
+export function settleAlcohol(itemCharges, windows) {
+  const per = {} // 멤버별 마진 분배
   let margin = 0
-  let cost = 0
   let marginUnattributed = 0
-  let costUnrecovered = 0
-  const aShare = (m) => (m.role === 'owner' ? 1.5 : 1.0)
 
-  // 1) 마진 분배 (시간귀속, 역마진은 0으로 clamp)
   for (const c of itemCharges || []) {
-    const m = (c.amount || 0) - (c.cost || 0)
-    const dist = Math.max(0, m)
-    margin += m
-    cost += c.cost || 0
+    const raw = (c.amount || 0) - (c.cost || 0)
+    margin += raw
+    const m = Math.max(0, raw) // 역마진(판매가<도매가)이면 분배 0 (마이너스 금지)
     const parts = participantsAt(windows, c.at)
-    const totalShares = parts.reduce((s, p) => s + aShare(p), 0)
-    if (totalShares <= 0) {
-      marginUnattributed += dist
+    if (parts.length === 0) {
+      marginUnattributed += m
       continue
     }
-    const unit = dist / totalShares
-    for (const p of parts) {
-      const v = Math.round(aShare(p) * unit)
-      marginPer[p.id] = (marginPer[p.id] || 0) + v
-      per[p.id] = (per[p.id] || 0) + v
-    }
+    const unit = m / parts.length // 전원 동일 N빵
+    for (const p of parts) per[p.id] = (per[p.id] || 0) + Math.round(unit)
   }
 
-  // 2) 도매원가 회수 — 출근 무관, 도매 담당 사장에게 (보통 시진핑 1명; 여럿이면 균등)
-  const owners = costOwnerIds || []
-  if (cost > 0 && owners.length > 0) {
-    const base = Math.floor(cost / owners.length)
-    let rem = cost - base * owners.length
-    for (const oid of owners) {
-      const amt = base + (rem > 0 ? 1 : 0)
-      if (rem > 0) rem--
-      costRecovery[oid] = (costRecovery[oid] || 0) + amt
-      per[oid] = (per[oid] || 0) + amt
-    }
-  } else if (cost > 0) {
-    costUnrecovered = cost // 사장이 아예 없을 때(방어)
-  }
-
-  return { margin, cost, marginUnattributed, costUnrecovered, per, marginPer, costRecovery }
+  return { margin, marginUnattributed, per }
 }

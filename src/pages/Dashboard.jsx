@@ -61,23 +61,20 @@ export default function Dashboard() {
     princess_referred_by: c.princess?.referred_by,
     customer_referred_by: c.customer?.referred_by,
   })
-  const wholesaleOwners = members.filter((m) => m.wholesale_owner && m.active).map((m) => m.id)
-  const costOwnerIds = wholesaleOwners.length ? wholesaleOwners : members.filter((m) => m.type === 'owner' && m.active).map((m) => m.id)
   const acc = {}
   for (const d of [...new Set(collected.map((c) => c.date))]) {
     const windows = avail
       .filter((a) => a.date === d && a.checked_in_at)
       .map((a) => ({ id: a.member_id, role: a.member?.type, inAt: a.checked_in_at, outAt: a.checked_out_at }))
     const res = settle(collected.filter((c) => c.date === d && c.type !== 'item').map(enrich), windows)
-    const ensure = (id) => (acc[id] = acc[id] || { talk: 0, date2: 0, share: 0, referral: 0, recruit: 0, alcohol: 0, cost: 0, total: 0 })
+    const ensure = (id) => (acc[id] = acc[id] || { talk: 0, date2: 0, share: 0, referral: 0, recruit: 0, alcohol: 0, total: 0 })
     for (const pm of res.perMember) {
       const a = ensure(pm.id)
       a.talk += pm.talk; a.date2 += pm.date2; a.share += pm.share; a.referral += pm.referral; a.recruit += pm.recruit; a.total += pm.total
     }
-    // 주류: 마진(출근자 분배)과 도매원가(도매담당 사장 회수) 분리
-    const alc = settleAlcohol(collected.filter((c) => c.date === d && c.type === 'item').map((c) => ({ amount: c.amount, cost: c.cost, at: c.created_at })), windows, costOwnerIds)
-    for (const [id, amt] of Object.entries(alc.marginPer)) { const a = ensure(id); a.alcohol += amt; a.total += amt }
-    for (const [id, amt] of Object.entries(alc.costRecovery)) { const a = ensure(id); a.cost += amt; a.total += amt }
+    // 주류 마진(판매 시각 출근자 N빵). 도매값은 각자 사입이라 앱에서 안 건드림.
+    const alc = settleAlcohol(collected.filter((c) => c.date === d && c.type === 'item').map((c) => ({ amount: c.amount, cost: c.cost, at: c.created_at })), windows)
+    for (const [id, amt] of Object.entries(alc.per)) { const a = ensure(id); a.alcohol += amt; a.total += amt }
   }
   const memberRows = Object.entries(acc)
     .map(([id, a]) => ({ id, ...a, name: memberMap[id]?.name ?? '(삭제됨)', role: memberMap[id]?.type }))
@@ -108,7 +105,6 @@ export default function Dashboard() {
       { label: '추천', value: 'referral' },
       { label: '영입', value: 'recruit' },
       { label: '주류', value: 'alcohol' },
-      { label: '도매원가', value: 'cost' },
       { label: '합계(원)', value: 'total' },
     ]))
   }
@@ -189,7 +185,7 @@ export default function Dashboard() {
       {/* 인원별 정산 합계 */}
       <h2 style={{ marginTop: 22 }}>인원별 정산 합계 (기간)</h2>
       <table>
-        <thead><tr><th>이름</th><th>역할</th><th>대화료</th><th>2차</th><th>지분</th><th>추천</th><th>영입</th><th>주류</th><th>도매원가</th><th>합계</th></tr></thead>
+        <thead><tr><th>이름</th><th>역할</th><th>대화료</th><th>2차</th><th>지분</th><th>추천</th><th>영입</th><th>주류</th><th>합계</th></tr></thead>
         <tbody>
           {memberRows.map((m) => (
             <tr key={m.id}>
@@ -198,7 +194,6 @@ export default function Dashboard() {
               <td>{m.share ? man(m.share) : '-'}</td><td>{m.referral ? man(m.referral) : '-'}</td>
               <td>{m.recruit ? man(m.recruit) : '-'}</td>
               <td>{m.alcohol ? man(m.alcohol) : '-'}</td>
-              <td style={{ color: '#ff9ec6' }} title="도매원가 회수(수익 아님)">{m.cost ? man(m.cost) : '-'}</td>
               <td style={{ fontWeight: 800, color: '#5ee0a0' }}>{man(m.total)}</td>
             </tr>
           ))}

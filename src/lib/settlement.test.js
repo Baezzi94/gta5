@@ -72,18 +72,17 @@ describe('settle() — 시간귀속', () => {
 })
 
 describe('settleAlcohol() — 시간귀속', () => {
-  it('주류: 마진 N빵(사장1.5) + 도매원가 사장 회수, 공주 포함 (단일 시각)', () => {
+  it('주류 마진 전원 동일(N빵), 도매원가 회수 없음 (사장·공주·스탭 동일)', () => {
     const w = [
       { id: 'O', role: 'owner', inAt: IN, outAt: null },
       { id: 'P1', role: 'princess', inAt: IN, outAt: null },
       { id: 'S1', role: 'staff', inAt: IN, outAt: null },
     ]
-    const a = settleAlcohol([{ amount: 300000, cost: 120000, at: T }], w, ['O']) // 마진18만, 도매12만, 도매담당 O
+    const a = settleAlcohol([{ amount: 300000, cost: 120000, at: T }], w) // 마진18만, 3명 N빵
     expect(a.margin).toBe(180000)
-    // 총지분 1.5+1+1=3.5, unit≈51428.57
-    expect(a.per['P1']).toBe(51429)
-    expect(a.per['S1']).toBe(51429)
-    expect(a.per['O']).toBe(77143 + 120000) // round(1.5*unit)+도매12만
+    expect(a.per['O']).toBe(60000)
+    expect(a.per['P1']).toBe(60000)
+    expect(a.per['S1']).toBe(60000)
   })
 
   it('예시: 21시 판매는 리아시만, 23시 판매는 리아시+박두팔 → 27만/9만', () => {
@@ -100,16 +99,6 @@ describe('settleAlcohol() — 시간귀속', () => {
     expect(a.per['bak']).toBe(90000)
   })
 
-  it('사장 2명 출근 시 도매원가 중복회수 안 함(사장 수로 분배)', () => {
-    const w = [
-      { id: 'O1', role: 'owner', inAt: IN, outAt: null },
-      { id: 'O2', role: 'owner', inAt: IN, outAt: null },
-    ]
-    const a = settleAlcohol([{ amount: 300000, cost: 120000, at: T }], w, ['O1', 'O2'])
-    const marginEach = Math.round((1.5 * a.margin) / 3.0) // 총지분 1.5+1.5=3
-    const recovered = (a.per['O1'] - marginEach) + (a.per['O2'] - marginEach)
-    expect(recovered).toBe(120000) // 도매원가 12만을 두 도매담당이 6만씩(중복 아님)
-  })
 })
 
 describe('participantsAt()', () => {
