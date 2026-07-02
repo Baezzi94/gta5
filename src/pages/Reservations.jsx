@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { listByDate as listAvail } from '../lib/schedule'
 import { listByDate as listReservations, createReservation, updateReservation, setStatus, startDate2, deleteReservation } from '../lib/reservations'
 import { useAuth } from '../app/AuthContext'
-import { findOrCreateByPhone } from '../lib/customers'
+import { createCustomer } from '../lib/customers'
 import { createTalkFromReservation, createTcFromReservation, createDate2FromReservation } from '../lib/charges'
 import { listMembers } from '../lib/members'
 import { isBannedCustomer } from '../lib/bans'
@@ -25,7 +25,7 @@ export default function Reservations() {
   const [avail, setAvail] = useState([])
   const [rows, setRows] = useState([])
   const [members, setMembers] = useState([])
-  const [form, setForm] = useState({ princess_id: '', phone: '', nickname: '', referred_by: '', start: '', end: '' })
+  const [form, setForm] = useState({ princess_id: '', nickname: '', referred_by: '', start: '', end: '' })
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
   const [editing, setEditing] = useState(null) // { id, princess_id, start, end }
@@ -75,16 +75,17 @@ export default function Reservations() {
     const start_min = hmToMin(form.start)
     const end_min = hmToMin(form.end)
     if (!form.princess_id) return setError('공주님을 선택하세요.')
-    if (!form.phone) return setError('손님 전화번호를 입력하세요.')
+    if (!form.nickname.trim()) return setError('손님 닉네임을 입력하세요.')
     if (Number.isNaN(start_min) || Number.isNaN(end_min) || start_min >= end_min) return setError('시간을 올바르게 입력하세요 (시작 < 종료).')
     try {
-      const customer = await findOrCreateByPhone({ phone: form.phone, nickname: form.nickname, referred_by: form.referred_by || null })
-      if (await isBannedCustomer({ phone: form.phone, customer_id: customer.id, nickname: form.nickname })) {
+      const nick = form.nickname.trim()
+      if (await isBannedCustomer({ nickname: nick })) {
         setError(`🚫 밴된 손님입니다. 예약 불가 — 밴 관리에서 해제하면 가능합니다.`)
         return
       }
+      const customer = await createCustomer({ nickname: nick, phone: null, referred_by: form.referred_by || null })
       await createReservation({ date, customer_id: customer.id, princess_id: form.princess_id, start_min, end_min })
-      setForm({ princess_id: '', phone: '', nickname: '', referred_by: '', start: '', end: '' })
+      setForm({ princess_id: '', nickname: '', referred_by: '', start: '', end: '' })
       load()
     } catch (e) {
       setError(e.message)
@@ -182,8 +183,7 @@ export default function Reservations() {
           ))}
         </select>
         <div style={{ display: 'flex', gap: 6 }}>
-          <input placeholder="손님 전화번호" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required style={{ flex: 1 }} />
-          <input placeholder="닉네임" value={form.nickname} onChange={(e) => setForm({ ...form, nickname: e.target.value })} style={{ flex: 1 }} />
+          <input placeholder="손님 닉네임" value={form.nickname} onChange={(e) => setForm({ ...form, nickname: e.target.value })} required style={{ flex: 1 }} />
         </div>
         <select value={form.referred_by} onChange={(e) => setForm({ ...form, referred_by: e.target.value })}>
           <option value="">추천인(삐끼) 없음</option>
@@ -229,7 +229,7 @@ export default function Reservations() {
                     r.princess?.name
                   )}
                 </td>
-                <td>{r.customer?.nickname} <span style={{ color: '#9a93b8' }}>{r.customer?.phone}</span></td>
+                <td>{r.customer?.nickname ?? '-'}</td>
                 <td>
                   {ed ? (
                     <span style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
