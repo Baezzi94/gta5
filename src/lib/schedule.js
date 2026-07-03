@@ -4,7 +4,7 @@ import { supabase } from './supabase'
 export async function listRange(startDate, endDate) {
   const { data, error } = await supabase
     .from('availability')
-    .select('*, member:members(id, name, phone, type, profile_photo_url)')
+    .select('*, member:members(id, name, phone, type, profile_photo_url, dual_princess)')
     .gte('date', startDate)
     .lte('date', endDate)
     .order('date', { ascending: true })
@@ -28,7 +28,7 @@ export async function listByDatePrincess(date, memberId) {
 export async function listByDate(date) {
   const { data, error } = await supabase
     .from('availability')
-    .select('*, member:members(id, name, phone, type, profile_photo_url)')
+    .select('*, member:members(id, name, phone, type, profile_photo_url, dual_princess)')
     .eq('date', date)
     .order('start_min', { ascending: true })
   if (error) throw error

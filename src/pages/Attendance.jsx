@@ -25,7 +25,7 @@ export default function Attendance() {
     try {
       setBlocks(await listRange(days[0], days[6]))
       const members = await listMembers()
-      setPrincesses(members.filter((m) => m.type === 'princess' && m.active))
+      setPrincesses(members.filter((m) => (m.type === 'princess' || m.dual_princess) && m.active))
     } catch (e) {
       setError(e.message)
     }
@@ -95,7 +95,7 @@ export default function Attendance() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6 }}>
         {days.map((d, i) => {
-          const dayBlocks = blocks.filter((b) => b.date === d && b.member?.type === 'princess')
+          const dayBlocks = blocks.filter((b) => b.date === d && (b.member?.type === 'princess' || b.member?.dual_princess))
           return (
             <div key={d} style={{ background: '#16131f', borderRadius: 8, padding: 8, minHeight: 120 }}>
               <div style={{ fontWeight: 700, color: i >= 5 ? '#ff8fb0' : '#ffcf5a', fontSize: 13, marginBottom: 6 }}>

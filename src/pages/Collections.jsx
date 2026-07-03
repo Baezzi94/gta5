@@ -27,7 +27,7 @@ export default function Collections() {
   const [handovers, setHandovers] = useState([])
   const [hoForm, setHoForm] = useState({ member_id: '', amount: '' })
   const [form, setForm] = useState({ type: 'tc', nickname: '', princess_id: '' })
-  const princesses = members.filter((m) => m.type === 'princess')
+  const princesses = members.filter((m) => m.type === 'princess' || m.dual_princess)
   const isHead = !!members.find((m) => m.id === memberId)?.wholesale_owner // 시진핑(총괄)만 true
   const [menu, setMenu] = useState([])
   const [saleCust, setSaleCust] = useState({ nickname: '' })

@@ -10,7 +10,7 @@ const MENU = [
   { to: '/attendance', label: '공주 출근부', icon: '🗓️', roles: ['owner', 'staff', 'princess'] },
   { to: '/staff-attendance', label: '스탭 출근부', icon: '🧑‍✈️', roles: ['owner', 'staff', 'princess'] },
   { to: '/bans', label: '밴', icon: '⛔', roles: ['owner', 'staff'] },
-  { to: '/flyer', label: '찌라시', icon: '📢', roles: ['owner', 'staff', 'promoter'] },
+  { to: '/flyer', label: '찌라시', icon: '📢', roles: ['owner', 'staff', 'promoter', 'princess'] },
   { to: '/menu', label: '메뉴 관리', icon: '🍾', roles: ['owner'] },
   { to: '/members', label: '멤버', icon: '👥', roles: ['owner'] },
   { to: '/profile', label: '내 프로필', icon: '🙍', roles: ['owner', 'staff', 'promoter', 'princess'] },

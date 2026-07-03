@@ -92,6 +92,16 @@ export default function Members() {
     }
   }
 
+  async function onToggleDual(m) {
+    setError('')
+    try {
+      await updateMember(m.id, { dual_princess: !m.dual_princess })
+      load()
+    } catch (e) {
+      setError(e.message)
+    }
+  }
+
   async function onDelete(id, name) {
     if (!window.confirm(`'${name}' 멤버를 삭제할까요? (되돌릴 수 없음)`)) return
     setError('')
@@ -196,7 +206,18 @@ export default function Members() {
                   </label>
                 </td>
                 <td>{ed ? <input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} style={{ width: 80 }} /> : m.name}</td>
-                <td>{TYPE_LABEL[m.type] ?? m.type}</td>
+                <td>
+                  {TYPE_LABEL[m.type] ?? m.type}
+                  {m.type !== 'princess' && (
+                    <button
+                      onClick={() => onToggleDual(m)}
+                      title="공주 역할 겸업(예약·찌라시·대화료 대상에 포함)"
+                      style={{ marginLeft: 6, fontSize: 11, background: m.dual_princess ? '#ff5ea0' : 'transparent', color: m.dual_princess ? '#1a1020' : '#9a93b8', border: '1px solid #ff5ea0', borderRadius: 6 }}
+                    >
+                      {m.dual_princess ? '공주겸업 ✓' : '공주겸업'}
+                    </button>
+                  )}
+                </td>
                 <td>{ed ? <input value={editing.phone ?? ''} onChange={(e) => setEditing({ ...editing, phone: e.target.value })} style={{ width: 110 }} /> : (m.phone ?? '-')}</td>
                 <td>
                   {ed ? (
