@@ -40,11 +40,12 @@ export default function Collections() {
       setRows(await listByDate(date))
       setAvail(await listAvailByDate(date))
       setPayouts(await listPayouts(date))
-      setLogs(await listCollectLogs()) // RLS로 시진핑만 실제 데이터 받음(그 외 빈 배열)
-      setHandovers(await listHandovers(date)) // 시진핑만
     } catch (e) {
       setError(e.message)
     }
+    // 감사용(로그·검산)은 시진핑 전용 + 마이그레이션 전이면 테이블이 없을 수 있음 → 실패해도 페이지엔 영향 없게 무시
+    try { setLogs(await listCollectLogs()) } catch { setLogs([]) }
+    try { setHandovers(await listHandovers(date)) } catch { setHandovers([]) }
   }
   useEffect(() => {
     load()

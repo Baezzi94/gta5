@@ -25,10 +25,10 @@ export default function Dashboard() {
     try {
       setCharges(await listRange(from, to))
       setAvail(await listAvailRange(from, to))
-      setCollectLogs(await listCollectLogs(2000)) // 감사용(시진핑만 RLS로 데이터 받음)
     } catch (e) {
       setError(e.message)
     }
+    try { setCollectLogs(await listCollectLogs(2000)) } catch { setCollectLogs([]) } // 감사용(시진핑만) — 실패해도 페이지 유지
   }
   useEffect(() => {
     load()
