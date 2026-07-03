@@ -1,20 +1,23 @@
 import { useEffect, useState } from 'react'
-import { listRange, CHARGE_LABEL } from '../lib/charges'
+import { listRange, listCollectLogs, CHARGE_LABEL } from '../lib/charges'
 import { listRange as listAvailRange } from '../lib/schedule'
 import { listMembers } from '../lib/members'
 import { settle, settleAlcohol } from '../lib/settlement'
 import { businessYmd, addDays } from '../lib/week'
-import { toCsv, downloadCsv } from '../lib/csv'
+import { toCsv, downloadCsv, downloadJson } from '../lib/csv'
+import { useAuth } from '../app/AuthContext'
 
 const man = (won) => `${Math.round(won / 10000).toLocaleString()}만`
 const ROLE_LABEL = { owner: '사장', staff: '운영스탭', promoter: '삐끼', princess: '공주님' }
 
 export default function Dashboard() {
+  const { memberId } = useAuth()
   const [from, setFrom] = useState(() => businessYmd(addDays(new Date(), -6)))
   const [to, setTo] = useState(() => businessYmd(new Date()))
   const [charges, setCharges] = useState([])
   const [avail, setAvail] = useState([])
   const [members, setMembers] = useState([])
+  const [collectLogs, setCollectLogs] = useState([])
   const [error, setError] = useState('')
 
   async function load() {
@@ -22,6 +25,7 @@ export default function Dashboard() {
     try {
       setCharges(await listRange(from, to))
       setAvail(await listAvailRange(from, to))
+      setCollectLogs(await listCollectLogs(2000)) // 감사용(시진핑만 RLS로 데이터 받음)
     } catch (e) {
       setError(e.message)
     }
@@ -84,6 +88,37 @@ export default function Dashboard() {
 
   const princessRank = memberRows.filter((m) => m.role === 'princess').map((m) => ({ ...m, earn: m.talk + m.date2 })).sort((a, b) => b.earn - a.earn)
   const referrerRank = memberRows.map((m) => ({ ...m, ref: m.referral + m.recruit })).filter((m) => m.ref > 0).sort((a, b) => b.ref - a.ref)
+  const isHead = !!members.find((m) => m.id === memberId)?.wholesale_owner // 시진핑(총괄)만
+
+  // 감사용: 사람별 출근시간·수금건수/금액·정산액 요약 → 이상거래자(일 많은데 수금 적은) 탐지
+  function exportAudit() {
+    const inRange = (d) => d && d >= from && d <= to
+    const logs = collectLogs.filter((l) => inRange(l.charge?.date))
+    const min = (a) => (a.checked_in_at && a.checked_out_at ? Math.max(0, Math.round((new Date(a.checked_out_at) - new Date(a.checked_in_at)) / 60000)) : 0)
+    const perMember = members.map((m) => {
+      const blocks = avail.filter((a) => a.member_id === m.id && inRange(a.date))
+      const workMinutes = blocks.reduce((s, a) => s + min(a), 0)
+      const my = logs.filter((l) => l.member_id === m.id)
+      const collected = my.filter((l) => l.collected)
+      const set = memberRows.find((r) => r.id === m.id)
+      return {
+        id: m.id, name: m.name, role: m.type,
+        checkedInBlocks: blocks.filter((a) => a.checked_in_at).length,
+        workMinutes,
+        collectCount: collected.length,
+        collectedValue: collected.reduce((s, l) => s + (l.charge?.amount || 0), 0),
+        uncollectActions: my.filter((l) => !l.collected).length,
+        earned: set?.total || 0,
+      }
+    }).filter((x) => x.workMinutes > 0 || x.collectCount > 0 || x.earned > 0)
+    const payload = {
+      meta: { app: 'gta5-gongju-ops', purpose: 'audit-anomaly(일많은데 수금/거래 적은 사람 탐지)', range: { from, to } },
+      perMember,
+      charges: charges.map((c) => ({ date: c.date, type: c.type, amount: c.amount, collected: c.collected, collected_at: c.collected_at ?? null, created_at: c.created_at, customer: c.customer?.nickname ?? null })),
+      collectLogs: logs.map((l) => ({ at: l.at, member: l.member?.name ?? null, member_id: l.member_id, collected: l.collected, chargeType: l.charge?.type ?? null, amount: l.charge?.amount ?? null, customer: l.charge?.customer?.nickname ?? null })),
+    }
+    downloadJson(`감사데이터_${from}_${to}.json`, payload)
+  }
 
   function exportCharges() {
     downloadCsv(`거래내역_${from}_${to}.csv`, toCsv(charges, [
@@ -129,6 +164,7 @@ export default function Dashboard() {
         <span style={{ flex: 1 }} />
         <button onClick={exportCharges}>거래내역 CSV</button>
         <button onClick={exportSettlement}>정산합계 CSV</button>
+        {isHead && <button onClick={exportAudit} style={{ background: '#3a1620', border: '1px solid #ff5e7a', color: '#ffb3c1' }}>🔍 감사 JSON (이상거래 탐지)</button>}
       </div>
 
       {/* KPI */}
