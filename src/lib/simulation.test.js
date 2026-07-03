@@ -156,6 +156,42 @@ describe('시뮬레이션: 주류 마진 N빵(도매값은 각자 사입)', () =
   })
 })
 
+describe('시뮬레이션: 현재 규칙 종합 한 판 (시진핑1.2 운영풀 + 주류 마진 N빵)', () => {
+  // 출근: 시진핑(1.2)·박두팔(사장1.0)·스탭ST(1.0)·공주P1(1.0)
+  const w = [
+    { id: 'SJP', role: 'owner', inAt: t(20), outAt: null, weight: 1.2 },
+    { id: 'BDP', role: 'owner', inAt: t(20), outAt: null, weight: 1.0 },
+    { id: 'ST', role: 'staff', inAt: t(20), outAt: null, weight: 1.0 },
+    { id: 'P1', role: 'princess', inAt: t(20), outAt: null, weight: 1.0 },
+  ]
+  const s = settle([
+    { type: 'tc', amount: 50000, at: t(21) },
+    { type: 'talk', amount: 250000, princess_id: 'P1', at: t(21) },
+    { type: 'date2', amount: 1000000, princess_id: 'P1', at: t(22) },
+  ], w)
+  const alc = settleAlcohol([{ amount: 300000, cost: 120000, at: t(21) }], w) // 마진 18만
+
+  it('운영풀 45만: 시진핑1.2 168750 / 박두팔1.0 140625 / 스탭 140625 (공주 제외)', () => {
+    expect(s.pool).toBe(450000)
+    expect(s.perMember.find((m) => m.id === 'SJP').share).toBe(168750)
+    expect(s.perMember.find((m) => m.id === 'BDP').share).toBe(140625)
+    expect(s.perMember.find((m) => m.id === 'ST').share).toBe(140625)
+    expect(s.perMember.find((m) => m.id === 'P1')?.share ?? 0).toBe(0) // 공주는 운영풀 지분 없음
+  })
+  it('공주 개인몫: 대화료 15만 + 2차 70만', () => {
+    const p1 = s.perMember.find((m) => m.id === 'P1')
+    expect(p1.talk).toBe(150000)
+    expect(p1.date2).toBe(700000)
+  })
+  it('주류 마진 18만 → 출근 4명 N빵 45000씩(시진핑도 동일)', () => {
+    expect(alc.margin).toBe(180000)
+    expect(alc.per['SJP']).toBe(45000)
+    expect(alc.per['BDP']).toBe(45000)
+    expect(alc.per['ST']).toBe(45000)
+    expect(alc.per['P1']).toBe(45000)
+  })
+})
+
 describe('⚠️ 발견 이슈(현재 동작 기록)', () => {
   it('재출근 후에도 원래 출근시각 보존 → 퇴근 전 판매 정상 귀속(reCheckIn 수정됨)', () => {
     // 수정: reCheckIn은 checked_out_at만 해제, checked_in_at(20시) 유지.
