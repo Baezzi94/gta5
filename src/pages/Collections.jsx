@@ -16,7 +16,6 @@ const ROLE_LABEL = { owner: '사장', staff: '운영스탭', promoter: '삐끼',
 
 export default function Collections() {
   const { role, memberId } = useAuth()
-  const isOwner = role === 'owner'
   const canAdd = role === 'owner' || role === 'staff'
   const [date, setDate] = useState(() => businessYmd(new Date()))
   const [rows, setRows] = useState([])
@@ -278,7 +277,7 @@ export default function Collections() {
                   {!voided && (r.collected
                     ? <button onClick={() => act(setCollected, r.id, false)}>수금취소</button>
                     : <button onClick={() => act(setCollected, r.id, true)}>수금</button>)}
-                  {isOwner && <button onClick={() => act(deleteCharge, r.id)}>삭제</button>}
+                  {isHead && <button onClick={() => act(deleteCharge, r.id)}>삭제</button>}
                 </td>
               )}
             </tr>
