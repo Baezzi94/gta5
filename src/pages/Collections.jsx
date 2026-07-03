@@ -142,7 +142,7 @@ export default function Collections() {
     .map((a) => ({ id: a.member_id, role: a.member?.type, inAt: a.checked_in_at, outAt: a.checked_out_at, weight: headOwner[a.member_id] ? 1.2 : 1.0 }))
   const settlement = settle(enriched, windows)
 
-  // 주류 분배: 판매 시각 출근 전원(사장+공주+스탭) N빵, 사장 1.5 + 도매원가 회수
+  // 주류: 판매 시각 출근자 전원 마진 N빵(도매원가는 각자 사입이라 앱 미처리)
   const itemCharges = live
     .filter((r) => r.collected && r.type === 'item')
     .map((c) => ({ amount: c.amount, cost: c.cost, at: c.created_at }))

@@ -46,28 +46,22 @@ export async function isBanned(phone) {
   return (data?.length ?? 0) > 0
 }
 
-// 전화 OR 손님id OR 닉네임 으로 밴 여부 (전화 없는 워크인·닉네임 밴도 잡기 위함)
+// 전화 OR 손님id OR 닉네임 으로 밴 여부 (전화 없는 워크인·닉네임 밴도 잡기 위함).
+// 밴 목록은 소수이므로 활성 밴을 한 번에 가져와 클라이언트에서 매칭 → 동명이인 손님행이
+// 아무리 많아도 OR 필터가 폭발하지 않음(URL 길이 초과로 밴 체크가 깨지는 것 방지).
 export async function isBannedCustomer({ phone, customer_id, nickname }) {
-  const ids = new Set()
-  if (customer_id) ids.add(customer_id)
-  const nk = (nickname || '').trim()
-  if (nk) {
-    // 같은 닉네임의 모든 손님 행(밴은 특정 행에 걸려 있어도 잡히게)
-    const { data: custs, error: cErr } = await supabase.from('customers').select('id').eq('nickname', nk)
-    if (cErr) throw cErr
-    for (const c of custs || []) ids.add(c.id)
-  }
-  const conds = []
   const norm = normPhone(phone)
-  if (norm) conds.push(`phone.eq.${norm}`)
-  for (const id of ids) conds.push(`customer_id.eq.${id}`)
-  if (!conds.length) return false
+  const nk = (nickname || '').trim()
+  if (!norm && !customer_id && !nk) return false
   const { data, error } = await supabase
     .from('bans')
-    .select('id')
+    .select('id, phone, customer_id, customer:customers(nickname)')
     .eq('lifted', false)
-    .or(conds.join(','))
-    .limit(1)
   if (error) throw error
-  return (data?.length ?? 0) > 0
+  return (data || []).some(
+    (b) =>
+      (norm && b.phone === norm) ||
+      (customer_id && b.customer_id === customer_id) ||
+      (nk && b.customer?.nickname === nk)
+  )
 }

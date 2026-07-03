@@ -204,7 +204,7 @@ export default function Reservations() {
           <TimeField value={form.end} onChange={(v) => setForm({ ...form, end: v })} />
         </div>
         <button type="submit">예약 추가</button>
-        <span style={{ color: '#9a93b8', fontSize: 12 }}>전화번호로 손님 자동 등록/조회. 추천인 지정 시 손님추천(3만) 근거로 기록. 가용시간 밖/중복이면 거부.</span>
+        <span style={{ color: '#9a93b8', fontSize: 12 }}>닉네임으로 예약 등록(동명이인 허용). 추천인 지정 시 손님추천(3만) 근거로 기록. 가용시간 밖/중복이면 거부.</span>
       </form>
 
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
