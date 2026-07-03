@@ -103,6 +103,19 @@ export async function setCollected(id, collected) {
     .select()
     .single()
   if (error) throw error
+  // 누가·언제 수금/미수금 처리했는지 로그(member_id는 DB default current_member_id()). 실패해도 본작업은 유지.
+  await supabase.from('charge_collect_logs').insert({ charge_id: id, collected })
+  return data
+}
+
+// 수금/미수금 처리 로그 (시진핑만 RLS로 조회 가능). 최근순.
+export async function listCollectLogs(limit = 300) {
+  const { data, error } = await supabase
+    .from('charge_collect_logs')
+    .select('*, member:members(name), charge:charges(date, type, amount, customer:customers(nickname))')
+    .order('at', { ascending: false })
+    .limit(limit)
+  if (error) throw error
   return data
 }
 

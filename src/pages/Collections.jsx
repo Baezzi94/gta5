@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { listByDate, createCharge, createMenuSale, setCollected, deleteCharge, CHARGE_AMOUNT, CHARGE_LABEL } from '../lib/charges'
+import { listByDate, createCharge, createMenuSale, setCollected, deleteCharge, listCollectLogs, CHARGE_AMOUNT, CHARGE_LABEL } from '../lib/charges'
 import { createCustomer } from '../lib/customers'
 import { isBannedCustomer } from '../lib/bans'
 import { listByDate as listAvailByDate } from '../lib/schedule'
@@ -15,7 +15,7 @@ const won = (n) => `${Math.round(n).toLocaleString()}원`
 const ROLE_LABEL = { owner: '사장', staff: '운영스탭', promoter: '삐끼', princess: '공주님' }
 
 export default function Collections() {
-  const { role } = useAuth()
+  const { role, memberId } = useAuth()
   const isOwner = role === 'owner'
   const canAdd = role === 'owner' || role === 'staff'
   const [date, setDate] = useState(() => businessYmd(new Date()))
@@ -23,8 +23,10 @@ export default function Collections() {
   const [avail, setAvail] = useState([])
   const [payouts, setPayouts] = useState([])
   const [members, setMembers] = useState([])
+  const [logs, setLogs] = useState([])
   const [form, setForm] = useState({ type: 'tc', nickname: '', princess_id: '' })
   const princesses = members.filter((m) => m.type === 'princess')
+  const isHead = !!members.find((m) => m.id === memberId)?.wholesale_owner // 시진핑(총괄)만 true
   const [menu, setMenu] = useState([])
   const [saleCust, setSaleCust] = useState({ nickname: '' })
   const [qty, setQty] = useState({}) // { menu_item_id: 수량 }
@@ -36,6 +38,7 @@ export default function Collections() {
       setRows(await listByDate(date))
       setAvail(await listAvailByDate(date))
       setPayouts(await listPayouts(date))
+      setLogs(await listCollectLogs()) // RLS로 시진핑만 실제 데이터 받음(그 외 빈 배열)
     } catch (e) {
       setError(e.message)
     }
@@ -255,7 +258,7 @@ export default function Collections() {
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ textAlign: 'left', color: '#ffcf5a' }}>
-            <th>유형</th><th>손님</th><th>공주님</th><th>금액</th><th>수금</th>{isOwner && <th>처리</th>}
+            <th>유형</th><th>손님</th><th>공주님</th><th>금액</th><th>수금</th>{canAdd && <th>처리</th>}
           </tr>
         </thead>
         <tbody>
@@ -270,12 +273,12 @@ export default function Collections() {
               <td style={{ fontWeight: 700, color: voided ? '#9a93b8' : (r.collected ? '#5ee0a0' : '#ff5e5e') }}>
                 {voided ? '취소됨' : (r.collected ? '수금완료' : '미수금')}
               </td>
-              {isOwner && (
+              {canAdd && (
                 <td style={{ display: 'flex', gap: 4 }}>
                   {!voided && (r.collected
                     ? <button onClick={() => act(setCollected, r.id, false)}>수금취소</button>
                     : <button onClick={() => act(setCollected, r.id, true)}>수금</button>)}
-                  <button onClick={() => act(deleteCharge, r.id)}>삭제</button>
+                  {isOwner && <button onClick={() => act(deleteCharge, r.id)}>삭제</button>}
                 </td>
               )}
             </tr>
@@ -300,7 +303,7 @@ export default function Collections() {
         <table>
           <thead>
             <tr style={{ color: '#ffcf5a' }}>
-              <th>이름</th><th>역할</th><th>대화료</th><th>2차</th><th>지분</th><th>손님추천</th><th>영입</th><th>주류</th><th>합계</th><th>지급</th>
+              <th>이름</th><th>역할</th><th>대화료</th><th>2차</th><th>지분</th><th>손님추천</th><th>영입</th><th>주류</th><th>합계</th>{isHead && <th>지급</th>}
             </tr>
           </thead>
           <tbody>
@@ -319,21 +322,21 @@ export default function Collections() {
                   <td>{m.recruit ? won(m.recruit) : '-'}</td>
                   <td>{m.alcohol ? won(m.alcohol) : '-'}</td>
                   <td style={{ fontWeight: 800, color: '#5ee0a0' }}>{won(m.total)}</td>
-                  <td>
-                    <span style={{ color: paid ? '#5ee0a0' : '#ff6b6b', fontWeight: 700, marginRight: 6 }}>
-                      {paid ? '지급완료' : '미지급'}
-                    </span>
-                    {mismatch && (
-                      <span title={`지급 당시 ${won(prow.paid_amount)} → 현재 ${won(m.total)}`} style={{ color: '#ffcf5a', fontSize: 12, marginRight: 6 }}>
-                        ⚠️ 지급 {won(prow.paid_amount)}
+                  {isHead && (
+                    <td>
+                      <span style={{ color: paid ? '#5ee0a0' : '#ff6b6b', fontWeight: 700, marginRight: 6 }}>
+                        {paid ? '지급완료' : '미지급'}
                       </span>
-                    )}
-                    {isOwner && (
-                      paid
+                      {mismatch && (
+                        <span title={`지급 당시 ${won(prow.paid_amount)} → 현재 ${won(m.total)}`} style={{ color: '#ffcf5a', fontSize: 12, marginRight: 6 }}>
+                          ⚠️ 지급 {won(prow.paid_amount)}
+                        </span>
+                      )}
+                      {paid
                         ? <button onClick={() => onTogglePaid(m.id, false)}>취소</button>
-                        : <button onClick={() => onTogglePaid(m.id, true, m.total)}>지급</button>
-                    )}
-                  </td>
+                        : <button onClick={() => onTogglePaid(m.id, true, m.total)}>지급</button>}
+                    </td>
+                  )}
                 </tr>
               )
             })}
@@ -348,6 +351,39 @@ export default function Collections() {
       <p style={{ color: '#9a93b8', fontSize: 12, marginTop: 6 }}>
         ※ 팁은 정산 제외(개인 수령). 지분·주류마진은 출근 시각 기준 자동 분배. 도매값은 각자 자기 돈으로 사입합니다.
       </p>
+
+      {/* 수금/미수금 처리 로그 — 시진핑(총괄)만 열람 */}
+      {isHead && (() => {
+        const dayLogs = logs.filter((l) => l.charge?.date === date)
+        return (
+          <div style={{ marginTop: 28 }}>
+            <h2>수금 처리 로그 <span style={{ color: '#9a93b8', fontSize: 13, fontWeight: 400 }}>(총괄만 열람 · {date})</span></h2>
+            {dayLogs.length === 0 ? (
+              <p style={{ color: '#9a93b8' }}>이 날짜의 수금 처리 기록이 없습니다.</p>
+            ) : (
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead>
+                  <tr style={{ textAlign: 'left', color: '#ffcf5a' }}>
+                    <th>시각</th><th>처리자</th><th>동작</th><th>거래</th><th>손님</th><th>금액</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dayLogs.map((l) => (
+                    <tr key={l.id} style={{ borderTop: '1px solid #2c2742' }}>
+                      <td>{new Date(l.at).toLocaleString('ko-KR', { hour12: false })}</td>
+                      <td>{l.member?.name ?? '-'}</td>
+                      <td style={{ color: l.collected ? '#5ee0a0' : '#ff6b6b', fontWeight: 700 }}>{l.collected ? '수금' : '미수금'}</td>
+                      <td>{l.charge ? (CHARGE_LABEL[l.charge.type] ?? l.charge.type) : '-'}</td>
+                      <td>{l.charge?.customer?.nickname ?? '-'}</td>
+                      <td>{l.charge ? man(l.charge.amount) : '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )
+      })()}
     </div>
   )
 }
