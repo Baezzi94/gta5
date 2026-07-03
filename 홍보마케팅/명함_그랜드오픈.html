@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공주님 클럽 — 그랜드 오픈 명함</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Hahmlet:wght@600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#08060d;min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:16px;padding:36px 16px;font-family:'Noto Sans KR',sans-serif}
+  .savebtn{background:linear-gradient(90deg,#ff5ea0,#ffcf5a);color:#1a1020;border:none;border-radius:10px;padding:10px 18px;font-weight:800;cursor:pointer;font-family:'Noto Sans KR'}
+  .savebtn:disabled{opacity:.5;cursor:wait}
+  .hint{color:#6f688c;font-size:12px}
+
+  .card{
+    width:960px;height:560px;position:relative;overflow:hidden;border-radius:20px;color:#fff;
+    padding:48px 56px;
+    background:
+      radial-gradient(560px 300px at 88% 8%, rgba(255,94,160,.22), transparent 60%),
+      radial-gradient(520px 320px at 4% 96%, rgba(255,207,90,.13), transparent 60%),
+      linear-gradient(160deg,#180b1f 0%, #0b0710 62%, #120a17 100%);
+    border:1px solid #3a2440;box-shadow:0 0 70px rgba(255,60,150,.18);
+  }
+  .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:8px;background:linear-gradient(180deg,#ff5ea0,#ffcf5a)}
+
+  .eyebrow{color:#ffcf5a;font-size:14px;font-weight:700;letter-spacing:3px}
+  .grand{margin-top:14px;font-family:'Noto Sans KR',sans-serif;font-weight:500;letter-spacing:11px;font-size:20px;color:#ffcf5a;text-shadow:0 0 14px rgba(255,207,90,.5)}
+  .title{margin-top:10px;font-family:'Hahmlet',serif;font-weight:800;font-size:72px;letter-spacing:1px;line-height:1;
+    text-shadow:0 0 4px #ff9ecb,0 0 16px #ff2e86,0 0 38px rgba(255,46,134,.6),0 3px 8px rgba(0,0,0,.5)}
+  .tag{margin-top:16px;color:#ffd6e8;font-size:18px;font-weight:700}
+  .tag .dot{color:#ff77b4;margin:0 6px}
+
+  .row{position:absolute;left:56px;right:48px;bottom:44px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+  .blk .lbl{color:#9a8fb0;font-size:12px;letter-spacing:1px}
+  .blk .big{font-family:'Black Han Sans',sans-serif;font-size:30px;margin-top:3px}
+  .date .big{background:linear-gradient(90deg,#ff77b4,#ffcf5a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .loc .big{color:#eadff0}
+  .loc .code{color:#ffcf5a}
+  .contact{text-align:right}
+  .contact .num{font-family:'Black Han Sans',sans-serif;font-size:30px;background:linear-gradient(90deg,#ffcf5a,#ff5ea0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .contact .who{color:#ffd6e8;font-size:13px}
+</style>
+</head>
+<body>
+  <button class="savebtn" id="saveBtn">🖼️ 이미지로 저장 (PNG)</button>
+
+  <div class="card" id="card">
+    <div class="eyebrow">CLIMAX · 서버 유일 공식 양주 바</div>
+    <div class="grand">GRAND OPENING</div>
+    <div class="title">공주님 클럽</div>
+    <div class="tag">진짜 술<span class="dot">·</span>진짜 공주님<span class="dot">·</span>재즈 라이브<span class="dot">·</span>안전구역</div>
+
+    <div class="row">
+      <div class="blk date">
+        <div class="lbl">OPEN</div>
+        <div class="big">7.4 (토) 22:00 ~</div>
+      </div>
+      <div class="blk loc">
+        <div class="lbl">LOCATION</div>
+        <div class="big"><span class="code">7219</span> 바하마 마마스</div>
+      </div>
+      <div class="blk contact">
+        <div class="lbl">예약 · 문의</div>
+        <div class="num">010-4499-3016</div>
+        <div class="who">사장 ) 시진핑</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">저장이 안 되면 Win+Shift+S 캡쳐</div>
+
+  <script type="module">
+    import { toPng } from 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/+esm'
+    const btn = document.getElementById('saveBtn')
+    btn.addEventListener('click', async () => {
+      btn.disabled = true; const label = btn.textContent; btn.textContent = '만드는 중…'
+      try {
+        await document.fonts.ready
+        await new Promise((r) => setTimeout(r, 200))
+        const url = await toPng(document.getElementById('card'), { pixelRatio: 3, cacheBust: true, backgroundColor: '#08060d' })
+        const a = document.createElement('a'); a.href = url; a.download = '공주님클럽_그랜드오픈명함.png'; a.click()
+      } catch (e) { alert('저장 실패: ' + e.message + '\n\nWin+Shift+S 캡쳐를 사용하세요.') }
+      btn.disabled = false; btn.textContent = label
+    })
+  </script>
+</body>
+</html>
