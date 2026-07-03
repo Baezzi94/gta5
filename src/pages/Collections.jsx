@@ -4,6 +4,7 @@ import { createCustomer } from '../lib/customers'
 import { isBannedCustomer } from '../lib/bans'
 import { listByDate as listAvailByDate } from '../lib/schedule'
 import { listByDate as listPayouts, setPaid } from '../lib/payouts'
+import { listHandovers, addHandover, deleteHandover } from '../lib/handovers'
 import { listMembers } from '../lib/members'
 import { listMenu } from '../lib/menu'
 import { settle, settleAlcohol } from '../lib/settlement'
@@ -23,6 +24,8 @@ export default function Collections() {
   const [payouts, setPayouts] = useState([])
   const [members, setMembers] = useState([])
   const [logs, setLogs] = useState([])
+  const [handovers, setHandovers] = useState([])
+  const [hoForm, setHoForm] = useState({ member_id: '', amount: '' })
   const [form, setForm] = useState({ type: 'tc', nickname: '', princess_id: '' })
   const princesses = members.filter((m) => m.type === 'princess')
   const isHead = !!members.find((m) => m.id === memberId)?.wholesale_owner // 시진핑(총괄)만 true
@@ -38,6 +41,7 @@ export default function Collections() {
       setAvail(await listAvailByDate(date))
       setPayouts(await listPayouts(date))
       setLogs(await listCollectLogs()) // RLS로 시진핑만 실제 데이터 받음(그 외 빈 배열)
+      setHandovers(await listHandovers(date)) // 시진핑만
     } catch (e) {
       setError(e.message)
     }
@@ -176,6 +180,48 @@ export default function Collections() {
       setError(e.message)
     }
   }
+
+  async function onAddHandover(e) {
+    e.preventDefault()
+    setError('')
+    const amt = Math.round(Number(hoForm.amount))
+    if (!hoForm.member_id) return setError('받은 사람을 선택하세요.')
+    if (!amt || amt < 0) return setError('받은 금액을 입력하세요.')
+    try {
+      await addHandover({ date, member_id: hoForm.member_id, amount: amt })
+      setHoForm({ member_id: '', amount: '' })
+      load()
+    } catch (e) {
+      setError(e.message)
+    }
+  }
+
+  // 정산 검산(시진핑만): 수금한 사람 = 도매가 낸 사람 → 각자 나에게 넘겨야 할 = Σ(수금액 − 술도매가)
+  //   received = 내가 실제 받은 금액. balance = 아직 안 낸(들고 있어야 할). 오차% = (받은−넘겨야할)/넘겨야할
+  const collectorByCharge = (() => {
+    const map = {}
+    const day = logs.filter((l) => l.charge?.date === date).sort((a, b) => new Date(b.at) - new Date(a.at))
+    for (const l of day) if (map[l.charge_id] === undefined) map[l.charge_id] = l.collected ? l.member_id : null
+    return map
+  })()
+  const expectedBy = {}
+  for (const r of rows) {
+    if (!r.collected || isVoid(r)) continue
+    const who = collectorByCharge[r.id]
+    if (!who) continue
+    expectedBy[who] = (expectedBy[who] || 0) + (r.amount - (r.cost || 0))
+  }
+  const receivedBy = {}
+  for (const h of handovers) receivedBy[h.member_id] = (receivedBy[h.member_id] || 0) + h.amount
+  const calcRows = members
+    .filter((m) => expectedBy[m.id] || receivedBy[m.id])
+    .map((m) => {
+      const exp = expectedBy[m.id] || 0
+      const rec = receivedBy[m.id] || 0
+      return { id: m.id, name: m.name, exp, rec, bal: exp - rec, pct: exp > 0 ? Math.round(((rec - exp) / exp) * 1000) / 10 : null }
+    })
+    .sort((a, b) => b.exp - a.exp)
+  const cashMembers = members.filter((m) => (m.type === 'owner' || m.type === 'staff') && m.active)
 
   return (
     <div>
@@ -383,6 +429,62 @@ export default function Collections() {
           </div>
         )
       })()}
+
+      {/* 정산 검산 계산기 — 시진핑(총괄)만. 넘겨야 할(수금−도매) vs 실제 받은 돈 */}
+      {isHead && (
+        <div style={{ marginTop: 28 }}>
+          <h2>정산 검산 <span style={{ color: '#9a93b8', fontSize: 13, fontWeight: 400 }}>(총괄만 · {date} · 10만 도매 float은 별도)</span></h2>
+          <form onSubmit={onAddHandover} style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10, padding: 10, background: '#16131f', borderRadius: 10 }}>
+            <span style={{ alignSelf: 'center', color: '#9a93b8', fontSize: 13 }}>중간정산 받은 돈 기록:</span>
+            <select value={hoForm.member_id} onChange={(e) => setHoForm({ ...hoForm, member_id: e.target.value })}>
+              <option value="">받은 사람</option>
+              {cashMembers.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+            </select>
+            <input type="number" min="0" placeholder="받은 금액(원)" value={hoForm.amount} onChange={(e) => setHoForm({ ...hoForm, amount: e.target.value })} style={{ width: 140 }} />
+            <button type="submit">기록</button>
+          </form>
+          {calcRows.length === 0 ? (
+            <p style={{ color: '#9a93b8' }}>수금된 거래가 없습니다.</p>
+          ) : (
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <thead>
+                <tr style={{ textAlign: 'left', color: '#ffcf5a' }}>
+                  <th>이름</th><th>넘겨야 할(수금−도매)</th><th>실제 받음</th><th>차액(미납)</th><th>오차</th>
+                </tr>
+              </thead>
+              <tbody>
+                {calcRows.map((c) => {
+                  const flag = c.pct != null && Math.abs(c.pct) > 5
+                  return (
+                    <tr key={c.id} style={{ borderTop: '1px solid #2c2742' }}>
+                      <td>{c.name}</td>
+                      <td>{won(c.exp)}</td>
+                      <td>{c.rec ? won(c.rec) : '-'}</td>
+                      <td style={{ color: c.bal > 0 ? '#ffcf5a' : (c.bal < 0 ? '#ff6b6b' : '#5ee0a0') }}>{won(c.bal)}</td>
+                      <td style={{ fontWeight: 700, color: flag ? '#ff5e5e' : '#9a93b8' }}>
+                        {c.pct == null ? '-' : `${c.pct > 0 ? '+' : ''}${c.pct}%`}{flag ? ' ⚠️' : ''}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          )}
+          <p style={{ color: '#9a93b8', fontSize: 12, marginTop: 6 }}>
+            ※ "넘겨야 할" = 본인이 수금한 금액 − 그 술 도매가(=마진, TC/대화료/2차는 전액). 중간정산 때 받은 돈을 위에 기록하면 차액·오차가 실시간 갱신됩니다. 오차 ±5% 초과 시 ⚠️.
+          </p>
+          {handovers.length > 0 && (
+            <div style={{ marginTop: 8, color: '#9a93b8', fontSize: 12 }}>
+              받은 기록: {handovers.map((h) => (
+                <span key={h.id} style={{ marginRight: 10 }}>
+                  {h.member?.name} {won(h.amount)}
+                  <button onClick={() => act(deleteHandover, h.id)} style={{ marginLeft: 3, fontSize: 11 }}>×</button>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
