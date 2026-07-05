@@ -256,7 +256,7 @@ export default function Collections() {
           <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
             <option value="tc">TC(입장료) 5만</option>
             <option value="talk">대화료 25만</option>
-            <option value="date2">2차 100만</option>
+            <option value="date2">2차 500만</option>
           </select>
           <input placeholder="손님 닉네임(선택)" value={form.nickname} onChange={(e) => setForm({ ...form, nickname: e.target.value })} />
           {form.type !== 'tc' && (

@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 
-export const CHARGE_AMOUNT = { tc: 50000, talk: 250000, date2: 1000000 }
+export const CHARGE_AMOUNT = { tc: 50000, talk: 250000, date2: 5000000 }
 export const CHARGE_LABEL = { tc: 'TC(입장료)', talk: '대화료', date2: '2차' }
 
 export async function listByDate(date) {
@@ -70,7 +70,7 @@ export async function createTcFromReservation(r) {
   return createFromReservation(r, 'tc')
 }
 
-// 2차 거래(100만)
+// 2차 거래(500만)
 export async function createDate2FromReservation(r) {
   return createFromReservation(r, 'date2', { princess_id: r.princess_id })
 }

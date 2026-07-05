@@ -1,0 +1,17 @@
+{
+    "crash_hash": "fivem.exe+12654D9",
+    "crash_hash_id": 1209146296,
+    "crash_hash_key": "red-bulldog-batman",
+    "crashometry_RockstarId": "251823525",
+    "crashometry_did_render_backbuf": "true",
+    "crashometry_gpu_id": "1002:743f",
+    "crashometry_gpu_name": "AMD Radeon RX 6400",
+    "crashometry_hs_state": "HS_HOSTED",
+    "crashometry_last_server": "141.11.194.147:30120",
+    "crashometry_last_server_url": "http://141.11.194.147:30120/",
+    "crashometry_last_server_ver": "master v1.0.0.31039",
+    "crashometry_load_game_first_launch": "true",
+    "crashometry_onesync_big": "true",
+    "crashometry_onesync_enabled": "true",
+    "crashometry_onesync_population": "true"
+}

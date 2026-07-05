@@ -126,8 +126,8 @@ export default function Reservations() {
       await load()
       setNotice(
         names.length
-          ? `⚠️ 2차로 ${dur}분 자리가 빕니다. 밀어야 할 예약: ${names.join(', ')} — 수정/취소로 조정하세요. (2차 100만 미수금 생성)`
-          : `2차 등록 완료 (겹치는 예약 없음). 2차 100만 미수금 생성됨.`
+          ? `⚠️ 2차로 ${dur}분 자리가 빕니다. 밀어야 할 예약: ${names.join(', ')} — 수정/취소로 조정하세요. (2차 500만 미수금 생성)`
+          : `2차 등록 완료 (겹치는 예약 없음). 2차 500만 미수금 생성됨.`
       )
     } catch (e) {
       setError(e.message)
