@@ -14,6 +14,11 @@ import Flyer from '../pages/Flyer'
 import Profile from '../pages/Profile'
 import Dashboard from '../pages/Dashboard'
 import Menu from '../pages/Menu'
+import MobileLayout from '../mobile/MobileLayout'
+import MAttendance from '../mobile/MAttendance'
+import MSell from '../mobile/MSell'
+import MReservations from '../mobile/MReservations'
+import MMe from '../mobile/MMe'
 
 function Root() {
   const { session, loading } = useAuth()
@@ -46,6 +51,20 @@ export default function App() {
           <Route path="collections" element={<Collections />} />
           <Route path="flyer" element={<Flyer />} />
           <Route path="profile" element={<Profile />} />
+        </Route>
+        <Route
+          path="/m"
+          element={
+            <ProtectedRoute>
+              <MobileLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="/m/attendance" replace />} />
+          <Route path="attendance" element={<MAttendance />} />
+          <Route path="sell" element={<MSell />} />
+          <Route path="reservations" element={<MReservations />} />
+          <Route path="me" element={<MMe />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
