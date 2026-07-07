@@ -7,68 +7,55 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bebas+Neue&family=Hahmlet:wght@700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:#08060d;min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:16px;padding:34px 16px;font-family:'Noto Sans KR',sans-serif}
-  .savebtn{background:linear-gradient(90deg,#ffcf5a,#ff9ec6);color:#1a1020;border:none;border-radius:10px;padding:10px 18px;font-weight:800;cursor:pointer;font-family:'Noto Sans KR'}
+  body{background:#000;min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:16px;padding:34px 16px;font-family:'Noto Sans KR',sans-serif}
+  .savebtn{background:linear-gradient(90deg,#ffcf5a,#e8a62f);color:#141007;border:none;border-radius:10px;padding:10px 18px;font-weight:800;cursor:pointer;font-family:'Noto Sans KR'}
   .savebtn:disabled{opacity:.5;cursor:wait}
-  .hint{color:#6f688c;font-size:12px}
+  .hint{color:#555}
 
   .card{
-    width:1040px;height:600px;position:relative;overflow:hidden;border-radius:20px;color:#fff;padding:44px 56px;
+    width:1040px;height:600px;position:relative;overflow:hidden;border-radius:18px;color:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;
     background:
-      radial-gradient(620px 340px at 82% 6%, rgba(255,207,90,.24), transparent 60%),
-      radial-gradient(560px 320px at 6% 96%, rgba(255,94,160,.16), transparent 60%),
-      linear-gradient(160deg,#1a1206 0%, #0b0710 58%, #140a10 100%);
-    border:1px solid #5a441c;box-shadow:0 0 80px rgba(255,190,70,.18);
+      radial-gradient(700px 420px at 50% 18%, rgba(255,190,70,.12), transparent 60%),
+      linear-gradient(180deg,#0b0b0d 0%, #050506 60%, #0a0a0c 100%);
+    border:1px solid #2a2418;
   }
-  .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:9px;background:linear-gradient(180deg,#ffcf5a,#ff9ec6)}
+  /* 얇은 골드 프레임 */
+  .frame{position:absolute;inset:16px;border:1px solid rgba(255,207,90,.35);border-radius:12px;pointer-events:none}
 
-  .eyebrow{color:#ffcf5a;font-size:15px;font-weight:700;letter-spacing:3px}
-  .bell{margin-top:6px;font-family:'Bebas Neue',sans-serif;font-size:86px;letter-spacing:5px;line-height:.95;
-    background:linear-gradient(90deg,#fff3cf 0%,#ffcf5a 45%,#e8a62f 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
-    filter:drop-shadow(0 0 26px rgba(255,190,70,.6))}
-  .bell .em{-webkit-text-fill-color:initial;color:#ffcf5a}
-  .spon{margin-top:8px;font-family:'Black Han Sans',sans-serif;font-size:28px;color:#ff9ec6;text-shadow:0 0 16px rgba(255,46,134,.45)}
-  .spon b{color:#fff}
+  .top{color:#ffcf5a;font-size:16px;font-weight:700;letter-spacing:6px}
+  .top .bell{font-family:'Bebas Neue',sans-serif;letter-spacing:4px;font-size:22px}
 
-  .free{position:absolute;left:56px;right:56px;bottom:150px}
-  .free .line{height:2px;background:linear-gradient(90deg,transparent,#ffcf5a,transparent)}
-  .free .big{text-align:center;font-family:'Black Han Sans',sans-serif;font-size:66px;line-height:1.1;margin:14px 0;color:#fff;text-shadow:0 0 6px #ffe7a0,0 0 22px #ffbe46,0 3px 8px rgba(0,0,0,.5)}
-  .free .big .g{background:linear-gradient(90deg,#ffcf5a,#ff9ec6);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .free .sub{text-align:center;color:#c9bcd6;font-size:16px}
-  .free .sub s{color:#8a7fa0}
+  .hero{margin:6px 0 4px;font-family:'Black Han Sans',sans-serif;font-size:132px;line-height:1;letter-spacing:2px;
+    text-shadow:0 2px 30px rgba(255,190,70,.28)}
+  .hero .tt{background:linear-gradient(180deg,#fff3cf,#ffcf5a 55%,#e0982a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .w{color:#fff}
 
-  .foot{position:absolute;left:56px;right:56px;bottom:40px;display:flex;justify-content:space-between;align-items:flex-end}
-  .foot .l .d{font-family:'Black Han Sans',sans-serif;font-size:22px;color:#ffcf5a}
-  .foot .l .s{color:#9a8fb0;font-size:13px;margin-top:2px}
-  .foot .r{text-align:right}
-  .foot .r .brand{font-family:'Hahmlet',serif;font-weight:800;font-size:26px;color:#fff;text-shadow:0 0 12px rgba(255,46,134,.5)}
-  .foot .r .t{color:#ffd6e8;font-size:13px}
+  .offer{margin-top:18px;font-family:'Black Han Sans',sans-serif;font-size:38px;color:#fff}
+  .offer .g{color:#ffcf5a}
+  .offer s{color:#6a6152;font-family:'Noto Sans KR';font-weight:400;font-size:22px}
+
+  .line{width:220px;height:1px;background:linear-gradient(90deg,transparent,#ffcf5a,transparent);margin:22px 0 0}
+
+  .foot{position:absolute;left:40px;right:40px;bottom:34px;display:flex;justify-content:space-between;align-items:flex-end;color:#8a8577;font-size:13px}
+  .foot .d{color:#ffcf5a;font-family:'Black Han Sans',sans-serif;font-size:18px}
+  .foot .brand{font-family:'Hahmlet',serif;font-weight:800;font-size:20px;color:#fff}
 </style>
 </head>
 <body>
   <button class="savebtn" id="saveBtn">🖼️ 이미지로 저장 (PNG)</button>
 
   <div class="card" id="card">
-    <div class="eyebrow">공주님 클럽 · CLIMAX</div>
-    <div class="bell">GOLDEN BELL <span class="em">🔔</span></div>
-    <div class="spon"><b>TT · 텔레토비 갱</b> 이 쏩니다!</div>
-
-    <div class="free">
-      <div class="line"></div>
-      <div class="big">오늘 <span class="g">TC · 맥주 무료</span></div>
-      <div class="line"></div>
-      <div class="sub"><s>TC 5만 · 맥주 3만</s> → 오늘 하루 <b style="color:#ffcf5a">전부 공짜</b>. 골든벨 쏜 날, 편하게 오세요.</div>
-    </div>
+    <div class="frame"></div>
+    <div class="top"><span class="bell">GOLDEN BELL</span> 🔔 · 공주님 클럽</div>
+    <div class="hero"><span class="tt">TT</span><span class="w">가 쏩니다</span></div>
+    <div class="offer">오늘 <span class="g">TC · 맥주 무료</span></div>
+    <div class="line"></div>
+    <div class="offer" style="font-size:18px;font-family:'Noto Sans KR';font-weight:500;color:#b9b2a3;margin-top:14px"><s>TC 5만 · 맥주 3만</s> → 오늘 하루 전부 공짜. 편하게 오세요.</div>
 
     <div class="foot">
-      <div class="l">
-        <div class="d">2026. 07. 07 · 오늘 하루</div>
-        <div class="s">TT 형님들 감사합니다 🍺</div>
-      </div>
-      <div class="r">
-        <div class="brand">공주님 클럽</div>
-        <div class="t">예약·문의 010-4499-3016 · 📍 7219 바하마 마마스</div>
-      </div>
+      <div><div class="d">2026. 07. 07 · 오늘 하루</div><div>TT 형님들 감사합니다 🍺</div></div>
+      <div style="text-align:right"><div class="brand">공주님 클럽</div><div>010-4499-3016 · 📍 7219 바하마 마마스</div></div>
     </div>
   </div>
 
@@ -82,7 +69,7 @@
       try {
         await document.fonts.ready
         await new Promise((r) => setTimeout(r, 200))
-        const url = await toPng(document.getElementById('card'), { pixelRatio: 3, cacheBust: true, backgroundColor: '#08060d' })
+        const url = await toPng(document.getElementById('card'), { pixelRatio: 3, cacheBust: true, backgroundColor: '#000' })
         const a = document.createElement('a'); a.href = url; a.download = '공주님클럽_골든벨.png'; a.click()
       } catch (e) { alert('저장 실패: ' + e.message + '\n\nWin+Shift+S 캡쳐를 사용하세요.') }
       btn.disabled = false; btn.textContent = label
