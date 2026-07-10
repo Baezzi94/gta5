@@ -67,7 +67,7 @@ export default function Race() {
           <h1 style={{ fontFamily: "'Black Han Sans',sans-serif", fontSize: 54, margin: '10px 0 6px', lineHeight: 1.1, textShadow: '0 2px 30px rgba(255,190,70,.3)' }}>
             음주운전 <span style={{ color: GOLD }}>레이스</span>
           </h1>
-          <div style={{ color: '#b9b2a3' }}>2026. 07. 11 (토) 저녁~밤 · 맵 최남단 → 최북단</div>
+          <div style={{ color: '#b9b2a3' }}>2026. 07. 11 (토) 저녁~밤 · 코스는 추후 안내</div>
         </div>
 
         {/* 요약 */}
@@ -82,7 +82,7 @@ export default function Race() {
         <div style={card}>
           <h2 style={h2}>경기 규칙</h2>
           <div style={li}><span style={num}>1.</span><span>출발 전, 제공된 <b>양주 1병을 전부 원샷</b>합니다. 스탭 입회 하에 전원 동시에 진행하며, <b>인증하지 않으면 실격</b>입니다.</span></div>
-          <div style={li}><span style={num}>2.</span><span>맵 <b>최남단에서 출발해 최북단에 먼저 도착</b>하면 우승입니다. 경로·방법은 자유입니다.</span></div>
+          <div style={li}><span style={num}>2.</span><span><b>정해진 코스를 먼저 완주</b>하면 우승입니다. 경로와 방법은 자유입니다. <b style={{ color: GOLD }}>코스는 추후 설명드리겠습니다.</b></span></div>
           <div style={li}><span style={num}>3.</span><span>차량은 <b>택시만</b> 사용할 수 있습니다.</span></div>
           <div style={li}><span style={num}>4.</span><span><b style={{ color: '#ff7b7b' }}>즉시 탈락</b> — 사망 후 부활 / EMS에 발견·이송 / 도착 시점에 취기가 풀려 있는 경우 / <b>대리운전</b>(반드시 본인이 직접 운전)</span></div>
           <div style={li}><span style={num}>5.</span><span><b>1등 한 명에게만</b> 상금을 지급합니다.</span></div>
@@ -107,7 +107,7 @@ export default function Race() {
         <div style={{ ...card, borderColor: '#4a3a1a' }}>
           <h2 style={h2}>경찰 관련 안내</h2>
           <p style={{ lineHeight: 1.7, margin: 0, color: '#d6d0c4' }}>
-            본 이벤트는 <b>치안총감과 사전 협의</b>를 마쳤습니다. 음주운전 행위 자체는 문제 삼지 않기로 합의되었습니다.<br />
+            본 이벤트는 <b>치안총감님과 사전 협의</b>를 마쳤습니다. 음주운전 행위 자체는 문제 삼지 않기로 합의되었습니다.<br />
             다만 이를 빙자하여 <b>무고한 시민에게 피해를 주거나 신고가 접수될 경우, 경찰은 정상적으로 대응</b>합니다.
           </p>
         </div>
