@@ -135,6 +135,11 @@ export default function Race() {
             </button>
             <span style={{ color: '#7d7466', fontSize: 12 }}>※ 전화번호는 공개되지 않으며, 참가비 안내 목적으로만 사용됩니다.</span>
           </form>
+          <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid #2a2418', color: '#a49a86', fontSize: 13, lineHeight: 1.8 }}>
+            <b style={{ color: GOLD, letterSpacing: 2, fontSize: 12 }}>접속 경로</b><br />
+            <b style={{ color: '#fff' }}>PC</b> — 브라우저에서 <code style={{ background: '#221d12', border: '1px solid #4a3f22', borderRadius: 5, padding: '1px 6px', color: '#fff' }}>gta5-rho.vercel.app/race</code><br />
+            <b style={{ color: '#fff' }}>인게임</b> — <code style={{ background: '#221d12', border: '1px solid #4a3f22', borderRadius: 5, padding: '1px 6px', color: '#fff' }}>P</code> 휴대폰 열기 → <code style={{ background: '#221d12', border: '1px solid #4a3f22', borderRadius: 5, padding: '1px 6px', color: '#fff' }}>Browser</code> → 위 주소 입력
+          </div>
         </div>
 
         {/* 신청자 리스트 */}

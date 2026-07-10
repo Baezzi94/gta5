@@ -13,7 +13,7 @@
   .hint{color:#555;font-size:12px}
 
   .card{
-    width:1160px;height:652px;position:relative;overflow:hidden;border-radius:16px;color:#fff;
+    width:1160px;height:730px;position:relative;overflow:hidden;border-radius:16px;color:#fff;
     background:
       radial-gradient(760px 420px at 50% 6%, rgba(255,190,70,.15), transparent 62%),
       linear-gradient(180deg,#0c0c0e 0%, #050506 58%, #0b0b0d 100%);
@@ -40,13 +40,22 @@
   .rules b{color:#fff}
   .rules .x{color:#ff7b7b;font-weight:700}
 
-  .cta{margin-top:auto;width:100%;border-radius:14px;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;
+  .cta{margin-top:auto;width:100%;border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:18px;text-align:left;
     background:linear-gradient(90deg,rgba(255,207,90,.16),rgba(255,207,90,.04));border:1px solid #5a4a1e}
-  .cta .l{text-align:left}
-  .cta .k{color:#a49a86;font-size:11px;letter-spacing:3px}
-  .cta .u{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;color:#ffcf5a;line-height:1.1}
-  .cta .r{text-align:right;color:#cfc7b6;font-size:13px}
-  .cta .r b{display:block;font-size:17px;color:#fff}
+  .qr{flex-shrink:0;text-align:center}
+  .qr img{width:122px;height:122px;display:block;background:#fff;padding:7px;border-radius:10px}
+  .qr .cap{color:#ffcf5a;font-size:11px;letter-spacing:2px;margin-top:5px;font-weight:700}
+
+  .paths{flex:1;display:flex;flex-direction:column;gap:9px}
+  .k{color:#a49a86;font-size:11px;letter-spacing:3px;margin-bottom:5px}
+  .path{display:flex;align-items:center;gap:10px;font-size:14px;color:#cfc7b6;line-height:1.45}
+  .pill{flex-shrink:0;font-weight:800;font-size:11px;letter-spacing:1px;color:#141007;background:#ffcf5a;border-radius:6px;padding:4px 8px}
+  .path b{color:#fff}
+  .path .u{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1.5px;color:#ffcf5a}
+  .path code{font-family:'Noto Sans KR';background:#221d12;border:1px solid #4a3f22;border-radius:5px;padding:1px 7px;color:#fff;font-size:13px}
+
+  .contact{flex-shrink:0;text-align:right;color:#a49a86;font-size:11px;letter-spacing:2px;padding-left:16px;border-left:1px solid #4a3f22}
+  .contact b{display:block;font-size:16px;color:#fff;letter-spacing:0;margin-top:5px;font-weight:700}
 </style>
 </head>
 <body>
@@ -73,11 +82,22 @@
       </div>
 
       <div class="cta">
-        <div class="l">
-          <div class="k">참가 신청</div>
-          <div class="u">GTA5-RHO.VERCEL.APP/RACE</div>
+        <div class="qr">
+          <img id="qrImg" alt="참가 신청 QR">
+          <div class="cap">QR 스캔</div>
         </div>
-        <div class="r">
+        <div class="paths">
+          <div class="k">참가 신청 방법</div>
+          <div class="path">
+            <span class="pill">PC</span>
+            <span>QR을 찍거나, 브라우저에 <span class="u">GTA5-RHO.VERCEL.APP/RACE</span> 입력</span>
+          </div>
+          <div class="path">
+            <span class="pill">인게임</span>
+            <span><code>P</code> 휴대폰 열기 → <code>Browser</code> → 위 주소 입력</span>
+          </div>
+        </div>
+        <div class="contact">
           문의 · 참가비 안내
           <b>시진핑 010-4499-3016</b>
         </div>
@@ -88,12 +108,24 @@
 
   <div class="hint">저장이 안 되면 Win+Shift+S 캡쳐</div>
 
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
   <script type="module">
     import { toPng } from 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/+esm'
+
+    const RACE_URL = 'https://gta5-rho.vercel.app/race'
+    const qrImg = document.getElementById('qrImg')
+
+    // QR을 data URI 로 만들어 <img> 에 넣는다. 외부 요청이 남지 않아 PNG 저장이 안전하다.
+    const qrReady = window.QRCode
+      .toDataURL(RACE_URL, { width: 640, margin: 1, errorCorrectionLevel: 'H', color: { dark: '#000000', light: '#ffffff' } })
+      .then((u) => new Promise((res) => { qrImg.onload = res; qrImg.onerror = res; qrImg.src = u }))
+      .catch(() => { qrImg.replaceWith(Object.assign(document.createElement('div'), { textContent: 'QR 생성 실패', style: 'color:#ff7b7b;font-size:12px;width:122px' })) })
+
     const btn = document.getElementById('saveBtn')
     btn.addEventListener('click', async () => {
       btn.disabled = true; const label = btn.textContent; btn.textContent = '만드는 중…'
       try {
+        await qrReady
         await document.fonts.ready
         await new Promise((r) => setTimeout(r, 200))
         const url = await toPng(document.getElementById('card'), { pixelRatio: 3, cacheBust: true, backgroundColor: '#000' })
