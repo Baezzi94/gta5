@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공주님 클럽 — NF 대거 출현</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bebas+Neue&family=Hahmlet:wght@700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#08060d;min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:16px;padding:34px 16px;font-family:'Noto Sans KR',sans-serif}
+  .savebtn{background:linear-gradient(90deg,#ff5ea0,#ffcf5a);color:#1a1020;border:none;border-radius:10px;padding:10px 18px;font-weight:800;cursor:pointer;font-family:'Noto Sans KR'}
+  .savebtn:disabled{opacity:.5;cursor:wait}
+  .hint{color:#6f688c;font-size:12px}
+
+  .card{
+    width:1040px;height:560px;position:relative;overflow:hidden;border-radius:18px;color:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:44px;
+    background:
+      radial-gradient(620px 340px at 50% 12%, rgba(255,94,160,.22), transparent 62%),
+      radial-gradient(520px 300px at 88% 96%, rgba(255,207,90,.12), transparent 60%),
+      linear-gradient(160deg,#180b1f 0%, #0b0710 60%, #120a17 100%);
+    border:1px solid #3a2440;
+  }
+  .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:8px;background:linear-gradient(180deg,#ff5ea0,#ffcf5a)}
+
+  .eyebrow{color:#ffcf5a;font-size:14px;font-weight:700;letter-spacing:5px}
+
+  .hero{margin:14px 0 2px;font-family:'Black Han Sans',sans-serif;font-size:104px;line-height:1.02;letter-spacing:1px;
+    color:#fff;text-shadow:0 0 6px #ff9ecb,0 0 26px #ff2e86,0 0 56px rgba(255,46,134,.5)}
+  .hero .nf{background:linear-gradient(180deg,#fff3cf,#ffcf5a 55%,#e0982a);-webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:none;filter:drop-shadow(0 0 22px rgba(255,190,70,.5))}
+
+  .open{margin-top:20px;display:inline-flex;align-items:center;gap:14px;padding:12px 30px;border:2px solid #ff5ea0;border-radius:999px;
+    background:linear-gradient(180deg,rgba(255,94,160,.16),rgba(255,207,90,.05));box-shadow:0 0 30px rgba(255,46,134,.3)}
+  .open .t{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:#ffcf5a}
+  .open .h{font-family:'Black Han Sans',sans-serif;font-size:38px;color:#fff}
+
+  .foot{position:absolute;left:44px;right:44px;bottom:30px;display:flex;justify-content:space-between;align-items:flex-end;font-size:13px;color:#b9a9c6}
+  .foot .brand{font-family:'Hahmlet',serif;font-weight:800;font-size:22px;color:#fff;text-shadow:0 0 12px rgba(255,46,134,.5)}
+  .foot b{color:#fff}
+</style>
+</head>
+<body>
+  <button class="savebtn" id="saveBtn">🖼️ 이미지로 저장 (PNG)</button>
+
+  <div class="card" id="card">
+    <div class="eyebrow">오늘 밤, 공주님 클럽</div>
+    <div class="hero"><span class="nf">NF</span> 대거 출현</div>
+    <div class="open">
+      <span class="t">TONIGHT OPEN</span>
+      <span class="h">22:00</span>
+    </div>
+
+    <div class="foot">
+      <div style="text-align:left">
+        <div class="brand">공주님 클럽</div>
+        <div>📍 7219 바하마 마마스</div>
+      </div>
+      <div style="text-align:right">
+        예약 · 문의
+        <div><b style="font-size:17px">010-4499-3016</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">저장이 안 되면 Win+Shift+S 캡쳐</div>
+
+  <script type="module">
+    import { toPng } from 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/+esm'
+    const btn = document.getElementById('saveBtn')
+    btn.addEventListener('click', async () => {
+      btn.disabled = true; const label = btn.textContent; btn.textContent = '만드는 중…'
+      try {
+        await document.fonts.ready
+        await new Promise((r) => setTimeout(r, 200))
+        const url = await toPng(document.getElementById('card'), { pixelRatio: 3, cacheBust: true, backgroundColor: '#08060d' })
+        const a = document.createElement('a'); a.href = url; a.download = '공주님클럽_NF출현.png'; a.click()
+      } catch (e) { alert('저장 실패: ' + e.message + '\n\nWin+Shift+S 캡쳐를 사용하세요.') }
+      btn.disabled = false; btn.textContent = label
+    })
+  </script>
+</body>
+</html>
