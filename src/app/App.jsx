@@ -14,6 +14,7 @@ import Flyer from '../pages/Flyer'
 import Profile from '../pages/Profile'
 import Dashboard from '../pages/Dashboard'
 import Menu from '../pages/Menu'
+import Race from '../pages/Race'
 import MobileLayout from '../mobile/MobileLayout'
 import MAttendance from '../mobile/MAttendance'
 import MSell from '../mobile/MSell'
@@ -31,6 +32,8 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Root />} />
+        {/* 공개 페이지: 로그인 없이 접근. 시진핑 로그인 상태면 확정/삭제 버튼이 보인다. */}
+        <Route path="/race" element={<Race />} />
         <Route
           path="/"
           element={

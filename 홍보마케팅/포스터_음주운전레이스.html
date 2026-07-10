@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>음주운전 레이스 — 공주님 클럽</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bebas+Neue&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#000;min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:16px;padding:34px 16px;font-family:'Noto Sans KR',sans-serif}
+  .savebtn{background:linear-gradient(90deg,#ffcf5a,#e8a62f);color:#141007;border:none;border-radius:10px;padding:10px 18px;font-weight:800;cursor:pointer;font-family:'Noto Sans KR'}
+  .savebtn:disabled{opacity:.5;cursor:wait}
+  .hint{color:#555;font-size:12px}
+
+  .card{
+    width:1160px;height:652px;position:relative;overflow:hidden;border-radius:16px;color:#fff;
+    background:
+      radial-gradient(760px 420px at 50% 6%, rgba(255,190,70,.15), transparent 62%),
+      linear-gradient(180deg,#0c0c0e 0%, #050506 58%, #0b0b0d 100%);
+    border:1px solid #2a2418;
+  }
+  .tape{position:absolute;left:0;right:0;height:14px;background:repeating-linear-gradient(45deg,#ffcf5a 0 16px,#0b0b0d 16px 32px)}
+  .tape.t{top:0} .tape.b{bottom:0}
+  .body{position:absolute;inset:14px 0;display:flex;flex-direction:column;align-items:center;padding:30px 54px 26px;text-align:center}
+
+  .eyebrow{color:#ffcf5a;font-size:13px;font-weight:700;letter-spacing:7px}
+  .title{font-family:'Black Han Sans',sans-serif;font-size:92px;line-height:1.02;margin:8px 0 2px;text-shadow:0 2px 34px rgba(255,190,70,.32)}
+  .title .g{background:linear-gradient(180deg,#fff3cf,#ffcf5a 55%,#e0982a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .date{color:#cfc7b6;font-size:17px;letter-spacing:1px}
+  .date b{color:#fff}
+
+  .stats{display:flex;gap:14px;margin:24px 0 18px;width:100%}
+  .box{flex:1;border:1px solid #2f2819;border-radius:14px;padding:16px 10px;background:linear-gradient(180deg,rgba(255,207,90,.06),rgba(0,0,0,0))}
+  .box .k{color:#a49a86;font-size:12px;letter-spacing:2px}
+  .box .v{font-family:'Black Han Sans',sans-serif;font-size:34px;margin-top:4px}
+  .box .v.gold{color:#ffcf5a}
+  .box .s{color:#7d7466;font-size:11px;margin-top:2px}
+
+  .rules{color:#b9b2a3;font-size:15px;line-height:1.75}
+  .rules b{color:#fff}
+  .rules .x{color:#ff7b7b;font-weight:700}
+
+  .cta{margin-top:auto;width:100%;border-radius:14px;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;
+    background:linear-gradient(90deg,rgba(255,207,90,.16),rgba(255,207,90,.04));border:1px solid #5a4a1e}
+  .cta .l{text-align:left}
+  .cta .k{color:#a49a86;font-size:11px;letter-spacing:3px}
+  .cta .u{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;color:#ffcf5a;line-height:1.1}
+  .cta .r{text-align:right;color:#cfc7b6;font-size:13px}
+  .cta .r b{display:block;font-size:17px;color:#fff}
+</style>
+</head>
+<body>
+  <button class="savebtn" id="saveBtn">🖼️ 이미지로 저장 (PNG)</button>
+
+  <div class="card" id="card">
+    <div class="tape t"></div>
+    <div class="body">
+      <div class="eyebrow">공주님 클럽 PRESENTS</div>
+      <div class="title">음주운전 <span class="g">레이스</span></div>
+      <div class="date"><b>2026. 07. 11 (토)</b> 저녁~밤 &nbsp;·&nbsp; 맵 최남단 → 최북단</div>
+
+      <div class="stats">
+        <div class="box"><div class="k">참가비</div><div class="v">50만원</div><div class="s">양주 1병 포함</div></div>
+        <div class="box"><div class="k">제 공</div><div class="v">양주 1병</div><div class="s">50만원 상당</div></div>
+        <div class="box"><div class="k">1등 상금</div><div class="v gold">???만원</div><div class="s">참가자가 많을수록 올라갑니다</div></div>
+        <div class="box"><div class="k">차 량</div><div class="v">택시만</div><div class="s">차종 제한</div></div>
+      </div>
+
+      <div class="rules">
+        출발 전 <b>양주 1병 원샷</b> 후 인증 · 맵 <b>최남단에서 최북단까지</b> 먼저 도착하면 우승 · 수단과 방법은 자유<br>
+        <span class="x">즉시 탈락</span> — 사망 후 부활 &nbsp;/&nbsp; EMS 발견·이송 &nbsp;/&nbsp; 도착 시 취기 해제 &nbsp;/&nbsp; 대리운전<br>
+        <b>1등 한 명</b>에게만 상금을 지급합니다.
+      </div>
+
+      <div class="cta">
+        <div class="l">
+          <div class="k">참가 신청</div>
+          <div class="u">GTA5-RHO.VERCEL.APP/RACE</div>
+        </div>
+        <div class="r">
+          문의 · 참가비 안내
+          <b>시진핑 010-4499-3016</b>
+        </div>
+      </div>
+    </div>
+    <div class="tape b"></div>
+  </div>
+
+  <div class="hint">저장이 안 되면 Win+Shift+S 캡쳐</div>
+
+  <script type="module">
+    import { toPng } from 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/+esm'
+    const btn = document.getElementById('saveBtn')
+    btn.addEventListener('click', async () => {
+      btn.disabled = true; const label = btn.textContent; btn.textContent = '만드는 중…'
+      try {
+        await document.fonts.ready
+        await new Promise((r) => setTimeout(r, 200))
+        const url = await toPng(document.getElementById('card'), { pixelRatio: 3, cacheBust: true, backgroundColor: '#000' })
+        const a = document.createElement('a'); a.href = url; a.download = '음주운전레이스_포스터.png'; a.click()
+      } catch (e) { alert('저장 실패: ' + e.message + '\n\nWin+Shift+S 캡쳐를 사용하세요.') }
+      btn.disabled = false; btn.textContent = label
+    })
+  </script>
+</body>
+</html>
