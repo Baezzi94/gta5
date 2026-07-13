@@ -6,6 +6,8 @@ import Login from '../pages/Login'
 import Onboarding from '../pages/Onboarding'
 import Pending from '../pages/Pending'
 import SubmitTip from '../pages/SubmitTip'
+import Inbox from '../pages/Inbox'
+import TipDetail from '../pages/TipDetail'
 
 function Stub({ name }) { return <div className="container">{name}</div> }
 
@@ -21,8 +23,8 @@ export default function App() {
           <Route path="/browse" element={<Stub name="정보 열람" />} />
         </Route>
         <Route element={<ProtectedRoute need="intel"><Layout /></ProtectedRoute>}>
-          <Route path="/inbox" element={<Stub name="접수함" />} />
-          <Route path="/inbox/:id" element={<Stub name="제보 상세" />} />
+          <Route path="/inbox" element={<Inbox />} />
+          <Route path="/inbox/:id" element={<TipDetail />} />
           <Route path="/persons" element={<Stub name="인물 DB" />} />
           <Route path="/persons/:id" element={<Stub name="인물 상세" />} />
         </Route>

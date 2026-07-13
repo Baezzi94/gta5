@@ -32,3 +32,35 @@ export async function listCategories() {
   if (error) throw error
   return data
 }
+
+export async function listInbox() {
+  const { data, error } = await supabase.from('tips')
+    .select('id, title, status, verdict, clearance, created_at, categories(name)')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data
+}
+
+export async function getTip(id) {
+  const { data, error } = await supabase.from('tips')
+    .select('*, categories(name), profiles!tips_submitter_id_fkey(char_name), tip_photos(id, path)')
+    .eq('id', id).single()
+  if (error) throw error
+  return data
+}
+
+export async function updateTipReview(id, fields) {
+  const patch = { ...fields }
+  if (fields.status === 'adopted' || fields.status === 'rejected') patch.decided_at = new Date().toISOString()
+  const { error } = await supabase.from('tips').update(patch).eq('id', id)
+  if (error) throw error
+}
+
+export async function getTipPhotoUrls(paths) {
+  const urls = []
+  for (const p of paths) {
+    const { data, error } = await supabase.storage.from('tip-photos').createSignedUrl(p, 3600)
+    if (!error && data?.signedUrl) urls.push(data.signedUrl)
+  }
+  return urls
+}
