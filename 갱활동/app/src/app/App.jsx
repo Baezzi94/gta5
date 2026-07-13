@@ -6,6 +6,7 @@ import Login from '../pages/Login'
 import Onboarding from '../pages/Onboarding'
 import Pending from '../pages/Pending'
 import SubmitTip from '../pages/SubmitTip'
+import Browse from '../pages/Browse'
 import Inbox from '../pages/Inbox'
 import TipDetail from '../pages/TipDetail'
 
@@ -20,7 +21,7 @@ export default function App() {
         <Route path="/pending" element={<Pending />} />
         <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route path="/" element={<SubmitTip />} />
-          <Route path="/browse" element={<Stub name="정보 열람" />} />
+          <Route path="/browse" element={<Browse />} />
         </Route>
         <Route element={<ProtectedRoute need="intel"><Layout /></ProtectedRoute>}>
           <Route path="/inbox" element={<Inbox />} />

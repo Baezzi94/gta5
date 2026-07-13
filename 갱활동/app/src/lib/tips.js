@@ -56,6 +56,21 @@ export async function updateTipReview(id, fields) {
   if (error) throw error
 }
 
+export async function listBrowse() {
+  const { data, error } = await supabase.from('browse_tips')
+    .select('id, title, body, clearance, decided_at, category_id')
+    .order('decided_at', { ascending: false })
+  if (error) throw error
+  return data
+}
+
+export async function listBrowsePhotos(tipId) {
+  const { data, error } = await supabase.from('browse_tip_photos')
+    .select('path').eq('tip_id', tipId)
+  if (error) throw error
+  return getTipPhotoUrls(data.map(p => p.path))
+}
+
 export async function getTipPhotoUrls(paths) {
   const urls = []
   for (const p of paths) {
