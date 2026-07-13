@@ -5,6 +5,7 @@ import Layout from '../components/Layout'
 import Login from '../pages/Login'
 import Onboarding from '../pages/Onboarding'
 import Pending from '../pages/Pending'
+import SubmitTip from '../pages/SubmitTip'
 
 function Stub({ name }) { return <div className="container">{name}</div> }
 
@@ -16,7 +17,7 @@ export default function App() {
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/pending" element={<Pending />} />
         <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-          <Route path="/" element={<Stub name="정보 제공" />} />
+          <Route path="/" element={<SubmitTip />} />
           <Route path="/browse" element={<Stub name="정보 열람" />} />
         </Route>
         <Route element={<ProtectedRoute need="intel"><Layout /></ProtectedRoute>}>
