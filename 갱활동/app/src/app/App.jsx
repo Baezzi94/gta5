@@ -9,6 +9,8 @@ import SubmitTip from '../pages/SubmitTip'
 import Browse from '../pages/Browse'
 import Inbox from '../pages/Inbox'
 import TipDetail from '../pages/TipDetail'
+import Persons from '../pages/Persons'
+import PersonDetail from '../pages/PersonDetail'
 
 function Stub({ name }) { return <div className="container">{name}</div> }
 
@@ -26,8 +28,8 @@ export default function App() {
         <Route element={<ProtectedRoute need="intel"><Layout /></ProtectedRoute>}>
           <Route path="/inbox" element={<Inbox />} />
           <Route path="/inbox/:id" element={<TipDetail />} />
-          <Route path="/persons" element={<Stub name="인물 DB" />} />
-          <Route path="/persons/:id" element={<Stub name="인물 상세" />} />
+          <Route path="/persons" element={<Persons />} />
+          <Route path="/persons/:id" element={<PersonDetail />} />
         </Route>
         <Route element={<ProtectedRoute need="admin"><Layout /></ProtectedRoute>}>
           <Route path="/admin" element={<Stub name="조직 관리" />} />
