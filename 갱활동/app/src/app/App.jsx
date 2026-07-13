@@ -11,8 +11,7 @@ import Inbox from '../pages/Inbox'
 import TipDetail from '../pages/TipDetail'
 import Persons from '../pages/Persons'
 import PersonDetail from '../pages/PersonDetail'
-
-function Stub({ name }) { return <div className="container">{name}</div> }
+import Admin from '../pages/Admin'
 
 export default function App() {
   return (
@@ -32,7 +31,7 @@ export default function App() {
           <Route path="/persons/:id" element={<PersonDetail />} />
         </Route>
         <Route element={<ProtectedRoute need="admin"><Layout /></ProtectedRoute>}>
-          <Route path="/admin" element={<Stub name="조직 관리" />} />
+          <Route path="/admin" element={<Admin />} />
         </Route>
       </Routes>
     </AuthProvider>
