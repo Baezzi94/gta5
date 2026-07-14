@@ -33,7 +33,7 @@ export default function Persons() {
           <div className="card">
             <strong>{p.person_names.map(n => n.name).join(' / ') || '(이름 미상)'}</strong>
             <span className="tag" style={{ float: 'right' }}>{CLEARANCE_LABELS[p.clearance]}</span>
-            <div style={{ color: '#888', fontSize: 13, marginTop: 4 }}>{p.phone ?? '번호 미상'} {p.affiliation ? `· ${p.affiliation}` : ''}</div>
+            <div style={{ color: p.phone ? '#888' : '#d9a13d', fontSize: 13, marginTop: 4 }}>{p.phone ?? '⚠ 번호 미상'} {p.affiliation ? `· ${p.affiliation}` : ''}</div>
           </div>
         </Link>
       ))}

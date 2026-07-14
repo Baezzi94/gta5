@@ -1,16 +1,23 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { getPerson, updatePerson } from '../lib/persons'
+import { useParams, useNavigate } from 'react-router-dom'
+import { getPerson, updatePerson, setPersonPhone, mergePersons } from '../lib/persons'
 import { supabase } from '../lib/supabase'
 import { CLEARANCE_LABELS } from '../lib/clearance'
 import { STATUS_LABELS } from '../lib/tips'
 
 export default function PersonDetail() {
   const { id } = useParams()
+  const nav = useNavigate()
   const [p, setP] = useState(null)
   const [newName, setNewName] = useState('')
+  const [phoneEdit, setPhoneEdit] = useState('')
+  const [msg, setMsg] = useState('')
 
-  async function refresh() { setP(await getPerson(id)) }
+  async function refresh() {
+    const data = await getPerson(id)
+    setP(data)
+    setPhoneEdit(data.phone ?? '')
+  }
   useEffect(() => { refresh() }, [id])
   if (!p) return <div className="container">로딩...</div>
 
@@ -23,11 +30,32 @@ export default function PersonDetail() {
     setNewName(''); refresh()
   }
 
+  async function savePhone() {
+    setMsg('')
+    const res = await setPersonPhone(p.id, phoneEdit)
+    if (res.conflict) {
+      const ok = window.confirm('이미 이 번호로 등록된 인물이 있습니다.\n그 인물로 병합할까요? (이름 이력·제보 연결이 이관되고, 이 카드는 삭제됩니다)')
+      if (ok) {
+        await mergePersons(p.id, res.conflict)
+        nav(`/persons/${res.conflict}`, { replace: true })
+      }
+      return
+    }
+    setMsg('전화번호 저장됨')
+    refresh()
+  }
+
   return (
     <div className="container">
       <h2>{p.person_names[0]?.name ?? '(이름 미상)'}</h2>
       <div className="card">
-        <p>전화번호: {p.phone ?? '미상'}</p>
+        <label>전화번호 {p.phone ? '' : <span style={{ color: '#d9a13d' }}>(미상 — 확보 시 기록)</span>}
+          <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+            <input value={phoneEdit} onChange={e => setPhoneEdit(e.target.value)} placeholder="번호 입력" />
+            <button className="btn" type="button" onClick={savePhone}>저장</button>
+          </div>
+        </label>
+        {msg && <p style={{ color: '#e8c15a', fontSize: 13, marginTop: 4 }}>{msg}</p>}
         <label style={{ display: 'block', marginTop: 8 }}>소속
           <input defaultValue={p.affiliation ?? ''} onBlur={e => updatePerson(p.id, { affiliation: e.target.value || null })} /></label>
         <label style={{ display: 'block', marginTop: 8 }}>특이사항
