@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../app/AuthContext'
 import { getTip, updateTipReview, getTipPhotoItems, listCategories } from '../lib/tips'
-import { findOrCreatePerson, linkTipPerson } from '../lib/persons'
+import { findOrCreatePerson, linkTipPerson, applyMention } from '../lib/persons'
 import { isAdmin, CLEARANCE_LABELS } from '../lib/clearance'
 
 export default function TipDetail() {
@@ -83,6 +83,21 @@ export default function TipDetail() {
             </select></label>
         )}
       </div>
+
+      {tip.tip_mentions?.length > 0 && (
+        <div className="card">
+          <strong>연관 인물 (제보자 기재)</strong>
+          {tip.tip_mentions.map(m => (
+            <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+              <span style={{ flex: 1 }}>{m.name ?? '(이름 미상)'} <span style={{ color: m.phone ? '#888' : '#d9a13d', fontSize: 13 }}>{m.phone ?? '번호 미상'}</span></span>
+              {m.applied
+                ? <span className="tag">반영됨</span>
+                : <button className="btn" type="button" style={{ width: 'auto', padding: '6px 10px', fontSize: 13 }}
+                    onClick={async () => { await applyMention(tip.id, m); const t = await getTip(id); setTip(t) }}>DB 반영</button>}
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="card">
         <strong>인물 연결</strong>

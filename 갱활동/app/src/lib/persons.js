@@ -96,6 +96,14 @@ export async function mergePersons(fromId, toId) {
   if (error) throw error
 }
 
+// 제보 연관 인물(제보자 기재)을 정보부 확인 후 인물 DB에 반영 + 제보 연결
+export async function applyMention(tipId, mention) {
+  const pid = await findOrCreatePerson({ phone: mention.phone, name: mention.name })
+  await linkTipPerson(tipId, pid)
+  await supabase.from('tip_mentions').update({ applied: true }).eq('id', mention.id)
+  return pid
+}
+
 export async function linkTipPerson(tipId, personId) {
   const { error } = await supabase.from('tip_persons')
     .upsert({ tip_id: tipId, person_id: personId }, { onConflict: 'tip_id,person_id', ignoreDuplicates: true })

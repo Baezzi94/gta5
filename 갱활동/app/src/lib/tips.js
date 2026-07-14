@@ -4,7 +4,7 @@ export const STATUS_LABELS = {
   received: '접수', reviewing: '검토중', adopted: '채택', rejected: '기각',
 }
 
-export async function createTip({ title, body, categoryId, files = [], userId }) {
+export async function createTip({ title, body, categoryId, files = [], mentions = [], userId }) {
   const { data: tip, error } = await supabase.from('tips')
     .insert({ title, body, category_id: categoryId || null, submitter_id: userId })
     .select('id').single()
@@ -18,6 +18,13 @@ export async function createTip({ title, body, categoryId, files = [], userId })
     if (upErr) throw upErr
     const { error: phErr } = await supabase.from('tip_photos').insert({ tip_id: tip.id, path, original_name: file.name })
     if (phErr) throw phErr
+  }
+  const rows = mentions
+    .map(m => ({ tip_id: tip.id, name: m.name?.trim() || null, phone: m.phone?.trim() || null }))
+    .filter(m => m.name || m.phone)
+  if (rows.length) {
+    const { error: mErr } = await supabase.from('tip_mentions').insert(rows)
+    if (mErr) throw mErr
   }
   return tip.id
 }
@@ -46,7 +53,7 @@ export async function listInbox() {
 
 export async function getTip(id) {
   const { data, error } = await supabase.from('tips')
-    .select('*, categories(name), profiles!tips_submitter_id_fkey(char_name), tip_photos(id, path, original_name)')
+    .select('*, categories(name), profiles!tips_submitter_id_fkey(char_name), tip_photos(id, path, original_name), tip_mentions(id, name, phone, applied)')
     .eq('id', id).single()
   if (error) throw error
   return data
