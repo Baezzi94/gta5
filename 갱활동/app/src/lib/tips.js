@@ -9,8 +9,11 @@ export async function createTip({ title, body, categoryId, files = [], userId })
     .insert({ title, body, category_id: categoryId || null, submitter_id: userId })
     .select('id').single()
   if (error) throw error
+  let i = 0
   for (const file of files) {
-    const path = `${userId}/${tip.id}/${Date.now()}_${file.name}`
+    // Storage 키는 한글/공백 불가 → 확장자만 살리고 안전한 이름으로 교체
+    const ext = (file.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png'
+    const path = `${userId}/${tip.id}/${Date.now()}_${i++}.${ext}`
     const { error: upErr } = await supabase.storage.from('tip-photos').upload(path, file)
     if (upErr) throw upErr
     const { error: phErr } = await supabase.from('tip_photos').insert({ tip_id: tip.id, path })
