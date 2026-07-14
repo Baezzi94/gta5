@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../app/AuthContext'
-import { getTip, updateTipReview, getTipPhotoUrls, listCategories } from '../lib/tips'
+import { getTip, updateTipReview, getTipPhotoItems, listCategories } from '../lib/tips'
 import { findOrCreatePerson, linkTipPerson } from '../lib/persons'
 import { isAdmin, CLEARANCE_LABELS } from '../lib/clearance'
 
@@ -22,7 +22,7 @@ export default function TipDetail() {
     getTip(id).then(async t => {
       setTip(t)
       setForm({ category_id: t.category_id ?? '', verdict: t.verdict, intel_memo: t.intel_memo ?? '', clearance: t.clearance ?? '' })
-      setPhotos(await getTipPhotoUrls(t.tip_photos.map(p => p.path)))
+      setPhotos(await getTipPhotoItems(t.tip_photos))
     })
   }, [id])
 
@@ -53,7 +53,12 @@ export default function TipDetail() {
       <h2>{tip.title}</h2>
       <p style={{ color: '#888', fontSize: 13 }}>제보자: {tip.profiles?.char_name ?? '?'} · {new Date(tip.created_at).toLocaleString('ko-KR')}</p>
       <div className="card" style={{ whiteSpace: 'pre-wrap' }}>{tip.body}</div>
-      {photos.map(u => <img key={u} src={u} alt="첨부" style={{ maxWidth: '100%', borderRadius: 8, marginBottom: 8 }} />)}
+      {photos.map(p => (
+        <figure key={p.url} style={{ marginBottom: 8 }}>
+          <img src={p.url} alt={p.name ?? '첨부'} style={{ maxWidth: '100%', borderRadius: 8 }} />
+          {p.name && <figcaption style={{ color: '#888', fontSize: 12, marginTop: 2 }}>{p.name}</figcaption>}
+        </figure>
+      ))}
 
       <div className="card">
         <label>분류

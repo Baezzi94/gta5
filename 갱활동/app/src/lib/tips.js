@@ -16,7 +16,7 @@ export async function createTip({ title, body, categoryId, files = [], userId })
     const path = `${userId}/${tip.id}/${Date.now()}_${i++}.${ext}`
     const { error: upErr } = await supabase.storage.from('tip-photos').upload(path, file)
     if (upErr) throw upErr
-    const { error: phErr } = await supabase.from('tip_photos').insert({ tip_id: tip.id, path })
+    const { error: phErr } = await supabase.from('tip_photos').insert({ tip_id: tip.id, path, original_name: file.name })
     if (phErr) throw phErr
   }
   return tip.id
@@ -46,7 +46,7 @@ export async function listInbox() {
 
 export async function getTip(id) {
   const { data, error } = await supabase.from('tips')
-    .select('*, categories(name), profiles!tips_submitter_id_fkey(char_name), tip_photos(id, path)')
+    .select('*, categories(name), profiles!tips_submitter_id_fkey(char_name), tip_photos(id, path, original_name)')
     .eq('id', id).single()
   if (error) throw error
   return data
@@ -72,6 +72,16 @@ export async function listBrowsePhotos(tipId) {
     .select('path').eq('tip_id', tipId)
   if (error) throw error
   return getTipPhotoUrls(data.map(p => p.path))
+}
+
+// 서명 URL + 원본 파일명 쌍 (접수함 상세용)
+export async function getTipPhotoItems(tipPhotos) {
+  const items = []
+  for (const p of tipPhotos) {
+    const { data, error } = await supabase.storage.from('tip-photos').createSignedUrl(p.path, 3600)
+    if (!error && data?.signedUrl) items.push({ url: data.signedUrl, name: p.original_name ?? null })
+  }
+  return items
 }
 
 export async function getTipPhotoUrls(paths) {
