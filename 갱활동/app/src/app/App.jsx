@@ -22,9 +22,10 @@ export default function App() {
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/pending" element={<Pending />} />
         <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-          <Route path="/" element={<SubmitTip />} />
-          <Route path="/browse" element={<Browse />} />
+          <Route path="/" element={<IntelRP />} />
           <Route path="/rp" element={<IntelRP />} />
+          <Route path="/submit" element={<SubmitTip />} />
+          <Route path="/browse" element={<Browse />} />
         </Route>
         <Route element={<ProtectedRoute need="intel"><Layout /></ProtectedRoute>}>
           <Route path="/inbox" element={<Inbox />} />
