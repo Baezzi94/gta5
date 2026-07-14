@@ -12,6 +12,7 @@ import TipDetail from '../pages/TipDetail'
 import Persons from '../pages/Persons'
 import PersonDetail from '../pages/PersonDetail'
 import Admin from '../pages/Admin'
+import IntelRP from '../pages/IntelRP'
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
         <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route path="/" element={<SubmitTip />} />
           <Route path="/browse" element={<Browse />} />
+          <Route path="/rp" element={<IntelRP />} />
         </Route>
         <Route element={<ProtectedRoute need="intel"><Layout /></ProtectedRoute>}>
           <Route path="/inbox" element={<Inbox />} />
