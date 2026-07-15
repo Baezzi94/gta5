@@ -13,6 +13,9 @@ import Persons from '../pages/Persons'
 import PersonDetail from '../pages/PersonDetail'
 import Admin from '../pages/Admin'
 import IntelRP from '../pages/IntelRP'
+import Reports from '../pages/Reports'
+import ReportCompose from '../pages/ReportCompose'
+import ReportDetail from '../pages/ReportDetail'
 
 export default function App() {
   return (
@@ -26,6 +29,9 @@ export default function App() {
           <Route path="/rp" element={<IntelRP />} />
           <Route path="/submit" element={<SubmitTip />} />
           <Route path="/browse" element={<Browse />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/reports/new" element={<ReportCompose />} />
+          <Route path="/reports/:id" element={<ReportDetail />} />
         </Route>
         <Route element={<ProtectedRoute need="intel"><Layout /></ProtectedRoute>}>
           <Route path="/inbox" element={<Inbox />} />
