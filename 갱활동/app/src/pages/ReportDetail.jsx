@@ -25,7 +25,7 @@ export default function ReportDetail() {
   const chief = profile?.role === 'intel_chief'
 
   return (
-    <div className="container">
+    <div className="container" style={{ maxWidth: 900 }}>
       <h2>{r.title}</h2>
       <p style={{ color: '#888', fontSize: 13 }}>
         {new Date(r.created_at).toLocaleString('ko-KR')} ·

@@ -54,7 +54,7 @@ export default function ReportCompose() {
   }
 
   return (
-    <div className="container">
+    <div className="container" style={{ maxWidth: 900 }}>
       <h2>새 보고서</h2>
       <form onSubmit={submit}>
         <div className="card">

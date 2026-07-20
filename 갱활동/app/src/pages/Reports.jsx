@@ -10,7 +10,7 @@ export default function Reports() {
   useEffect(() => { listReports().then(setRows) }, [])
   const chief = profile?.role === 'intel_chief'
   return (
-    <div className="container">
+    <div className="container" style={{ maxWidth: 900 }}>
       <h2>보고</h2>
       {chief && <Link to="/reports/new"><button className="btn btn-primary" style={{ margin: '8px 0' }}>새 보고서 작성</button></Link>}
       {rows.map(r => (
