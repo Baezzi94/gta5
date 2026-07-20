@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useAuth } from '../app/AuthContext'
 import { getReport, markReportRead } from '../lib/reports'
 import { CLEARANCE_LABELS, isIntel } from '../lib/clearance'
+import { MiniMarkdown } from '../lib/miniMarkdown'
 
 export default function ReportDetail() {
   const { id } = useParams()
@@ -31,7 +32,7 @@ export default function ReportDetail() {
         <span className="tag" style={{ marginLeft: 6 }}>{CLEARANCE_LABELS[r.clearance]}</span>
         {chief && (r.read_at ? ' 대표님 열람함' : ' 미열람')}
       </p>
-      <div className="card" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.7 }}>{r.body}</div>
+      <div className="card"><MiniMarkdown text={r.body} /></div>
 
       {attached.length > 0 && (
         <>

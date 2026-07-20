@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { createReport } from '../lib/reports'
 import { listInbox } from '../lib/tips'
 import { CLEARANCE_LABELS } from '../lib/clearance'
+import { MiniMarkdown } from '../lib/miniMarkdown'
 
 export default function ReportCompose() {
   const nav = useNavigate()
@@ -11,6 +12,7 @@ export default function ReportCompose() {
   const [clearance, setClearance] = useState(0)
   const [tips, setTips] = useState([])
   const [checked, setChecked] = useState(new Set())
+  const [preview, setPreview] = useState(false)
   const [err, setErr] = useState('')
 
   useEffect(() => {
@@ -61,7 +63,13 @@ export default function ReportCompose() {
             <input type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" onChange={importFile} style={{ marginTop: 4 }} />
           </label>
           <input placeholder="제목" value={title} onChange={e => setTitle(e.target.value)} />
-          <textarea placeholder="보고 내용" rows={8} value={body} onChange={e => setBody(e.target.value)} style={{ marginTop: 8 }} />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+            <button type="button" className="btn" style={{ width: 'auto', padding: '4px 10px', fontSize: 12 }}
+              onClick={() => setPreview(p => !p)}>{preview ? '편집' : '미리보기'}</button>
+          </div>
+          {preview
+            ? <div className="card" style={{ marginTop: 6 }}><MiniMarkdown text={body} /></div>
+            : <textarea placeholder="보고 내용 (마크다운 지원: # 제목, 표, - 목록, **굵게**)" rows={10} value={body} onChange={e => setBody(e.target.value)} style={{ marginTop: 6 }} />}
           <label style={{ display: 'block', marginTop: 8 }}>보안등급 (누구까지 수신할지)
             <select value={clearance} onChange={e => setClearance(e.target.value)}>
               {[0, 1, 2, 3].map(l => <option key={l} value={l}>{CLEARANCE_LABELS[l]}</option>)}
