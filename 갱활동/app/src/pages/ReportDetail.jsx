@@ -21,6 +21,7 @@ export default function ReportDetail() {
 
   if (!r) return <div className="container">로딩...</div>
   const attached = r.report_tips.map(x => x.tips).filter(Boolean)
+  const chief = profile?.role === 'intel_chief'
 
   return (
     <div className="container">
@@ -28,7 +29,7 @@ export default function ReportDetail() {
       <p style={{ color: '#888', fontSize: 13 }}>
         {new Date(r.created_at).toLocaleString('ko-KR')} ·
         <span className="tag" style={{ marginLeft: 6 }}>{CLEARANCE_LABELS[r.clearance]}</span>
-        {r.read_at ? ' 수신 확인됨' : ' 미확인'}
+        {chief && (r.read_at ? ' 대표님 열람함' : ' 미열람')}
       </p>
       <div className="card" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.7 }}>{r.body}</div>
 

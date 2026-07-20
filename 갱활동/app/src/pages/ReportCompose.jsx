@@ -26,6 +26,22 @@ export default function ReportCompose() {
     })
   }
 
+  // MD/TXT 파일 → 첫 번째 '# 제목'을 제목으로, 나머지를 본문으로
+  async function importFile(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const text = await file.text()
+    const lines = text.split('\n')
+    const hIdx = lines.findIndex(l => /^#\s+/.test(l))
+    if (hIdx >= 0) {
+      setTitle(lines[hIdx].replace(/^#\s+/, '').trim())
+      setBody(lines.slice(hIdx + 1).join('\n').trim())
+    } else {
+      setBody(text.trim())
+    }
+    e.target.value = ''   // 같은 파일 재선택 허용
+  }
+
   async function submit(e) {
     e.preventDefault()
     if (!title.trim() || !body.trim()) return setErr('제목과 내용을 입력하십시오.')
@@ -40,6 +56,10 @@ export default function ReportCompose() {
       <h2>새 보고서</h2>
       <form onSubmit={submit}>
         <div className="card">
+          <label style={{ display: 'block', marginBottom: 10 }}>
+            <span style={{ color: '#888', fontSize: 13 }}>MD 파일 불러오기 (첫 # 제목 → 제목, 나머지 → 본문)</span>
+            <input type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" onChange={importFile} style={{ marginTop: 4 }} />
+          </label>
           <input placeholder="제목" value={title} onChange={e => setTitle(e.target.value)} />
           <textarea placeholder="보고 내용" rows={8} value={body} onChange={e => setBody(e.target.value)} style={{ marginTop: 8 }} />
           <label style={{ display: 'block', marginTop: 8 }}>보안등급 (누구까지 수신할지)
