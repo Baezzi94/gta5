@@ -16,6 +16,7 @@ import IntelRP from '../pages/IntelRP'
 import Reports from '../pages/Reports'
 import ReportCompose from '../pages/ReportCompose'
 import ReportDetail from '../pages/ReportDetail'
+import SharedReports from '../pages/SharedReports'
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/rp" element={<IntelRP />} />
           <Route path="/submit" element={<SubmitTip />} />
           <Route path="/browse" element={<Browse />} />
+          <Route path="/shared" element={<SharedReports />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/reports/new" element={<ReportCompose />} />
           <Route path="/reports/:id" element={<ReportDetail />} />

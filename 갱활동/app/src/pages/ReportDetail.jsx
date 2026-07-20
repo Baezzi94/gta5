@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useAuth } from '../app/AuthContext'
-import { getReport, markReportRead } from '../lib/reports'
+import { getReport, markReportRead, shareReportAll } from '../lib/reports'
 import { CLEARANCE_LABELS, isIntel } from '../lib/clearance'
 import { MiniMarkdown } from '../lib/miniMarkdown'
 
@@ -23,6 +23,14 @@ export default function ReportDetail() {
   if (!r) return <div className="container">로딩...</div>
   const attached = r.report_tips.map(x => x.tips).filter(Boolean)
   const chief = profile?.role === 'intel_chief'
+  const admin = chief || profile?.role === 'boss'
+  const shared = r.clearance === 3
+
+  async function shareAll() {
+    if (!window.confirm('이 보고서를 전 조직원에게 공개합니다. 계속할까요?')) return
+    await shareReportAll(r.id)
+    setR({ ...r, clearance: 3 })
+  }
 
   return (
     <div className="container" style={{ maxWidth: 900 }}>
@@ -32,6 +40,13 @@ export default function ReportDetail() {
         <span className="tag" style={{ marginLeft: 6 }}>{CLEARANCE_LABELS[r.clearance]}</span>
         {chief && (r.read_at ? ' 대표님 열람함' : ' 미열람')}
       </p>
+      {admin && (
+        <div style={{ marginBottom: 10 }}>
+          {shared
+            ? <span className="tag" style={{ borderColor: '#7a5f1d', color: '#e8c15a' }}>전체 공개됨 (P3)</span>
+            : <button className="btn btn-primary" style={{ width: 'auto' }} onClick={shareAll}>전체 공유</button>}
+        </div>
+      )}
       <div className="card"><MiniMarkdown text={r.body} /></div>
 
       {attached.length > 0 && (

@@ -26,6 +26,7 @@ export default function Layout() {
         <NavLink to="/" end style={({ isActive }) => ({ ...tab, ...(isActive ? active : {}) })}>정보부 RP</NavLink>
         <NavLink to="/submit" style={({ isActive }) => ({ ...tab, ...(isActive ? active : {}) })}>정보 제공</NavLink>
         <NavLink to="/browse" style={({ isActive }) => ({ ...tab, ...(isActive ? active : {}) })}>정보 열람</NavLink>
+        <NavLink to="/shared" style={({ isActive }) => ({ ...tab, ...(isActive ? active : {}) })}>공유 보고</NavLink>
         {isAdmin(profile?.role) && (
           <NavLink to="/reports" style={({ isActive }) => ({ ...tab, ...(isActive ? active : {}) })}>
             보고{boss && unread > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 999, padding: '1px 7px', fontSize: 11, marginLeft: 5 }}>{unread}</span>}

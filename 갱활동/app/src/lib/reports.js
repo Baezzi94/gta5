@@ -35,6 +35,22 @@ export async function markReportRead(id) {
     .eq('id', id).is('read_at', null)
 }
 
+// 전체 공유: 등급을 P3(전체)로 낮춰 전 조직원에게 개방
+export async function shareReportAll(id) {
+  const { error } = await supabase.from('reports').update({ clearance: 3 }).eq('id', id)
+  if (error) throw error
+}
+
+// 공유(P3) 보고서 목록 — 전 조직원 열람용
+export async function listSharedReports() {
+  const { data, error } = await supabase.from('reports')
+    .select('id, title, created_at')
+    .eq('clearance', 3)
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data
+}
+
 export async function countUnreadReports() {
   const { count, error } = await supabase.from('reports')
     .select('id', { count: 'exact', head: true }).is('read_at', null)
