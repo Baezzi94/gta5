@@ -112,6 +112,7 @@ export default function Race() {
           <div style={li}><span style={num}>·</span><span>아래 폼에 <b>닉네임</b>과 <b>인게임 전화번호</b>를 남기면 접수됩니다.</span></div>
           <div style={li}><span style={num}>·</span><span>집결 장소·시간 등 세부 안내는 <b>{HOST_CONTACT}</b>이 개별적으로 연락드립니다.</span></div>
           <div style={li}><span style={num}>·</span><span>정원 상한은 없습니다. 많이 오실수록 판이 커집니다.</span></div>
+          <div style={li}><span style={num}>·</span><span><b style={{ color: GOLD }}>참가 인원에 따라 일정(시작 시간·날짜)이 조정될 수 있습니다.</b> 확정 시 개별 안내드립니다.</span></div>
         </div>
 
         {/* 신청 폼 */}
