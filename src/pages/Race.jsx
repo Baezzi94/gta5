@@ -6,6 +6,7 @@ import { applyRace, listPublicEntries, listEntriesAdmin, setEntryConfirmed, dele
 // ⬇⬇ 형님이 정해주시면 이 두 줄만 바꾸면 사이트 전체 반영됩니다 (포스터·공지문도 같은 값으로) ⬇⬇
 const EVENT_WHEN = '__월 __일 (_) __:__'   // 예: '7월 25일 (토) 22:00'
 const HOST_CONTACT = '주최측'              // 예: '블랙아웃 OOO'  (문의 연락 담당)
+const HOST_PHONE = '시진핑 010-4499-3016'  // 문의 연락처
 // ⬆⬆ ------------------------------------------------------------------------ ⬆⬆
 
 const GOLD = '#ffcf5a'
@@ -174,8 +175,9 @@ export default function Race() {
           {isHead && <p style={{ color: '#7d6a70', fontSize: 12, marginBottom: 0 }}>※ 참가확정 = 최종 참가 확정. 이 버튼과 전화번호는 시진핑에게만 보입니다.</p>}
         </div>
 
-        <div style={{ textAlign: 'center', color: '#5c4c52', fontSize: 12, marginTop: 26 }}>
-          BLACK OUT · 음주운전 레이스
+        <div style={{ textAlign: 'center', color: '#8a7a80', fontSize: 13, marginTop: 26, lineHeight: 1.7 }}>
+          <b style={{ color: RED, letterSpacing: 3 }}>BLACK OUT</b> · 음주운전 레이스<br />
+          <span style={{ color: '#a4969a' }}>문의 · {HOST_PHONE}</span>
         </div>
       </div>
       <div style={stripes} />
