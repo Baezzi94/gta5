@@ -76,7 +76,7 @@ export default function Race() {
             음주운전 <span style={{ color: RED }}>레이스</span>
           </h1>
           <div style={{ display: 'inline-block', marginTop: 6, padding: '6px 16px', border: `1px solid ${GOLD}66`, borderRadius: 999, color: GOLD, fontWeight: 700 }}>
-            {EVENT_WHEN} · 코스는 추후 안내
+            {EVENT_WHEN} · 코스는 현장에서 안내
           </div>
         </div>
 
@@ -92,7 +92,7 @@ export default function Race() {
         <div style={card}>
           <h2 style={h2}>경기 규칙</h2>
           <div style={li}><span style={num}>1.</span><span>출발 전, 제공된 <b>양주 1병을 전부 원샷</b>합니다. 스탭 입회 하에 전원 동시에 진행하며, <b>인증하지 않으면 실격</b>입니다.</span></div>
-          <div style={li}><span style={num}>2.</span><span><b>정해진 코스를 먼저 완주</b>하면 우승입니다. 경로와 방법은 자유입니다. <b style={{ color: GOLD }}>코스는 추후 설명드리겠습니다.</b></span></div>
+          <div style={li}><span style={num}>2.</span><span><b>정해진 코스를 먼저 완주</b>하면 우승입니다. 경로와 방법은 자유입니다. <b style={{ color: GOLD }}>코스는 사전 연습 방지를 위해 현장에서 안내합니다.</b></span></div>
           <div style={li}><span style={num}>3.</span><span><b style={{ color: '#ff7b7b' }}>즉시 탈락</b> — 사망 후 부활 / EMS에 발견·이송 / 도착 시점에 취기가 풀려 있는 경우 / <b>대리운전</b>(반드시 본인이 직접 운전)</span></div>
           <div style={li}><span style={num}>4.</span><span>순위는 <b>도착 순서</b>대로. 1·2·3등에게 각각 상품을 드립니다.</span></div>
         </div>
