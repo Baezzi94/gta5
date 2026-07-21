@@ -28,11 +28,26 @@ export async function getReport(id) {
   return data
 }
 
-// 보스 열람 시 읽음 처리 (최초 1회)
+// 보스 열람 시 읽음 처리 (최초 1회) — Layout 배지·정보부장 "대표님 열람함" 표시용
 export async function markReportRead(id) {
   await supabase.from('reports')
     .update({ read_at: new Date().toISOString() })
     .eq('id', id).is('read_at', null)
+}
+
+// 개인별 열람 기록 (누구든 상세 열람 시)
+export async function markReadBy(reportId, userId) {
+  await supabase.from('report_reads')
+    .upsert({ report_id: reportId, user_id: userId }, { onConflict: 'report_id,user_id', ignoreDuplicates: true })
+}
+
+// 열람자 명단 (관리자용)
+export async function listReaders(reportId) {
+  const { data, error } = await supabase.from('report_reads')
+    .select('read_at, profiles(char_name)')
+    .eq('report_id', reportId).order('read_at')
+  if (error) return []
+  return data ?? []
 }
 
 // 전체 공유: 등급을 P3(전체)로 낮춰 전 조직원에게 개방

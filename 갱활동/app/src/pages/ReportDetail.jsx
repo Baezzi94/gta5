@@ -1,24 +1,29 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useAuth } from '../app/AuthContext'
-import { getReport, markReportRead, shareReportAll } from '../lib/reports'
+import { getReport, markReportRead, markReadBy, listReaders, shareReportAll } from '../lib/reports'
 import { CLEARANCE_LABELS, isIntel } from '../lib/clearance'
 import { MiniMarkdown } from '../lib/miniMarkdown'
 
 export default function ReportDetail() {
   const { id } = useParams()
-  const { profile } = useAuth()
+  const { profile, session } = useAuth()
   const [r, setR] = useState(null)
+  const [readers, setReaders] = useState([])
 
   useEffect(() => {
+    if (!profile) return
+    const isAdmin = profile.role === 'intel_chief' || profile.role === 'boss'
     getReport(id).then(async data => {
       setR(data)
-      if (profile?.role === 'boss' && !data.read_at) {
-        await markReportRead(id)   // 보스가 열면 수신 확인
+      if (session?.user?.id) await markReadBy(id, session.user.id)   // 개인 열람 기록
+      if (profile.role === 'boss' && !data.read_at) {
+        await markReportRead(id)   // 보스 수신 확인
         setR({ ...data, read_at: new Date().toISOString() })
       }
+      if (isAdmin) setReaders(await listReaders(id))
     })
-  }, [id, profile?.role])
+  }, [id, profile, session?.user?.id])
 
   if (!r) return <div className="container">로딩...</div>
   const attached = r.report_tips.map(x => x.tips).filter(Boolean)
@@ -63,6 +68,21 @@ export default function ReportDetail() {
       )}
 
       <p style={{ textAlign: 'right', color: '#e8c15a', marginTop: 16, letterSpacing: 2 }}>— 정보부장 —</p>
+
+      {admin && (
+        <div className="card" style={{ marginTop: 20 }}>
+          <strong>열람자 {readers.length}명</strong>
+          {readers.length === 0
+            ? <p style={{ color: '#666', fontSize: 13, marginTop: 6 }}>아직 아무도 열람하지 않았습니다.</p>
+            : <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {readers.map((rd, i) => (
+                  <span key={i} className="tag" title={new Date(rd.read_at).toLocaleString('ko-KR')}>
+                    {rd.profiles?.char_name ?? '?'}
+                  </span>
+                ))}
+              </div>}
+        </div>
+      )}
     </div>
   )
 }
