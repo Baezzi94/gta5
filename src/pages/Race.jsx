@@ -4,7 +4,7 @@ import { useAuth } from '../app/AuthContext'
 import { applyRace, listPublicEntries, listEntriesAdmin, setEntryConfirmed, deleteEntry } from '../lib/race'
 
 // ⬇⬇ 형님이 정해주시면 이 두 줄만 바꾸면 사이트 전체 반영됩니다 (포스터·공지문도 같은 값으로) ⬇⬇
-const EVENT_WHEN = '__월 __일 (_) __:__'   // 예: '7월 25일 (토) 22:00'
+const EVENT_WHEN = '7월 24일 (금) 오후 10시'   // 확정
 const HOST_CONTACT = '주최측'              // 예: '블랙아웃 OOO'  (문의 연락 담당)
 const HOST_PHONE = '시진핑 010-4499-3016'  // 문의 연락처
 // ⬆⬆ ------------------------------------------------------------------------ ⬆⬆
