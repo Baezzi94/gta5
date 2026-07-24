@@ -119,8 +119,34 @@ export default function Flyer() {
           )}
         </div>
 
+        {/* 가격표 + 필수 안내 (포스터와 동일 기준) */}
+        <div style={{ padding: '12px 24px 0' }}>
+          <div style={{ background: '#140d1e', border: '1px solid #33253f', borderRadius: 12, padding: '12px 14px' }}>
+            <div style={{ color: '#ffcf5a', fontSize: 11, fontWeight: 800, letterSpacing: 2, marginBottom: 8 }}>◆ 가격 안내</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 18, rowGap: 4 }}>
+              {[
+                ['T/C (입장료)', '5만', '맥주 2잔 포함'],
+                ['대화료 (공주님 지목)', '25만', ''],
+                ['양주 (보틀)', '30만', ''],
+                ['프리미엄 양주', '50만', ''],
+                ['맥주', '3만', ''],
+                ['담배 (10갑)', '4.5만', '배달가능'],
+              ].map(([nm, pr, sm]) => (
+                <div key={nm} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 12.5, borderBottom: '1px dotted #2c2440', paddingBottom: 3 }}>
+                  <span style={{ color: '#e6dcef' }}>{nm}{sm && <span style={{ color: '#9a8fb0', fontSize: 10.5 }}> · {sm}</span>}</span>
+                  <span style={{ color: '#ffcf5a', fontWeight: 800, whiteSpace: 'nowrap', marginLeft: 8 }}>{pr}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ color: '#ff9ec6', fontSize: 11.5, marginTop: 9, lineHeight: 1.6 }}>
+              ※ <b style={{ color: '#ffd6e8' }}>입장 시 T/C 5만원</b>이 기본 부과됩니다 (맥주 2잔 포함).<br />
+              ※ 공주님과의 대화는 <b style={{ color: '#ffd6e8' }}>예약제</b>이며 <b style={{ color: '#ffd6e8' }}>대화료 25만원</b>이 별도입니다.
+            </div>
+          </div>
+        </div>
+
         {/* 푸터 */}
-        <div style={{ marginTop: 14, padding: '14px 24px 18px', borderTop: '1px solid #2c2440', textAlign: 'center' }}>
+        <div style={{ marginTop: 12, padding: '14px 24px 18px', borderTop: '1px solid #2c2440', textAlign: 'center' }}>
           <div style={{ color: '#ff9ec6', fontWeight: 800, fontSize: 15 }}>예약 없이 술 한잔 · 공주님은 예약제</div>
           <div style={{ color: '#ffd6e8', fontSize: 13, marginTop: 4 }}>📍 <b style={{ color: '#ffcf5a' }}>7219</b> 바하마 마마스 클럽 · 예약/문의 010-4499-3016</div>
         </div>
