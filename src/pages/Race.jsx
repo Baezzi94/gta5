@@ -74,7 +74,7 @@ export default function Race() {
             음주운전 <span style={{ color: PINK }}>레이스</span>
           </h1>
           <div style={{ display: 'inline-block', marginTop: 6, padding: '6px 16px', border: `1px solid ${GOLD}66`, borderRadius: 999, color: GOLD, fontWeight: 700 }}>
-            {EVENT_WHEN} · 코스는 현장에서 안내
+            {EVENT_WHEN} · 코스 1012 → 8206 (서부 고속도로)
           </div>
           <div style={{ color: '#ffd6e8', fontSize: 13, marginTop: 12, fontWeight: 700 }}>🏁 조직·소속 관계없이 <b style={{ color: GOLD }}>누구나 참가 가능</b>합니다</div>
         </div>
@@ -91,9 +91,24 @@ export default function Race() {
         <div style={card}>
           <h2 style={h2}>경기 규칙</h2>
           <div style={li}><span style={num}>1.</span><span>출발 전, 제공된 <b>양주 1병을 전부 원샷</b>합니다. 스탭 입회 하에 전원 동시에 진행하며, <b>인증하지 않으면 실격</b>입니다.</span></div>
-          <div style={li}><span style={num}>2.</span><span><b>정해진 코스를 먼저 완주</b>하면 우승입니다. 경로와 방법은 자유입니다. <b style={{ color: GOLD }}>코스는 사전 연습 방지를 위해 현장에서 안내합니다.</b></span></div>
+          <div style={li}><span style={num}>2.</span><span>코스는 <b style={{ color: GOLD }}>1012 → 8206 (서부 고속도로)</b>입니다. <b>반드시 지정된 코스로만 주행</b>해야 하며, 먼저 도착하는 분이 우승입니다.</span></div>
           <div style={li}><span style={num}>3.</span><span><b style={{ color: '#ff7b7b' }}>즉시 탈락</b> — 사망 후 부활 / EMS에 발견·이송 / 도착 시점에 취기가 풀려 있는 경우 / <b>대리운전</b>(반드시 본인이 직접 운전)</span></div>
           <div style={li}><span style={num}>4.</span><span><b>가장 먼저 도착한 1등 한 명에게만</b> 상금 <b style={{ color: GOLD }}>300만원</b>을 드립니다. (2·3등 시상 없음)</span></div>
+        </div>
+
+        {/* 코스 · 경찰 협조 안내 */}
+        <div style={{ ...card, borderColor: '#5a4a1e' }}>
+          <h2 style={h2}>코스 · 경찰 협조 안내</h2>
+          <div style={{ textAlign: 'center', padding: '4px 0 12px' }}>
+            <div style={{ color: '#a99bb8', fontSize: 12, letterSpacing: 3 }}>C O U R S E</div>
+            <div style={{ fontFamily: "'Black Han Sans',sans-serif", fontSize: 34, color: GOLD, lineHeight: 1.3 }}>1012 → 8206</div>
+            <div style={{ color: '#d6cbe0', fontSize: 14, fontWeight: 700 }}>서부 고속도로</div>
+          </div>
+          <div style={li}><span style={num}>·</span><span>본 코스 구간은 <b>행정처리비용 납부가 완료</b>되어, <b style={{ color: '#5ee0a0' }}>경찰 지원 하에 안전하게 진행</b>됩니다.</span></div>
+          <div style={{ marginTop: 10, padding: '12px 14px', background: 'rgba(255,123,123,.08)', border: '1px solid #6a2a2a', borderRadius: 10, lineHeight: 1.7 }}>
+            <b style={{ color: '#ff7b7b' }}>⚠ 지정 코스를 이탈할 경우</b>, 해당 구간에서의 <b>음주운전은 범법행위</b>입니다.<br />
+            <span style={{ color: '#d6cbe0' }}>이 경우 주최측은 <b style={{ color: '#ff9a9a' }}>법적인 책임을 지원해드릴 수 없습니다.</b> 반드시 지정 코스로만 주행해주세요.</span>
+          </div>
         </div>
 
         {/* 상금 안내 */}
