@@ -81,7 +81,7 @@ export default function Race() {
 
         {/* 요약 */}
         <div style={{ ...card, display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 16, textAlign: 'center' }}>
-          <div><div style={{ color: '#a99bb8', fontSize: 12 }}>참가비</div><div style={{ fontSize: 22, fontWeight: 800 }}>30만원</div><div style={{ color: '#7d6f8a', fontSize: 11 }}>양주 포함</div></div>
+          <div><div style={{ color: '#a99bb8', fontSize: 12 }}>참가비</div><div style={{ fontSize: 22, fontWeight: 800 }}>50만원</div><div style={{ color: '#7d6f8a', fontSize: 11 }}>양주 포함</div></div>
           <div><div style={{ color: '#a99bb8', fontSize: 12 }}>제공</div><div style={{ fontSize: 22, fontWeight: 800, color: '#5ee0a0' }}>양주 1병</div><div style={{ color: '#7d6f8a', fontSize: 11 }}>30만원 상당</div></div>
           <div><div style={{ color: '#a99bb8', fontSize: 12 }}>1등 상금</div><div style={{ fontSize: 22, fontWeight: 800, color: GOLD }}>300만원</div><div style={{ color: '#7d6f8a', fontSize: 11 }}>1등 단독 몰아주기</div></div>
           <div><div style={{ color: '#a99bb8', fontSize: 12 }}>시상</div><div style={{ fontSize: 22, fontWeight: 800 }}>1등만</div><div style={{ color: '#7d6f8a', fontSize: 11 }}>2·3등 없음</div></div>
@@ -111,7 +111,7 @@ export default function Race() {
         <div style={card}>
           <h2 style={h2}>참가 안내</h2>
           <div style={li}><span style={num}>·</span><span><b style={{ color: GOLD }}>조직·소속 관계없이 누구나</b> 참가하실 수 있습니다.</span></div>
-          <div style={li}><span style={num}>·</span><span>참가비는 <b>30만원</b>입니다. 참가비 30만원에는 <b style={{ color: '#5ee0a0' }}>30만원 상당의 양주 1병</b>이 포함되어 있습니다.</span></div>
+          <div style={li}><span style={num}>·</span><span>참가비는 <b>50만원</b>입니다. 참가비에는 <b style={{ color: '#5ee0a0' }}>30만원 상당의 양주 1병</b>이 포함되어 있습니다.</span></div>
           <div style={li}><span style={num}>·</span><span>아래 폼에 <b>닉네임</b>과 <b>인게임 전화번호</b>를 남기면 접수됩니다.</span></div>
           <div style={li}><span style={num}>·</span><span>신청 후 <b>{HOST_CONTACT}</b>에서 참가비 입금 안내와 집결 장소·시간을 개별적으로 연락드립니다.</span></div>
           <div style={li}><span style={num}>·</span><span><b style={{ color: '#ff7b7b' }}>대회 시작 전까지 참가비가 입금되지 않으면 참가가 취소</b>됩니다.</span></div>
