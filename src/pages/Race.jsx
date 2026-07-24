@@ -82,10 +82,10 @@ export default function Race() {
 
         {/* 요약 · 상품 */}
         <div style={{ ...card, display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 16, textAlign: 'center' }}>
-          <div><div style={{ color: '#a4969a', fontSize: 12 }}>참가비</div><div style={{ fontSize: 22, fontWeight: 800, color: '#5ee0a0' }}>무료</div><div style={{ color: '#7d6a70', fontSize: 11 }}>양주 제공</div></div>
-          <div><div style={{ color: '#a4969a', fontSize: 12 }}>1등</div><div style={{ fontSize: 20, fontWeight: 800, color: GOLD }}>파우치</div><div style={{ color: '#7d6a70', fontSize: 11 }}>약 1,800만 상당</div></div>
-          <div><div style={{ color: '#a4969a', fontSize: 12 }}>2등</div><div style={{ fontSize: 20, fontWeight: 800 }}>상어 코스튬</div><div style={{ color: '#7d6a70', fontSize: 11 }}>레어 코스튬</div></div>
-          <div><div style={{ color: '#a4969a', fontSize: 12 }}>3등</div><div style={{ fontSize: 20, fontWeight: 800 }}>격려</div><div style={{ color: '#7d6a70', fontSize: 11 }}>참가에 감사를</div></div>
+          <div><div style={{ color: '#a4969a', fontSize: 12 }}>참가비</div><div style={{ fontSize: 22, fontWeight: 800 }}>30만원</div><div style={{ color: '#7d6a70', fontSize: 11 }}>양주 포함</div></div>
+          <div><div style={{ color: '#a4969a', fontSize: 12 }}>제공</div><div style={{ fontSize: 22, fontWeight: 800, color: '#5ee0a0' }}>양주 1병</div><div style={{ color: '#7d6a70', fontSize: 11 }}>30만원 상당</div></div>
+          <div><div style={{ color: '#a4969a', fontSize: 12 }}>1등 상금</div><div style={{ fontSize: 22, fontWeight: 800, color: GOLD }}>300만원</div><div style={{ color: '#7d6a70', fontSize: 11 }}>1등 단독 몰아주기</div></div>
+          <div><div style={{ color: '#a4969a', fontSize: 12 }}>시상</div><div style={{ fontSize: 22, fontWeight: 800 }}>1등만</div><div style={{ color: '#7d6a70', fontSize: 11 }}>2·3등 없음</div></div>
         </div>
 
         {/* 경기 규칙 */}
@@ -94,23 +94,27 @@ export default function Race() {
           <div style={li}><span style={num}>1.</span><span>출발 전, 제공된 <b>양주 1병을 전부 원샷</b>합니다. 스탭 입회 하에 전원 동시에 진행하며, <b>인증하지 않으면 실격</b>입니다.</span></div>
           <div style={li}><span style={num}>2.</span><span><b>정해진 코스를 먼저 완주</b>하면 우승입니다. 경로와 방법은 자유입니다. <b style={{ color: GOLD }}>코스는 사전 연습 방지를 위해 현장에서 안내합니다.</b></span></div>
           <div style={li}><span style={num}>3.</span><span><b style={{ color: '#ff7b7b' }}>즉시 탈락</b> — 사망 후 부활 / EMS에 발견·이송 / 도착 시점에 취기가 풀려 있는 경우 / <b>대리운전</b>(반드시 본인이 직접 운전)</span></div>
-          <div style={li}><span style={num}>4.</span><span>순위는 <b>도착 순서</b>대로. 1·2·3등에게 각각 상품을 드립니다.</span></div>
+          <div style={li}><span style={num}>4.</span><span><b>가장 먼저 도착한 1등 한 명에게만</b> 상금 <b style={{ color: GOLD }}>300만원</b>을 드립니다. (2·3등 시상 없음)</span></div>
         </div>
 
-        {/* 상품 안내 */}
+        {/* 상금 안내 */}
         <div style={card}>
-          <h2 style={h2}>상품 안내</h2>
-          <div style={li}><span style={{ ...num, color: GOLD }}>1등</span><span><b style={{ color: GOLD }}>파우치</b> <span style={{ color: '#a4969a' }}>(약 1,800만원 상당)</span></span></div>
-          <div style={li}><span style={{ ...num, color: '#d6d0c4' }}>2등</span><span><b>상어 코스튬</b></span></div>
-          <div style={li}><span style={{ ...num, color: '#d6d0c4' }}>3등</span><span><b>격려</b> — 도전에 감사드립니다.</span></div>
+          <h2 style={h2}>상금 안내</h2>
+          <div style={{ textAlign: 'center', padding: '6px 0 10px' }}>
+            <div style={{ color: '#a4969a', fontSize: 13, letterSpacing: 2 }}>1 S T &nbsp; P R I Z E</div>
+            <div style={{ fontFamily: "'Black Han Sans',sans-serif", fontSize: 46, color: GOLD, lineHeight: 1.2, textShadow: '0 0 24px rgba(255,207,90,.35)' }}>300만원</div>
+            <div style={{ color: '#d6d0c4', fontSize: 13 }}>단독 우승자 몰아주기</div>
+          </div>
+          <div style={li}><span style={num}>·</span><span>상금은 <b>1등 한 명에게 전액</b> 지급됩니다. 2·3등 시상은 없습니다.</span></div>
         </div>
 
         {/* 참가 안내 */}
         <div style={card}>
           <h2 style={h2}>참가 안내</h2>
-          <div style={li}><span style={num}>·</span><span><b style={{ color: '#5ee0a0' }}>참가비는 무료</b>입니다. 양주는 주최측(BLACK OUT)이 제공합니다.</span></div>
+          <div style={li}><span style={num}>·</span><span>참가비는 <b>30만원</b>입니다. 참가비 30만원에는 <b style={{ color: '#5ee0a0' }}>30만원 상당의 양주 1병</b>이 포함되어 있습니다.</span></div>
           <div style={li}><span style={num}>·</span><span>아래 폼에 <b>닉네임</b>과 <b>인게임 전화번호</b>를 남기면 접수됩니다.</span></div>
-          <div style={li}><span style={num}>·</span><span>집결 장소·시간 등 세부 안내는 <b>{HOST_CONTACT}</b>이 개별적으로 연락드립니다.</span></div>
+          <div style={li}><span style={num}>·</span><span>신청 후 <b>{HOST_CONTACT}</b>이 참가비 입금 안내와 집결 장소·시간을 개별적으로 연락드립니다.</span></div>
+          <div style={li}><span style={num}>·</span><span><b style={{ color: '#ff7b7b' }}>대회 시작 전까지 참가비가 입금되지 않으면 참가가 취소</b>됩니다.</span></div>
           <div style={li}><span style={num}>·</span><span>정원 상한은 없습니다. 많이 오실수록 판이 커집니다.</span></div>
           <div style={li}><span style={num}>·</span><span><b style={{ color: GOLD }}>참가 인원에 따라 일정(시작 시간·날짜)이 조정될 수 있습니다.</b> 확정 시 개별 안내드립니다.</span></div>
         </div>
